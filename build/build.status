@@ -1,0 +1,32 @@
+Scripts call premake:
+	Linux
+	Mac
+	Windows ... OK
+
+Testing premake.lua
+	Linux
+	Mac ... ok
+	Windows ... ok
+
+User friendly premake calls
+	Linux
+	Mac
+	Windows
+
+Testing premake projects
+	gnu
+		Linux
+		Mac ... ok
+		Windows
+		
+	vs2008 - managed
+		Windows ... ok
+		
+	vs2008 - umanaged
+		Windows
+		
+	codeblocks gcc
+		Linux
+		Mac
+		Windows
+readme
