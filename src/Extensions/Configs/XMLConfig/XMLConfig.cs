@@ -9,7 +9,7 @@ using MusiC.Exceptions;
 namespace MusiC.Configs
 {
 	public class XMLConfig : Config
-	{	
+	{
 		Dictionary<String, ExtensionInfo> _tagCache = new Dictionary<String, ExtensionInfo>();
 		
 		public XMLConfig()
@@ -44,11 +44,13 @@ namespace MusiC.Configs
 				throw new MCException("XmlNode submited is null");
 				
 			XmlAttribute att = n.Attributes[attName];
-			
-			if(att==null)
-				if(!isOptional)
-					throw new MissingAttributeException(attName);
-				return null;
+
+            if (att == null)
+            {
+                if (!isOptional)
+                    throw new MissingAttributeException(attName);
+                return null;
+            }
 			
 			return att.Value;
 		}
