@@ -12,6 +12,8 @@ namespace MusiC
 	{		
 		UnhandledExceptionEventHandler _UnhandledExceptionHandler;
 		String _configFile;
+		String _extensionsDir;
+		
 //		static MusiC _this=null;
 		
 		public MusiC()
@@ -24,8 +26,12 @@ namespace MusiC
 		
 		public String ExtensionsDir
 		{
-			get {return Global<ExtensionLoader>.GetInstance().ExtensionsDir;}
-			set {Global<ExtensionLoader>.GetInstance().ExtensionsDir=value;}
+			get {return _extensionsDir;}
+			set {
+				if(!Directory.Exists(value))
+					throw new MissingFileOrDirectoryException("Wasn't able to find extensions dir (" + _extensionsDir + ").");				
+				_extensionsDir=value;
+			}
 		}
 		
 		public String ConfigFile
@@ -52,6 +58,7 @@ namespace MusiC
 				// Grab an ExtensionLoader instance
 				Message("Starting Extension Loading");ReportIndent();
 				ExtensionLoader loader = Global<ExtensionLoader>.GetInstance();
+				loader.Load(_extensionsDir);
 				ReportUnindent();
 				
 				// TODO: Uncomment protection

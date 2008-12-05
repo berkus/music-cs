@@ -12,6 +12,7 @@ namespace MusiC.Apps
 		static void Main(String[] args)
 		{
 			MusiC m = Global<MusiC>.GetInstance();
+			m.ExtensionsDir=".";
 			m.Load();
 			m.Run();
 			m.Unload();

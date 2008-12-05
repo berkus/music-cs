@@ -7,30 +7,24 @@ using MusiC.Exceptions;
 namespace MusiC.Extensions
 {
 	public class ExtensionLoader : MusiCObject, IGlobal
-	{
-		String _extensionsDir=null;
-		public String ExtensionsDir
-		{
-			get {return _extensionsDir;}
-			set {_extensionsDir=value;}
-		}
-		
+	{		
 		public ExtensionLoader()
 		{
 		}
 		
 		public void Initialize()
 		{
+		}
+		
+		public void Load(String extensionsDir)
+		{
 			// Get exec path if user don't provide one.
-			if(_extensionsDir==null)
-				_extensionsDir=Path.Combine(Path.GetDirectoryName(Assembly.GetEntryAssembly().Location), "Extensions");
-			
-			if(!Directory.Exists(_extensionsDir))
-				throw new MissingFileOrDirectoryException("Wasn't able to find extension folder (" + _extensionsDir + ").");
+			if(extensionsDir==null)
+				extensionsDir=Path.Combine(Path.GetDirectoryName(Assembly.GetEntryAssembly().Location), "Extensions");
 			
 			ExtensionCache cache = Global<ExtensionCache>.GetInstance();
 			
-			foreach(String ext in Directory.GetFiles(_extensionsDir))
+			foreach(String ext in Directory.GetFiles(extensionsDir))
 			{
 				Message("Loading " + ext);ReportIndent();
 				
@@ -54,7 +48,6 @@ namespace MusiC.Extensions
 				}
 			}
 		}
-		
 		public void BuildCache()
 		{
 		}
