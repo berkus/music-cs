@@ -89,20 +89,20 @@ namespace MusiC
 		
 		public void Error(MCException ex)
 		{
-			Message("--------- [ERROR] ---------");
+			Error("[ MCException ]");
 			
 			foreach(string message in ex.MessageList)
-				Message(message);
+				Error(message);
 			
 			StackFrame entry;
 			StackTrace st = new StackTrace(ex, true);
 			
-			Message("--------- [STACK TRACE] ---------");
+			Error("[ MCException: STACK TRACE ]");
 			
 			for(int idx=0; idx < st.FrameCount; idx++)
 			{
 				entry = st.GetFrame(idx);
-				Message("[" + entry.GetMethod().Name+"] - " +
+				Error("[" + entry.GetMethod().Name+"] - " +
 					System.IO.Path.GetFileName(entry.GetFileName()) +
 					" (L" + entry.GetFileLineNumber().ToString()+
 					", C"+entry.GetFileColumnNumber()+")");
@@ -111,20 +111,20 @@ namespace MusiC
 		
 		public void Error(Exception ex)
 		{
-			Message("--------- [ERROR] ---------");
+			Error("--------- [ERROR] ---------");
 			
-			Message("[SYSTEM MESSAGE]: " + ex.Message);
+			Error("[SYSTEM]: " + ex.Message);
 			
 			StackFrame entry;
 			StackTrace st = new StackTrace(ex, true);
 			
-			Message("--------- [STACK TRACE] ---------");
+			Error("--------- [STACK TRACE] ---------");
 
 			
 			for(int idx=0; idx < st.FrameCount; idx++)
 			{
 				entry = st.GetFrame(idx);
-				Message("[" + entry.GetMethod().Name+"] - " +
+				Error("[" + entry.GetMethod().Name+"] - " +
 					System.IO.Path.GetFileName(entry.GetFileName()) +
 					" (L" + entry.GetFileLineNumber().ToString()+
 					", C"+entry.GetFileColumnNumber()+")");

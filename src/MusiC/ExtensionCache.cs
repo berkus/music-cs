@@ -53,6 +53,9 @@ namespace MusiC.Extensions
 			if(_objConfig!=null)
 				return _objConfig;
 			
+			if(_tConfig == null)
+				throw new Exceptions.MissingExtensionException("MusiC doesn't know how to load a configuration extension. Seems none was provided or aproved.");
+			
 			_objConfig = Invoker.LoadConfig(_tConfig);
 			return _objConfig;
 		}

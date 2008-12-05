@@ -1,5 +1,7 @@
 using System;
 using System.Diagnostics;
+using System.IO;
+using System.Reflection;
 
 using MusiC.Extensions;
 using MusiC.Exceptions;
@@ -7,10 +9,9 @@ using MusiC.Exceptions;
 namespace MusiC
 {
 	public class MusiC : MusiCObject, IGlobal
-	{
-		String _configFile="data/config.xml";
-		
+	{		
 		UnhandledExceptionEventHandler _UnhandledExceptionHandler;
+		String _configFile;
 //		static MusiC _this=null;
 		
 		public MusiC()
@@ -30,7 +31,12 @@ namespace MusiC
 		public String ConfigFile
 		{
 			get {return _configFile;}
-			set {_configFile=value;}
+			set {
+				if(!File.Exists(value))
+					throw new MissingFileOrDirectoryException("Wasn't able to find configuration file (" + _configFile + ").");
+				
+				_configFile=value;
+			}
 		}
 		
 		public void Load()
@@ -61,12 +67,21 @@ namespace MusiC
 				ReportUnindent();
 				
 				Message("Retrieving Config Handler");ReportIndent();
+				
+				// Get exec path if user don't provide one.
+				if(_configFile==null)
+					_configFile=Path.Combine(Path.GetDirectoryName(Assembly.GetEntryAssembly().Location), "config.xml");
+				
 				cfg.Load(_configFile);
 				ReportUnindent();
 			}
 			catch(MCException mce)
 			{
 				mce.Report();
+			}
+			catch(Exception e)
+			{
+				this.Error(e);
 			}
 			
 			//cache.Print();

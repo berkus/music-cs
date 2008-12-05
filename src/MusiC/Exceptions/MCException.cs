@@ -23,7 +23,7 @@ namespace MusiC.Exceptions
 		
 		public MCException(String message) : base(message)
 		{
-			//m_message.Enqueue("[MusiC Messages]:");
+			//m_message.Enqueue("[MusiC]:");
 			m_message.Enqueue((++msgCounter).ToString() + ". " + message);
 		}
 		
@@ -31,7 +31,7 @@ namespace MusiC.Exceptions
 		{	
 			m_message.Enqueue("[SYSTEM]:" + e.Message);
 			m_message.Enqueue("");
-			//m_message.Enqueue("[MusiC Messages]:");
+			//m_message.Enqueue("[MusiC]:");
 			m_message.Enqueue((++msgCounter).ToString() + ". " + message);
 		}
 		
