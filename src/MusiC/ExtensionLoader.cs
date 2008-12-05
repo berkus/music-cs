@@ -6,7 +6,7 @@ using MusiC.Exceptions;
 
 namespace MusiC.Extensions
 {
-	public class ExtensionLoader : MusiCObject
+	public class ExtensionLoader : MusiCObject, IGlobal
 	{
 		String _basePath=null;
 		public String BasePath
@@ -16,6 +16,10 @@ namespace MusiC.Extensions
 		}
 		
 		public ExtensionLoader()
+		{
+		}
+		
+		public void Initialize()
 		{
 			if(_basePath==null)
 				// Get exec path if user don't provide one.

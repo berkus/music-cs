@@ -4,8 +4,13 @@ using MusiC.Exceptions;
 
 namespace MusiC
 {
+	public interface IGlobal
+	{
+		void Initialize();
+	}
+	
 	public class Global<T> : MusiCObject
-	where T : MusiCObject, new()
+	where T : class, IGlobal, new()
 	{
 		static T _instance=null;
 		
@@ -17,6 +22,7 @@ namespace MusiC
 					// TODO: Check if class has abstract CreateInstance or a public Constructor and call the one
 					// TODO: available
 					_instance = new T();
+					_instance.Initialize();
 				}
 				catch (MCException e) {
 					Type t = typeof(T);

@@ -5,12 +5,16 @@ using MusiC;
 
 namespace MusiC.Extensions
 {
-	public class ExtensionCache : MusiCObject
+	public class ExtensionCache : MusiCObject, IGlobal
 	{
 		Config _objConfig=null;
 		Type _tConfig=null;
 		
 		Dictionary<String, Type> _tHandlerCache = new Dictionary<String, Type>();
+		
+		public void Initialize()
+		{
+		}
 		
 		public void Add(Type t)
 		{

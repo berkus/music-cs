@@ -4,14 +4,19 @@ namespace MusiC.Exceptions
 {
 	public class MCException : ApplicationException
 	{
-		class MCExceptionReporter : MusiCObject
+		public class MCExceptionReporter : MusiCObject
 		{
 		}
 		
 		int msgCounter = 0;
 		System.Collections.Generic.Queue<String> m_message = new System.Collections.Generic.Queue<String>();
-		MCExceptionReporter _reporter = new MCExceptionReporter()
-;
+		MCExceptionReporter _reporter = new MCExceptionReporter();
+		
+		public MCExceptionReporter Reporter
+		{
+			get {return _reporter;}
+		}
+		
 		public System.Collections.Generic.IEnumerable<String> MessageList {
 			get { return m_message; }
 		}

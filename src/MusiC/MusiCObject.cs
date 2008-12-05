@@ -135,13 +135,12 @@ namespace MusiC
 		{
 			MCException ex = args.ExceptionObject as MCException;
 			
-//			if(ex==null)
-//				Error(args.ExceptionObject as Exception);
-//			
-//			Error(ex);
-			
 			if(ex != null)
+			{
+				ex.Reporter.Error("This library or one of its components generated an unhandled exception.");
+				ex.Reporter.Error("Please report this event at our site, http://sites.google.com/site/music-cs");
 				ex.Report();
+			}
 		}
 		
 		public void Warning(String msg)
