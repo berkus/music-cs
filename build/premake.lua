@@ -5,6 +5,7 @@ end
 
 function MakeManagedProjects()
 	dofile("MusiC.lua")
+	dofile("MusiC.Apps.GenreC.lua")
 	dofile("MusiC.Extensions.Classifiers.Barbedo.lua")
 	dofile("MusiC.Extensions.Configs.XMLConfig.lua")
 	dofile("MusiC.Extensions.Features.SpecRollOff.lua")

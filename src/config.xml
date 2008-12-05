@@ -1,0 +1,33 @@
+<?xml version="1.0"?>
+<MusicClassifier version="1.0">
+	
+	<Handler name="WavHandler" class="MCModule.FileHandlers.WavHandler" pattern=".*[.]wav$"/>
+	
+	<Declare name="Hamming" class="MCModule.Windows.Hamming">
+		<Param name="Size" class="System.Int32" />
+		<Param name="Overlap" class="System.Int32" />
+	</Declare>
+
+	<Declare name="RollOff" class="MCModule.Features.SpecRollOff"/>
+	<Declare name="Barbedo" class="MCModule.Classifiers.Barbedo"/>
+	
+	<Train dir="/Users/mjsmagalhaes/projeto_final/data">
+		<Label name="classical" input="/Users/mjsmagalhaes/projeto_final/data/classical"/>
+		<Label name="electronic" output="/Users/mjsmagalhaes/projeto_final/data/classical"/>
+	</Train>
+	
+	<Classify dir="/Users/mjsmagalhaes/projeto_final/data/classical"/>
+ 
+	<Algorithm>
+		
+		<Hamming>
+			<Size value="1024" />
+			<Overlap value="512" />
+		</Hamming>
+
+		<RollOff/>
+
+		<Barbedo/>
+		
+	</Algorithm>
+</MusicClassifier>
