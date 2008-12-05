@@ -2,22 +2,23 @@
 
 package = newpackage()
 package.name="MusiC.Extensions.Classifiers.uBarbedo"
+package.path=project.path
 
 -- Input
 package.language="c++"
 package.files={
-	matchrecursive("../src/Extensions/Classifiers/Barbedo/*.cpp")
+	matchrecursive(base_src_dir.."/Extensions/Classifiers/Barbedo/*.cpp")
 }
 package.links={
 	"gsl",
 	"gslcblas"
 }
 package.libpaths={
-	"../deps/"..OS.."/lib"
+	base_deps_dir.."/"..OS.."/lib"
 }
 
 package.includepaths={
-    "../deps/include"
+	base_deps_dir.."/include"
 }
 
 -- Code Generation
@@ -29,7 +30,7 @@ package.kind="dll"
 package.target="MusiC.Extensions.Classifiers.uBarbedo"
 package.targetprefix=""
 package.targetextension="dll"
-package.objdir="../bin/obj"
+package.objdir="obj"
 
 -- Debug:MusiC
 package.config["Debug"].defines={"DEBUG"}

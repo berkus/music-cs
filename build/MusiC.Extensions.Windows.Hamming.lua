@@ -2,11 +2,12 @@
 
 package = newpackage()
 package.name="MusiC.Extensions.Windows.Hamming"
+package.path=project.path
 
 -- Input
 package.language="c#"
 package.files={
-	matchrecursive("../src/Extensions/Windows/Hamming/*.cs")
+	matchrecursive(base_src_dir.."/Extensions/Windows/Hamming/*.cs")
 }
 package.links={
 	"System",
@@ -21,7 +22,7 @@ package.kind="dll"
 package.target="MusiC.Extensions.Windows.Hamming"
 package.targetprefix=""
 package.targetextension="dll"
-package.objdir="../bin/obj"
+package.objdir=base_bin_dir.."/obj"
 
 -- Debug:MusiC
 package.config["Debug"].defines={"DEBUG"}

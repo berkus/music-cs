@@ -2,21 +2,22 @@
 
 package = newpackage()
 package.name="MusiC.Extensions.Handlers.uDBHandler"
+package.path=project.path
 
 -- Input
 package.language="c++"
 package.files={
-	matchrecursive("../src/Extensions/Handlers/DBHandler/*.cpp")
+	matchrecursive(base_src_dir.."/Extensions/Handlers/DBHandler/*.cpp")
 }
 package.links={
 	"gsl",
 	"gslcblas"
 }
 package.libpaths={
-	"../deps/"..OS.."/lib"
+	base_deps_dir.."/"..OS.."/lib"
 }
 package.includepaths={
-    "../deps/include"
+	base_deps_dir.."/include"
 }
 
 -- Code Generation
@@ -28,7 +29,7 @@ package.kind="dll"
 package.target="MusiC.Extensions.Handlers.uDBHandler"
 package.targetprefix=""
 package.targetextension="dll"
-package.objdir="../bin/obj"
+package.objdir="obj"
 
 -- Debug:MusiC
 package.config["Debug"].defines={"DEBUG"}

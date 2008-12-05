@@ -13,20 +13,28 @@ function MakeManagedProjects()
 	dofile("MusiC.Extensions.Windows.Hamming.lua")
 end
 
+addoption("unmanaged", "Switch to build CPP code when it is available.")
+
+base_deps_dir="../../deps"
+base_src_dir="../../src"
+base_bin_dir="../bin"
+
 project.name="MusiC"
-project.bindir="../bin"
+project.bindir=base_bin_dir
 project.configs={"Debug", "Release"}
+project.path="./"..target
 
 if
-target == "vs2002" or
-target == "vs2003" or
-target == "vs2005" or
-target == "vs2008"
+target=="vs2003" or
+target=="vs2005" or
+target=="vs2008"
 then
 	--Visual Studio supports both managed and unmanaged, but separately
-	if options["unmanaged"] or options["umng"] then
+	if options["unmanaged"] then
+        project.path=project.path.."-unmanaged"
 		MakeUnmanagedProjects()
 	else
+        project.path=project.path.."-managed"
 		MakeManagedProjects()
 	end
 elseif
@@ -39,9 +47,11 @@ elseif
 target=="cb-gcc" or
 target=="cb-ow" or
 target=="cl-gcc" or
+target=="vs2002" or
 target=="vs6"
 then
 	-- Those support only unmanaged code
+	-- vs2002 dont support .net 2.0
 	MakeUnmanagedProjects()
 elseif
 target=="gnu"

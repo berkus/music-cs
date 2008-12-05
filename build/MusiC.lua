@@ -3,11 +3,12 @@
 
 package = newpackage()
 package.name="MusiC"
+package.path=project.path
 
 -- Input
 package.language="c#"
 package.files={
-	matchrecursive("../src/Music/*.cs")
+	matchrecursive(base_src_dir.."/Music/*.cs")
 }
 package.links={
 	"System",
@@ -15,7 +16,7 @@ package.links={
 	"log4net"
 }
 package.libpaths={
-	"../deps/DotNet"
+	base_deps_dir.."/DotNet"
 }
 -- Code Generation
 package.defines={"TRACE"}
@@ -26,7 +27,7 @@ package.kind="dll"
 package.target="MusiC"
 package.targetprefix=""
 package.targetextension="dll"
-package.objdir="../bin/obj"
+package.objdir=base_bin_dir.."/obj"
 
 -- Debug:MusiC
 package.config["Debug"].defines={"DEBUG"}

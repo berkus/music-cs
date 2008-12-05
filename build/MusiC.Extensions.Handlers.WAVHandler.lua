@@ -2,11 +2,12 @@
 
 package = newpackage()
 package.name="MusiC.Extensions.Handlers.WAVHandler"
+package.path=project.path
 
 -- Input
 package.language="c#"
 package.files={
-	matchrecursive("../src/Extensions/Handlers/WAVHandler/*.cs")
+	matchrecursive(base_src_dir.."/Extensions/Handlers/WAVHandler/*.cs")
 }
 package.links={
 	"System",
@@ -21,7 +22,7 @@ package.kind="dll"
 package.target="MusiC.Extensions.Handlers.WAVHandler"
 package.targetprefix=""
 package.targetextension="dll"
-package.objdir="../bin/obj"
+package.objdir=base_bin_dir.."/obj"
 
 -- Debug:MusiC
 package.config["Debug"].defines={"DEBUG"}

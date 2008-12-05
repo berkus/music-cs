@@ -11,7 +11,7 @@ Testing premake.lua
 User friendly premake calls
 	Linux
 	Mac
-	Windows
+	Windows ... ok
 
 Testing premake projects
 	gnu
@@ -20,10 +20,10 @@ Testing premake projects
 		Windows
 		
 	vs2008 - managed
-		Windows ... ok
+		Windows ... ok - sharpdev, ok - vs2008 express
 		
 	vs2008 - umanaged
-		Windows
+		Windows ... ok - vs2008 express
 		
 	codeblocks gcc
 		Linux
