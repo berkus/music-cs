@@ -8,11 +8,11 @@ namespace MusiC.Extensions
 {
 	public class ExtensionLoader : MusiCObject, IGlobal
 	{
-		String _basePath=null;
-		public String BasePath
+		String _extensionsDir=null;
+		public String ExtensionsDir
 		{
-			get {return _basePath;}
-			set {_basePath=value;}
+			get {return _extensionsDir;}
+			set {_extensionsDir=value;}
 		}
 		
 		public ExtensionLoader()
@@ -21,17 +21,16 @@ namespace MusiC.Extensions
 		
 		public void Initialize()
 		{
-			if(_basePath==null)
-				// Get exec path if user don't provide one.
-				_basePath=Path.GetDirectoryName(Assembly.GetEntryAssembly().Location);
+			// Get exec path if user don't provide one.
+			if(_extensionsDir==null)
+				_extensionsDir=Path.Combine(Path.GetDirectoryName(Assembly.GetEntryAssembly().Location), "Extensions");
+			
+			if(!Directory.Exists(_extensionsDir))
+				throw new MissingFileOrDirectoryException("Wasn't able to find extension folder (" + _extensionsDir + ").");
 			
 			ExtensionCache cache = Global<ExtensionCache>.GetInstance();
-			String extensionDir=_basePath + "/Extensions";
 			
-			if(!Directory.Exists(extensionDir))
-				throw new MCException("Wasn't able to find extension folder. Add an 'Extension' folder at " + _basePath + ".");
-			
-			foreach(String ext in Directory.GetFiles(extensionDir))
+			foreach(String ext in Directory.GetFiles(_extensionsDir))
 			{
 				Message("Loading " + ext);ReportIndent();
 				

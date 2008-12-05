@@ -21,10 +21,10 @@ namespace MusiC
 		{
 		}
 		
-		public String BaseExtensionDir
+		public String ExtensionsDir
 		{
-			get {return Global<ExtensionLoader>.GetInstance().BasePath;}
-			set {Global<ExtensionLoader>.GetInstance().BasePath=value;}
+			get {return Global<ExtensionLoader>.GetInstance().ExtensionsDir;}
+			set {Global<ExtensionLoader>.GetInstance().ExtensionsDir=value;}
 		}
 		
 		public String ConfigFile
