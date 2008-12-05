@@ -9,7 +9,7 @@ package.path=project.path
 package.language="c#"
 package.files={
 	matchrecursive(base_src_dir.."/Music/*.cs"),
-	base_src_dir.."/config.xml"
+	matchrecursive(base_src_dir.."/*.xml")
 }
 package.links={
 	"System",
