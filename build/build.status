@@ -34,3 +34,6 @@ readme
 src/config.xml
 	add to projects
 	copy after build to /bin
+	
+FIXME:
+	premake --clean
