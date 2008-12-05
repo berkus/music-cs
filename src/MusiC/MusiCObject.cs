@@ -1,7 +1,9 @@
 using System;
 using System.Reflection;
-
+using System.Diagnostics;
 using System.Collections.Generic;
+
+using MusiC.Exceptions;
 
 namespace MusiC
 {
@@ -13,8 +15,6 @@ namespace MusiC
 		MESSAGE,
 		DEBUG,
 	}
-	
-	
 	
 	public class MusiCObject
 	{
@@ -85,6 +85,63 @@ namespace MusiC
 			
 			if(currentLvl >= (int)ReportLevel.ERROR)
 				Report(msg, "ERROR");
+		}
+		
+		public void Error(MCException ex)
+		{
+			Message("--------- [ERROR] ---------");
+			
+			foreach(string message in ex.MessageList)
+				Message(message);
+			
+			StackFrame entry;
+			StackTrace st = new StackTrace(ex, true);
+			
+			Message("--------- [STACK TRACE] ---------");
+			
+			for(int idx=0; idx < st.FrameCount; idx++)
+			{
+				entry = st.GetFrame(idx);
+				Message("[" + entry.GetMethod().Name+"] - " +
+					System.IO.Path.GetFileName(entry.GetFileName()) +
+					" (L" + entry.GetFileLineNumber().ToString()+
+					", C"+entry.GetFileColumnNumber()+")");
+			}
+		}
+		
+		public void Error(Exception ex)
+		{
+			Message("--------- [ERROR] ---------");
+			
+			Message("[SYSTEM MESSAGE]: " + ex.Message);
+			
+			StackFrame entry;
+			StackTrace st = new StackTrace(ex, true);
+			
+			Message("--------- [STACK TRACE] ---------");
+
+			
+			for(int idx=0; idx < st.FrameCount; idx++)
+			{
+				entry = st.GetFrame(idx);
+				Message("[" + entry.GetMethod().Name+"] - " +
+					System.IO.Path.GetFileName(entry.GetFileName()) +
+					" (L" + entry.GetFileLineNumber().ToString()+
+					", C"+entry.GetFileColumnNumber()+")");
+			}
+		}
+		
+		static public void UnhandledException(Object sender, UnhandledExceptionEventArgs args)
+		{
+			MCException ex = args.ExceptionObject as MCException;
+			
+//			if(ex==null)
+//				Error(args.ExceptionObject as Exception);
+//			
+//			Error(ex);
+			
+			if(ex != null)
+				ex.Report();
 		}
 		
 		public void Warning(String msg)

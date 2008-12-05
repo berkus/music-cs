@@ -25,7 +25,7 @@ namespace MusiC.Extensions
 			String extensionDir=_basePath + "/Extensions";
 			
 			if(!Directory.Exists(extensionDir))
-				throw new MissingFileOrDirectoryException("Wasn't able to find extension folder. Add an 'Extension' folder at " + _basePath + ".");
+				throw new MCException("Wasn't able to find extension folder. Add an 'Extension' folder at " + _basePath + ".");
 			
 			foreach(String ext in Directory.GetFiles(extensionDir))
 			{
