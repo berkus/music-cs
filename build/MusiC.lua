@@ -8,7 +8,8 @@ package.path=project.path
 -- Input
 package.language="c#"
 package.files={
-	matchrecursive(base_src_dir.."/Music/*.cs")
+	matchrecursive(base_src_dir.."/Music/*.cs"),
+	base_src_dir.."/config.xml"
 }
 package.links={
 	"System",

@@ -79,71 +79,78 @@ if %version%==g goto build
 goto codeblocks
 
 :build
+cls
 echo.
-echo [Options] Compiler:%compiler%, Version:%version%, Projects:%vsprojects%
+REM echo [Options] Compiler:%compiler%, Version:%version%, Projects:%vsprojects%
 echo.
 
 if %compiler%==g (
 	premake --dotnet mono2 --target gnu
-	goto menu
+	goto pause-before-menu
 )
 
 if %compiler%==v (
 	if %version%==1 (
 		premake --target vs6
-		goto menu
+		goto pause-before-menu
 	)
 	if %version%==2 (
 		premake --target vs2002
-		goto menu
+		goto pause-before-menu
 	)
 	if %version%==3 (
 		if %vsprojects%==m premake --target vs2003
 		if %vsprojects%==u premake --unmanaged --target vs2003
 		if %vsprojects%==b premake --target vs2003
 		if %vsprojects%==b premake --unmanaged --target vs2003
-		goto menu
+		goto pause-before-menu
 	)
 	if %version%==4 (
 		if %vsprojects%==m premake --target vs2005
 		if %vsprojects%==u premake --unmanaged --target vs2005
 		if %vsprojects%==b premake --target vs2005
 		if %vsprojects%==b premake --unmanaged --target vs2005
-		goto menu
+		goto pause-before-menu
 	)
 	if %version%==5 (
 		if %vsprojects%==m premake --target vs2008
 		if %vsprojects%==u premake --unmanaged --target vs2008
 		if %vsprojects%==b premake --target vs2008
 		if %vsprojects%==b premake --unmanaged --target vs2008
-		goto menu
+		goto pause-before-menu
 	)
 )
 
 if %compiler%==c (
 	if %version%==o (
 		premake --target cb-ow
-		goto menu
+		goto pause-before-menu
 	)
 	if %version%==g (
 		premake --target cb-gcc
-		goto menu
+		goto pause-before-menu
 	)
 )
 
 if %compiler%==C (
 	premake --target cl-gcc
-	goto menu
+	goto pause-before-menu
 )
 
 if %compiler%==m (
 	premake --dotnet mono2 --target monodev
-	goto menu
+	goto pause-before-menu
 )
 
 if %compiler%==s (
 	premake --dotnet mono2 --target sharpdev
-	goto menu
+	goto pause-before-menu
 )
+
+:pause-before-menu
+echo.
+echo.
+pause
+goto menu
 
 :exit

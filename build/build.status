@@ -32,7 +32,7 @@ Testing premake projects
 readme
 
 src/config.xml
-	add to projects
+	add to projects ... ok
 	copy after build to /bin
 	
 FIXME:
