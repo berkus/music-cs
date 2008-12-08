@@ -2,7 +2,7 @@ using System;
 
 namespace MusiC.Exceptions
 {
-	class MissingFileOrDirectoryException : MCException
+	public class MissingFileOrDirectoryException : MCException
 	{
 		public MissingFileOrDirectoryException(String msg) : base(msg)
 		{

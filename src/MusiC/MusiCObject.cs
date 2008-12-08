@@ -9,22 +9,22 @@ namespace MusiC
 {
 	public enum ReportLevel
 	{
-		NOTSET,
-		ERROR,
-		WARNING,
-		MESSAGE,
-		DEBUG,
+		NotSet,
+		Error,
+		Warning,
+		Message,
+		Debug,
 	}
 	
 	public class MusiCObject
 	{
 		static int _level=0;
-		static int _globalReportLevel=(int)ReportLevel.DEBUG;
+		static int _globalReportLevel=(int)ReportLevel.Debug;
 		static String _indent = String.Empty;
 		
 		private static readonly log4net.ILog _log = log4net.LogManager.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
 		
-		int _localReportLevel=(int)ReportLevel.NOTSET;
+		int _localReportLevel=(int)ReportLevel.NotSet;
 		
 		override public String ToString()
 		{
@@ -81,9 +81,9 @@ namespace MusiC
 		
 		public void Error(String msg)
 		{
-			int currentLvl = (_localReportLevel==(int)ReportLevel.NOTSET) ? _globalReportLevel : _localReportLevel;
+			int currentLvl = (_localReportLevel==(int)ReportLevel.NotSet) ? _globalReportLevel : _localReportLevel;
 			
-			if(currentLvl >= (int)ReportLevel.ERROR)
+			if(currentLvl >= (int)ReportLevel.Error)
 				Report(msg, "ERROR");
 		}
 		
@@ -111,15 +111,14 @@ namespace MusiC
 		
 		public void Error(Exception ex)
 		{
-			Error("--------- [ERROR] ---------");
+			Error("[ System Exception ]");
 			
-			Error("[SYSTEM]: " + ex.Message);
+			Error(ex.Message);
 			
 			StackFrame entry;
 			StackTrace st = new StackTrace(ex, true);
 			
-			Error("--------- [STACK TRACE] ---------");
-
+			Error("[ StackTrace ]");
 			
 			for(int idx=0; idx < st.FrameCount; idx++)
 			{
@@ -145,25 +144,25 @@ namespace MusiC
 		
 		public void Warning(String msg)
 		{
-			int currentLvl = (_localReportLevel==(int)ReportLevel.NOTSET) ? _globalReportLevel : _localReportLevel;
+			int currentLvl = (_localReportLevel==(int)ReportLevel.NotSet) ? _globalReportLevel : _localReportLevel;
 			
-			if(currentLvl >= (int)ReportLevel.WARNING)
+			if(currentLvl >= (int)ReportLevel.Warning)
 				Report(msg, "WARNING");
 		}
 		
 		public void Message(String msg)
 		{
-			int currentLvl = (_localReportLevel==(int)ReportLevel.NOTSET) ? _globalReportLevel : _localReportLevel;
+			int currentLvl = (_localReportLevel==(int)ReportLevel.NotSet) ? _globalReportLevel : _localReportLevel;
 			
-			if(currentLvl >= (int)ReportLevel.MESSAGE)
+			if(currentLvl >= (int)ReportLevel.Message)
 				Report(msg, "MESSAGE");
 		}
 		
 		public void Debug(String msg)
 		{
-			int currentLvl = (_localReportLevel==(int)ReportLevel.NOTSET) ? _globalReportLevel : _localReportLevel;
+			int currentLvl = (_localReportLevel==(int)ReportLevel.NotSet) ? _globalReportLevel : _localReportLevel;
 			
-			if(currentLvl >= (int)ReportLevel.DEBUG)
+			if(currentLvl >= (int)ReportLevel.Debug)
 				Report(msg, "DEBUG");
 		}
 				
@@ -193,9 +192,9 @@ namespace MusiC
 		
 		public void ReportIndent()
 		{
-			int currentLvl = (_localReportLevel==(int)ReportLevel.NOTSET) ? _globalReportLevel : _localReportLevel;
+			int currentLvl = (_localReportLevel==(int)ReportLevel.NotSet) ? _globalReportLevel : _localReportLevel;
 			
-			if(currentLvl != (int)ReportLevel.NOTSET)
+			if(currentLvl != (int)ReportLevel.NotSet)
 			{
 				//Console.WriteLine
 				_log.Info(_indent+"{");
@@ -211,9 +210,9 @@ namespace MusiC
 		
 		public void ReportUnindent(bool extraNewLine)
 		{
-			int currentLvl = (_localReportLevel==(int)ReportLevel.NOTSET) ? _globalReportLevel : _localReportLevel;
+			int currentLvl = (_localReportLevel==(int)ReportLevel.NotSet) ? _globalReportLevel : _localReportLevel;
 			
-			if(currentLvl != (int)ReportLevel.NOTSET)
+			if(currentLvl != (int)ReportLevel.NotSet)
 			{
 				_indent=_indent.Remove(0,4);
 				_level--;

@@ -73,13 +73,14 @@ namespace MusiC
 				Config cfg = cache.GetConfig();
 				ReportUnindent();
 				
-				Message("Retrieving Config Handler");ReportIndent();
-				
+				Message("Loading Config File");ReportIndent();
 				// Get exec path if user don't provide one.
 				if(_configFile==null)
 					_configFile=Path.Combine(Path.GetDirectoryName(Assembly.GetEntryAssembly().Location), "config.xml");
 				
 				cfg.Load(_configFile);
+				Message(_configFile + " ... [LOADED]");
+				
 				ReportUnindent();
 			}
 			catch(MCException mce)
@@ -88,10 +89,8 @@ namespace MusiC
 			}
 			catch(Exception e)
 			{
-				this.Error(e);
+				Error(e);
 			}
-			
-			//cache.Print();
 		}
 		
 		public void Run()

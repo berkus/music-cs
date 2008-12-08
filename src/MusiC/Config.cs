@@ -4,6 +4,8 @@ using System.Reflection;
 using System.Xml;
 using System.IO;
 
+using MusiC.Exceptions;
+
 namespace MCModule
 {
 	public class Config
@@ -229,7 +231,6 @@ namespace MusiC
 		public Config()
 		{
 			Message(this.GetType().FullName + " ... [LOADED]");
-			//Console.WriteLine("[Config]: {0} ... [LOADED]",);
 		}
 		
 		protected void AddAlgorithm(MCModule.Algorithm algortihm)
@@ -243,13 +244,14 @@ namespace MusiC
 			_trainList.AddLast(label);
 		}
 		
-		protected void AddDir(String dir)
+		protected bool AddDir(String dir)
 		{
-			if(!Directory.Exists(dir))
-				/// @todo Throw exception
-				Console.WriteLine("Unavailable Directory");
+			bool returnValue;
 			
-			_classifyList.AddLast(dir);
+			if(returnValue=Directory.Exists(dir))
+				_classifyList.AddLast(dir);
+			
+			return returnValue;
 		}
 		
 		protected void AddHandler(HandlerInfo hInfo)
@@ -257,6 +259,6 @@ namespace MusiC
 			_handlerList.AddLast(hInfo);
 		}
 		
-		abstract public void Load(String str);
+		abstract public void Load(String file);
 	}
 }

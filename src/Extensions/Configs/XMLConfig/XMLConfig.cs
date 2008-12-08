@@ -146,7 +146,11 @@ namespace MusiC.Configs
 			foreach(XmlNode classifyNode in cfgFile.GetElementsByTagName("Classify"))
 			{
 				/// @todo Add support to allow/deny algorithms to use this folder
-				AddDir(XmlSafeAttribute(classifyNode,"dir"));
+				
+				String dir = XmlSafeAttribute(classifyNode,"dir");
+				
+				if(!AddDir(dir))
+					Warning("A non-existent directory ("+ dir +") wasn't added to the processing queue.");
 			}
 		}
 		
