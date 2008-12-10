@@ -28,7 +28,8 @@ package.kind="dll"
 package.target="MusiC"
 package.targetprefix=""
 package.targetextension="dll"
+package.bindir=base_bin_dir
 package.objdir=base_bin_dir.."/obj"
-
+package.config[matchrecursive(base_src_dir.."/*.xml")].buildaction="Content"
 -- Debug:MusiC
 package.config["Debug"].defines={"DEBUG"}

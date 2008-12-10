@@ -9,11 +9,13 @@ namespace MusiC.Extensions
 	{
 		Config _objConfig=null;
 		Type _tConfig=null;
+		Type _tBaseConfig=null;
 		
 		Dictionary<String, Type> _tHandlerCache = new Dictionary<String, Type>();
 		
 		public void Initialize()
 		{
+			_tBaseConfig=typeof(Config);
 		}
 		
 		public void Add(Type t)
@@ -39,12 +41,12 @@ namespace MusiC.Extensions
 		
 		string Identify(Type t)
 		{
-			if(t.IsSubclassOf(typeof(Config)))
+			if(_tBaseConfig.IsAssignableFrom(t))
 				return "Config";
 			
 			if(t.IsSubclassOf(typeof(Config)))
 				return "Config";
-			
+			Warning(_tBaseConfig.TypeHandle.Value.ToString());
 			return null;
 		}
 		

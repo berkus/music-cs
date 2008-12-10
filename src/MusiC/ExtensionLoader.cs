@@ -24,27 +24,26 @@ namespace MusiC.Extensions
 			
 			ExtensionCache cache = Global<ExtensionCache>.GetInstance();
 			
-			foreach(String ext in Directory.GetFiles(extensionsDir))
+			foreach(String ext in Directory.GetFiles(extensionsDir, "*.dll"))
 			{
-				Message("Loading " + ext);ReportIndent();
-				
+				// FIX: When MusiC.dll is loaded the Type.IsSubClassOf() fails.
+				if(Path.GetFileName(ext) == "MusiC.dll")
+					continue;
+					
 				try {
 					Assembly l = Assembly.LoadFrom(ext);
-					
+					Message(ext+" ... [LOADED]");ReportIndent();
 					
 					foreach(Type t in l.GetExportedTypes())
 					{
-						// TODO: try { } catch { }
-						Message(t.ToString() + " ... [FOUND]");
 						cache.Add(t);
 					}
+					
+					ReportUnindent();
 				}
 				catch {
 					// Probably trying to load an unmanaged assembly.
-					Warning("Wasnt able to load. Non managed assembly ?");
-				}
-				finally {
-					ReportUnindent();
+					Warning(ext+" ... [LOADING FAILED]");
 				}
 			}
 		}

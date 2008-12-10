@@ -30,6 +30,7 @@ package.kind="dll"
 package.target="MusiC.Extensions.Classifiers.uBarbedo"
 package.targetprefix=""
 package.targetextension="dll"
+package.bindir=base_bin_dir.."/Extensions"
 package.objdir="obj"
 
 -- Debug:MusiC

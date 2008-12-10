@@ -22,6 +22,7 @@ package.kind="exe"
 package.target="MusiC.Apps.GenreC"
 package.targetprefix=""
 package.targetextension="dll"
+package.bindir=base_bin_dir
 package.objdir=base_bin_dir.."/obj"
 
 -- Debug:MusiC

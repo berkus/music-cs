@@ -19,7 +19,7 @@ function CreateProject()
 
 	base_deps_dir="../../deps"
 	base_src_dir="../../src"
-	base_bin_dir="../bin"
+	base_bin_dir="../../bin"
 
 	project.name="MusiC"
 	project.bindir=base_bin_dir
