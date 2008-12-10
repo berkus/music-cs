@@ -1,25 +1,74 @@
 using System;
 using System.Xml;
+using System.Collections.Generic;
 
 using MCModule.Exceptions;
 
 namespace MusiC
 {
-	public class ExtensionInfo : BinaryInfo
+	public class Instantiable : MusiCObject
 	{
-		// Atributtes
+		String _name = null;
+		String _class = null;
+		Dictionary<String, Instantiable> _paramCache = new Dictionary<String, Instantiable>();
 		
-		String mTag = String.Empty;
-		
-		// Properties
-		
-		public String Tag
+		public String Name
 		{
-			get { return mTag; }
-			set { if (value != null) { mTag = value; } }
+			get { return _name; }
+			set {_name = value; }
 		}
 		
-		// Methods
+		public String Class
+		{
+			get { return _class; }
+			set { _class = value; }
+		}
+		
+		public Instantiable(String paramName, String tParam)
+		{
+			_name=paramName;
+			_class=tParam;
+		}
+		
+		public virtual void AddParam(String paramName, String paramClass)
+		{
+			_paramCache.Add(paramName, new Instantiable(paramName, paramClass));
+		}
+		
+		public virtual String[] GetTypes()
+		{
+			return null;
+		}
+		
+		public virtual String[] GetParamsValue()
+		{
+			return null;
+		}
+	}
+	
+	public enum ExtensionType
+	{
+		Classifier,
+		Feature,
+		Window,
+		Configuration,
+		FileHandler,
+		NotSet
+	}
+	
+	public class ExtensionInfo : Instantiable
+	{
+		ExtensionType _type = ExtensionType.NotSet;
+		
+		public ExtensionType Type
+		{
+			get { return _type; }
+			set { _type = value; }
+		}
+		
+		public ExtensionInfo() : base(null, null)
+		{
+		}
 	}
 }
 

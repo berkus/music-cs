@@ -223,7 +223,7 @@ namespace MusiC
 {
 	abstract public class Config : MusiCObject
 	{
-		LinkedList<MCModule.Algorithm> _algList = new LinkedList<MCModule.Algorithm>();
+		LinkedList<Algorithm> _algList = new LinkedList<Algorithm>();
 		LinkedList<TrainLabel> _trainList = new LinkedList<TrainLabel>();
 		LinkedList<String> _classifyList = new LinkedList<String>();
 		LinkedList<HandlerInfo> _handlerList = new LinkedList<HandlerInfo>();
@@ -233,9 +233,9 @@ namespace MusiC
 			Message(this.GetType().FullName + " ... [LOADED]");
 		}
 		
-		protected void AddAlgorithm(MCModule.Algorithm algortihm)
+		protected void AddAlgorithm(Algorithm algorithm)
 		{
-			_algList.AddLast(algortihm);
+			_algList.AddLast(algorithm);
 		}
 		
 		protected void AddTrainLabel(TrainLabel label)

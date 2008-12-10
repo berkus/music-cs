@@ -38,3 +38,31 @@ namespace MCModule
 		}
 	}
 }
+
+namespace MusiC
+{
+	public class Algorithm
+	{
+		ExtensionInfo _classifier = null;
+		ExtensionInfo _window = null;
+		LinkedList<ExtensionInfo> _featureList = new LinkedList<ExtensionInfo>();
+		
+		public void Add(ExtensionInfo info)
+		{
+			switch(info.Type)
+			{
+				case ExtensionType.Classifier:
+					_classifier=info;
+					break;
+				case ExtensionType.Window:
+					_window=info;
+					break;
+				case ExtensionType.Feature:
+					_featureList.AddLast(info);
+					break;
+				default:
+					break;
+			}
+		}
+	}
+}

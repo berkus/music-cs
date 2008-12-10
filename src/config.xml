@@ -3,13 +3,13 @@
 	
 	<Handler name="WavHandler" class="MCModule.FileHandlers.WavHandler" pattern=".*[.]wav$"/>
 	
-	<Declare name="Hamming" class="MCModule.Windows.Hamming">
+	<Window name="Hamming" class="MCModule.Windows.Hamming">
 		<Param name="Size" class="System.Int32" />
 		<Param name="Overlap" class="System.Int32" />
-	</Declare>
+	</Window>
 
-	<Declare name="RollOff" class="MCModule.Features.SpecRollOff"/>
-	<Declare name="Barbedo" class="MCModule.Classifiers.Barbedo"/>
+	<Feature name="RollOff" class="MCModule.Features.SpecRollOff"/>
+	<Classifier name="Barbedo" class="MCModule.Classifiers.Barbedo"/>
 	
 	<Train dir="/Users/mjsmagalhaes/projeto_final/data">
 		<Label name="classical" input="/Users/mjsmagalhaes/projeto_final/data/classical"/>

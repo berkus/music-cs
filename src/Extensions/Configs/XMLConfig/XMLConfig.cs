@@ -20,7 +20,7 @@ namespace MusiC.Configs
 		{
 			XmlDocument cfgFile = new XmlDocument();
 			cfgFile.Load(cfgPath);
-	
+			
 			#region Parsing Declares
 			BuildTagCache(cfgFile);
 			#endregion
@@ -28,11 +28,11 @@ namespace MusiC.Configs
 			#region Parsing Handlers
 			BuildHandlerList(cfgFile);
 			#endregion
-	
+			
 			#region Parsing Data
 			ParseData(cfgFile);
 			#endregion
-	
+			
 			#region Parsing algorithms
 			BuildAlgorithmList(cfgFile);
 			#endregion
@@ -42,15 +42,15 @@ namespace MusiC.Configs
 		{
 			if(n==null)
 				throw new MCException("XmlNode submited is null");
-				
+			
 			XmlAttribute att = n.Attributes[attName];
 
-            if (att == null)
-            {
-                if (!isOptional)
-                    throw new MissingAttributeException(attName);
-                return null;
-            }
+			if (att == null)
+			{
+				if (!isOptional)
+					throw new MissingAttributeException(attName);
+				return null;
+			}
 			
 			return att.Value;
 		}
@@ -85,10 +85,12 @@ namespace MusiC.Configs
 		
 		void BuildTagCache(XmlDocument cfgFile)
 		{
-			foreach (XmlNode n in cfgFile.GetElementsByTagName("Declare"))
+			foreach (XmlNode n in cfgFile.GetElementsByTagName("Classifier"))
 			{
 				ExtensionInfo info = new ExtensionInfo();
-				info.Type = XmlSafeAttribute(n, "class");
+				info.Class = XmlSafeAttribute(n, "class");
+				info.Name = XmlSafeAttribute(n, "name");
+				info.Type = ExtensionType.Classifier;
 				
 				XmlNodeList nList = n.ChildNodes;
 				foreach (XmlNode param in nList)
@@ -99,12 +101,45 @@ namespace MusiC.Configs
 					}
 				}
 				
-				try {
-					_tagCache.Add(XmlSafeAttribute(n, "name"), info);
-				} catch {
-					// TODO: Consume and throw MCException
-					Console.WriteLine("Error while creating dictionary. Check for duplicated entries.");
+				_tagCache.Add(info.Name, info);
+			}
+			
+			foreach (XmlNode n in cfgFile.GetElementsByTagName("Window"))
+			{
+				ExtensionInfo info = new ExtensionInfo();
+				info.Class = XmlSafeAttribute(n, "class");
+				info.Name = XmlSafeAttribute(n, "name");
+				info.Type = ExtensionType.Window;
+				
+				XmlNodeList nList = n.ChildNodes;
+				foreach (XmlNode param in nList)
+				{
+					if(param.Name == "Param")
+					{
+						info.AddParam(XmlSafeAttribute(param, "name"), XmlSafeAttribute(param, "class"));
+					}
 				}
+				
+				_tagCache.Add(info.Name, info);
+			}
+			
+			foreach (XmlNode n in cfgFile.GetElementsByTagName("Feature"))
+			{
+				ExtensionInfo info = new ExtensionInfo();
+				info.Class = XmlSafeAttribute(n, "class");
+				info.Name = XmlSafeAttribute(n, "name");
+				info.Type = ExtensionType.Feature;
+				
+				XmlNodeList nList = n.ChildNodes;
+				foreach (XmlNode param in nList)
+				{
+					if(param.Name == "Param")
+					{
+						info.AddParam(XmlSafeAttribute(param, "name"), XmlSafeAttribute(param, "class"));
+					}
+				}
+				
+				_tagCache.Add(info.Name, info);
 			}
 		}
 		
@@ -141,7 +176,7 @@ namespace MusiC.Configs
 					}
 				}
 			}
-							
+			
 			// Adding Train/Classify support
 			foreach(XmlNode classifyNode in cfgFile.GetElementsByTagName("Classify"))
 			{
@@ -158,44 +193,18 @@ namespace MusiC.Configs
 		{
 			foreach (XmlNode n in cfgFile.GetElementsByTagName("Algorithm"))
 			{
-				MCModule.Algorithm algorithm = new MCModule.Algorithm();
-	
-				// Searching for defined tags
-				foreach (String key in _tagCache.Keys)
-				{
-					//Loading declared tags inside the algorithm node
-					// TODO: Check with multiple algorithms
-					XmlNodeList nList = cfgFile.GetElementsByTagName(key, n.NamespaceURI);
+				Algorithm algorithm = new Algorithm();
 
-					if (nList.Count == 0)
-						continue;
-	
-					foreach (XmlNode tag in nList)
-					{
-						ExtensionInfo info;
-						_tagCache.TryGetValue(tag.Name, out info);
-	
-						// Loading parameters
-						foreach (BinaryParam param in info.GetParam())
-						{
-							try
-							{
-								// TODO: Prevent erros
-								XmlNodeList paramList = cfgFile.GetElementsByTagName(param.Name, tag.NamespaceURI);
-								XmlAttribute attr = paramList.Item(0).Attributes["value"];// Parameters with same tag name are not accepted.
-								param.strValue = attr.Value;
-							}
-							catch (System.Exception e)
-							{
-								Console.WriteLine(" --- Error while loading parameter value ---");
-								Console.WriteLine("[*]" + e.Message);
-							}
-						} //Closing the foreach loading the parameter before loading the library
-						//Support multiple parameters
-						
-						// TODO: Finish algorithm object adding window, features and classifier to it.
-					}
+				foreach (XmlNode child in n.ChildNodes)
+				{
+					ExtensionInfo i;
+					
+					if(_tagCache.TryGetValue(child.Name, out i))
+						algorithm.Add(i);
+					else
+						Warning("Cant find extension "+child.Name);
 				}
+				
 				AddAlgorithm(algorithm);
 			}
 		}
