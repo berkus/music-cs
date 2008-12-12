@@ -97,6 +97,7 @@ namespace MusiC.Configs
 				{
 					if(param.Name == "Param")
 					{
+						///@note make sure the params are declared in the correct order.
 						info.AddParam(XmlSafeAttribute(param, "name"), XmlSafeAttribute(param, "class"));
 					}
 				}
@@ -200,7 +201,20 @@ namespace MusiC.Configs
 					ExtensionInfo i;
 					
 					if(_tagCache.TryGetValue(child.Name, out i))
+					{
+						foreach(XmlNode param in child.ChildNodes)
+						{
+							if(param.Name != "Param")
+								continue;
+							
+							Instantiable ext = i.GetParamByName(XmlSafeAttribute(param, "name"));
+							
+							if(ext != null)
+								ext.StrValue = XmlSafeAttribute(param, "value", true);
+						}
+						
 						algorithm.Add(i);
+					}
 					else
 						Warning("Cant find extension "+child.Name);
 				}

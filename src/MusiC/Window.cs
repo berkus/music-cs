@@ -163,3 +163,10 @@ namespace MCModule
 		abstract public double Factory(int n);
 	}
 }
+
+namespace MusiC
+{
+	abstract public class Window : Extension
+	{
+	}
+}

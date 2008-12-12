@@ -43,26 +43,64 @@ namespace MusiC
 {
 	public class Algorithm
 	{
-		ExtensionInfo _classifier = null;
-		ExtensionInfo _window = null;
-		LinkedList<ExtensionInfo> _featureList = new LinkedList<ExtensionInfo>();
+		bool _isInitialized=false;
+		ExtensionInfo _classifierInfo = null;
+		ExtensionInfo _windowInfo = null;
+		LinkedList<ExtensionInfo> _featureListInfo = new LinkedList<ExtensionInfo>();
+		
+		Window _window = null;
+		Classifier _classifier = null;
+		LinkedList<Feature> _featureList = new LinkedList<Feature>();
 		
 		public void Add(ExtensionInfo info)
 		{
 			switch(info.Type)
 			{
 				case ExtensionType.Classifier:
-					_classifier=info;
+					_classifierInfo=info;
 					break;
 				case ExtensionType.Window:
-					_window=info;
+					_windowInfo=info;
 					break;
 				case ExtensionType.Feature:
-					_featureList.AddLast(info);
+					_featureListInfo.AddLast(info);
 					break;
 				default:
 					break;
 			}
+		}
+		
+		public void Initialize()
+		{
+			if(_isInitialized)
+				return;
+			
+			//@todo Throw exceptions while we dont have defaults
+			//@todo Add default componenets
+			
+			if(_windowInfo == null)
+				return;
+			
+			// classifier is not necessary ... maybe just extraction.
+			//if(_classifierInfo == null)
+			//	return;
+			
+			if(_featureListInfo.Count != 0)
+				return;
+			
+			_window = Invoker.LoadType(_windowInfo) as Window;
+			
+			Feature f;
+			foreach(ExtensionInfo i in _featureListInfo)
+			{
+				f = Invoker.LoadType(i) as Feature;
+				
+				if (f != null)
+					_featureList.AddLast(f);
+			}
+			
+			if(_classifierInfo != null)
+				_classifier = Invoker.LoadType(_classifierInfo) as Classifier;
 		}
 	}
 }

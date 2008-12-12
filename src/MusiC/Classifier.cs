@@ -90,3 +90,10 @@ namespace MCModule
 #endregion
 	}
 }
+
+namespace MusiC
+{
+	abstract public class Classifier : Extension
+	{
+	}
+}

@@ -68,3 +68,14 @@ namespace MCModule
 		abstract public void Dispose();
 	} 
 }
+
+namespace MusiC
+{
+	abstract public class Feature : Extension
+	{
+		Feature()
+		{
+			Message("Feature ok");
+		}
+	}
+}

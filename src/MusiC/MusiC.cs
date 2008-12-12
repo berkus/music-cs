@@ -64,24 +64,6 @@ namespace MusiC
 				// TODO: Uncomment protection
 				//if( !loader.HasConfig() || !loader.HasFileHandler() )
 				//	throw new MissingExtensionException("MusiC needs at least a Config and a Handler extension.");
-				
-				Message("Initializing Extension Cache");ReportIndent();
-				ExtensionCache cache = Global<ExtensionCache>.GetInstance();
-				ReportUnindent();
-				
-				Message("Retrieving Config Handler");ReportIndent();
-				Config cfg = cache.GetConfig();
-				ReportUnindent();
-				
-				Message("Loading Config File");ReportIndent();
-				// Get exec path if user don't provide one.
-				if(_configFile==null)
-					_configFile=Path.Combine(Path.GetDirectoryName(Assembly.GetEntryAssembly().Location), "config.xml");
-				
-				cfg.Load(_configFile);
-				Message(_configFile + " ... [LOADED]");
-				
-				ReportUnindent();
 			}
 			catch(MCException mce)
 			{
@@ -95,6 +77,15 @@ namespace MusiC
 		
 		public void Run()
 		{
+			ExtensionCache cache = Global<ExtensionCache>.GetInstance();
+			Config cfg = cache.GetConfig();
+			
+			// Get exec path if user don't provide one.
+			if(_configFile==null)
+				_configFile=Path.Combine(Path.GetDirectoryName(Assembly.GetEntryAssembly().Location), "config.xml");
+			
+			cfg.Load(_configFile);
+			Message(_configFile + " ... [LOADED]");
 		}
 		
 		public void Unload()

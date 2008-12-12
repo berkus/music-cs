@@ -79,7 +79,7 @@ namespace MCModule
 
 namespace MusiC
 {
-	public class Extension
+	abstract public class Extension : MusiCObject
 	{
 	}
 	
@@ -91,6 +91,11 @@ namespace MusiC
 		}
 		
 		public static Extension LoadType(BinaryInfo t)
+		{
+			return null;
+		}
+		
+		public static Extension LoadType(Instantiable i)
 		{
 			return null;
 		}
