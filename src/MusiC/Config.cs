@@ -5,6 +5,7 @@ using System.Xml;
 using System.IO;
 
 using MusiC.Exceptions;
+using MusiC.Extensions;
 
 namespace MCModule
 {
@@ -257,6 +258,16 @@ namespace MusiC
 		protected void AddHandler(HandlerInfo hInfo)
 		{
 			_handlerList.AddLast(hInfo);
+		}
+		
+		protected ExtensionInfo GetExtensionInfo(String className)
+		{
+			return Global<ExtensionCache>.GetInstance().GetInfo(className);
+		}
+		
+		public IEnumerable<Algorithm> GetAlgorithmList()
+		{
+			return _algList;
 		}
 		
 		abstract public void Load(String file);

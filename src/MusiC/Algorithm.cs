@@ -2,6 +2,8 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 
+using MusiC.Extensions;
+
 namespace MCModule
 {
 	public class Algorithm : IDisposable
@@ -43,64 +45,27 @@ namespace MusiC
 {
 	public class Algorithm
 	{
-		bool _isInitialized=false;
-		ExtensionInfo _classifierInfo = null;
-		ExtensionInfo _windowInfo = null;
-		LinkedList<ExtensionInfo> _featureListInfo = new LinkedList<ExtensionInfo>();
-		
 		Window _window = null;
 		Classifier _classifier = null;
 		LinkedList<Feature> _featureList = new LinkedList<Feature>();
 		
-		public void Add(ExtensionInfo info)
+		public void Add(String extensionClass, ParamList args)
 		{
+			ExtensionInfo info = Global<ExtensionCache>.GetInstance().GetInfo(extensionClass);
 			switch(info.Type)
 			{
 				case ExtensionType.Classifier:
-					_classifierInfo=info;
+					_classifier = info.Instantiate(args) as Classifier;
 					break;
 				case ExtensionType.Window:
-					_windowInfo=info;
+					_window = info.Instantiate(args) as Window;
 					break;
 				case ExtensionType.Feature:
-					_featureListInfo.AddLast(info);
+					_featureList.AddLast(info.Instantiate(args) as Feature);
 					break;
 				default:
 					break;
 			}
-		}
-		
-		public void Initialize()
-		{
-			if(_isInitialized)
-				return;
-			
-			//@todo Throw exceptions while we dont have defaults
-			//@todo Add default componenets
-			
-			if(_windowInfo == null)
-				return;
-			
-			// classifier is not necessary ... maybe just extraction.
-			//if(_classifierInfo == null)
-			//	return;
-			
-			if(_featureListInfo.Count != 0)
-				return;
-			
-			_window = Invoker.LoadType(_windowInfo) as Window;
-			
-			Feature f;
-			foreach(ExtensionInfo i in _featureListInfo)
-			{
-				f = Invoker.LoadType(i) as Feature;
-				
-				if (f != null)
-					_featureList.AddLast(f);
-			}
-			
-			if(_classifierInfo != null)
-				_classifier = Invoker.LoadType(_classifierInfo) as Classifier;
 		}
 	}
 }

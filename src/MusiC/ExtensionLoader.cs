@@ -47,9 +47,6 @@ namespace MusiC.Extensions
 				}
 			}
 		}
-		public void BuildCache()
-		{
-		}
 		
 		public bool HasConfig()
 		{

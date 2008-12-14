@@ -10,7 +10,7 @@ namespace MusiC.Configs
 {
 	public class XMLConfig : Config
 	{
-		Dictionary<String, ExtensionInfo> _tagCache = new Dictionary<String, ExtensionInfo>();
+		Dictionary<String, String> _tagCache = new Dictionary<String, String>();
 		
 		public XMLConfig()
 		{
@@ -21,21 +21,13 @@ namespace MusiC.Configs
 			XmlDocument cfgFile = new XmlDocument();
 			cfgFile.Load(cfgPath);
 			
-			#region Parsing Declares
 			BuildTagCache(cfgFile);
-			#endregion
 			
-			#region Parsing Handlers
 			BuildHandlerList(cfgFile);
-			#endregion
 			
-			#region Parsing Data
 			ParseData(cfgFile);
-			#endregion
 			
-			#region Parsing algorithms
 			BuildAlgorithmList(cfgFile);
-			#endregion
 		}
 		
 		String XmlSafeAttribute(XmlNode n, String attName, bool isOptional)
@@ -85,62 +77,9 @@ namespace MusiC.Configs
 		
 		void BuildTagCache(XmlDocument cfgFile)
 		{
-			foreach (XmlNode n in cfgFile.GetElementsByTagName("Classifier"))
-			{
-				ExtensionInfo info = new ExtensionInfo();
-				info.Class = XmlSafeAttribute(n, "class");
-				info.Name = XmlSafeAttribute(n, "name");
-				info.Type = ExtensionType.Classifier;
-				
-				XmlNodeList nList = n.ChildNodes;
-				foreach (XmlNode param in nList)
-				{
-					if(param.Name == "Param")
-					{
-						///@note make sure the params are declared in the correct order.
-						info.AddParam(XmlSafeAttribute(param, "name"), XmlSafeAttribute(param, "class"));
-					}
-				}
-				
-				_tagCache.Add(info.Name, info);
-			}
-			
-			foreach (XmlNode n in cfgFile.GetElementsByTagName("Window"))
-			{
-				ExtensionInfo info = new ExtensionInfo();
-				info.Class = XmlSafeAttribute(n, "class");
-				info.Name = XmlSafeAttribute(n, "name");
-				info.Type = ExtensionType.Window;
-				
-				XmlNodeList nList = n.ChildNodes;
-				foreach (XmlNode param in nList)
-				{
-					if(param.Name == "Param")
-					{
-						info.AddParam(XmlSafeAttribute(param, "name"), XmlSafeAttribute(param, "class"));
-					}
-				}
-				
-				_tagCache.Add(info.Name, info);
-			}
-			
-			foreach (XmlNode n in cfgFile.GetElementsByTagName("Feature"))
-			{
-				ExtensionInfo info = new ExtensionInfo();
-				info.Class = XmlSafeAttribute(n, "class");
-				info.Name = XmlSafeAttribute(n, "name");
-				info.Type = ExtensionType.Feature;
-				
-				XmlNodeList nList = n.ChildNodes;
-				foreach (XmlNode param in nList)
-				{
-					if(param.Name == "Param")
-					{
-						info.AddParam(XmlSafeAttribute(param, "name"), XmlSafeAttribute(param, "class"));
-					}
-				}
-				
-				_tagCache.Add(info.Name, info);
+			foreach (XmlNode n in cfgFile.GetElementsByTagName("Declare"))
+			{				
+				_tagCache.Add(XmlSafeAttribute(n, "name"), XmlSafeAttribute(n, "class"));
 			}
 		}
 		
@@ -198,22 +137,20 @@ namespace MusiC.Configs
 
 				foreach (XmlNode child in n.ChildNodes)
 				{
-					ExtensionInfo i;
+					String className;
+					ParamList paramList = new ParamList();
 					
-					if(_tagCache.TryGetValue(child.Name, out i))
+					if(_tagCache.TryGetValue(child.Name, out className))
 					{
 						foreach(XmlNode param in child.ChildNodes)
 						{
 							if(param.Name != "Param")
 								continue;
 							
-							Instantiable ext = i.GetParamByName(XmlSafeAttribute(param, "name"));
-							
-							if(ext != null)
-								ext.StrValue = XmlSafeAttribute(param, "value", true);
+							paramList.Add(XmlSafeAttribute(param, "name"), className, XmlSafeAttribute(param, "value", true));
 						}
 						
-						algorithm.Add(i);
+						algorithm.Add(className, paramList);
 					}
 					else
 						Warning("Cant find extension "+child.Name);

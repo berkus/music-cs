@@ -1,5 +1,7 @@
 using System;
 
+using MusiC;
+
 namespace MCModule.Features
 {
 	public class SpecRollOff : MCModule.Feature
@@ -44,6 +46,22 @@ namespace MCModule.Features
 		
 		override public void Dispose()
 		{
+		}
+	}
+}
+
+namespace MusiC.Extensions.Features
+{
+	public class SpecRollOff : Feature
+	{		
+		override unsafe public double * Extract(Window wnd)
+		{
+			return m_data;
+		}
+		
+		override public int FeatureSize(Window wnd)
+		{
+			return wnd.WindowCount;
 		}
 	}
 }

@@ -1,5 +1,7 @@
 using System;
 
+using MusiC;
+
 using MCModule.UnmanagedInterface;
 
 namespace MCModule
@@ -71,11 +73,46 @@ namespace MCModule
 
 namespace MusiC
 {
-	abstract public class Feature : Extension
+	abstract unsafe public class Feature : Extension
 	{
-		Feature()
+		public Feature()
 		{
 			Message("Feature ok");
+		}
+		
+		/// @todo this shouldnt be protected. Add methods(or properties) for access.
+		/// @todo change m_data for another name
+		protected double* m_data;
+		/// @todo change m_temp for another name
+		protected double* m_temp;
+
+		int m_wndSize;
+		int m_wndCount;
+		
+		string m_name;
+		public string Name
+		{
+			get { return m_name; }
+		}
+	
+		public Feature(string name)
+		{
+			m_name = name;
+			Message(name);
+		}
+	
+		public double * OutterExtract(Window wnd)
+		{	
+			return Extract(wnd);
+		}
+		
+		abstract public int FeatureSize(Window wnd);
+		
+		/// All frame data must be consecutive
+		abstract public double * Extract(Window wnd);
+		
+		virtual public void Dispose()
+		{
 		}
 	}
 }

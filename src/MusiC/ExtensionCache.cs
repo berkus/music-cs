@@ -9,9 +9,9 @@ namespace MusiC.Extensions
 	{
 		Config _objConfig=null;
 		Type _tConfig=null;
-		Type _tBaseConfig=null;
 		
-		Dictionary<String, Type> _tHandlerCache = new Dictionary<String, Type>();
+		//Dictionary<String, Type> _tHandlerCache = new Dictionary<String, Type>();
+		Dictionary<String, ExtensionInfo> _extensionList = new Dictionary<String, ExtensionInfo>();
 		
 		public void Initialize()
 		{
@@ -20,34 +20,13 @@ namespace MusiC.Extensions
 		
 		public void Add(Type t)
 		{
-			string id = Identify(t);
-			switch(id)
-			{
-				case "Config":
-					_tConfig=t;
-					break;
-				
-				case "Handler":
-					_tHandlerCache.Add(t.ToString(), t);
-					break;
-					
-				default:
-					Message(t.ToString() + " ... [REJECTED]");
-					return;
-			}
+			ExtensionInfo info = new ExtensionInfo(t);
+			_extensionList.Add(t.FullName, info);
+			
+			if(info.Type == ExtensionType.Configuration)
+				_tConfig = t;
 			
 			Message(t.ToString() + " ... [ADDED]");
-		}
-		
-		string Identify(Type t)
-		{
-			if(_tBaseConfig.IsAssignableFrom(t))
-				return "Config";
-			
-			if(t.IsSubclassOf(typeof(Config)))
-				return "Config";
-			Warning(_tBaseConfig.TypeHandle.Value.ToString());
-			return null;
 		}
 		
 		public Config GetConfig()
@@ -62,31 +41,12 @@ namespace MusiC.Extensions
 			return _objConfig;
 		}
 		
-		public void GetWindow(String wName)
+		public ExtensionInfo GetInfo(String className)
 		{
-		}
-		
-		public void GetFeature(String fName)
-		{
-		}
-		
-		public void GetClassifier(String cName)
-		{
-		}
-		
-		public void GetHandler(String hName)
-		{
-		}
-		
-		public Type GetHandlerType(String hClassName)
-		{
-			Type hType;
+			ExtensionInfo info;
+			_extensionList.TryGetValue(className, out info);
 			
-			if(!_tHandlerCache.TryGetValue(hClassName, out hType))
-				/// @todo Throw exception.
-				return null;
-			
-			return hType;
+			return info;
 		}
 	}
 }

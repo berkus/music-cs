@@ -166,7 +166,70 @@ namespace MCModule
 
 namespace MusiC
 {
-	abstract public class Window : Extension
+	abstract unsafe public class Window : Extension
 	{
+		/// @todo this shouldnt be protected. Add methods(or properties) for access.
+		protected int m_size;
+		int m_nWnd = -1;
+		int m_overlap;
+		int m_step;
+		
+		/// Window Values
+		double* m_wndData = null;
+		
+		/// Windowed Sound Data
+		double* m_dataStream = null;
+	
+		string m_name;
+		public string Name
+		{
+			get { return m_name; }
+		}
+	
+		public int WindowCount
+		{
+			get { return m_nWnd; }
+		}
+	
+		public int WindowSize
+		{
+			get { return m_size; }
+		}
+		
+		int m_bytesAllocated = 0;
+	
+		public Window(string name, int size, int overlap)
+		{
+		}
+		
+		private void Load()
+		{
+		}
+		
+		virtual public void Attach()
+		{
+		}
+		
+		virtual public void Detach()
+		{
+		}
+		
+		virtual public bool IsAttached()
+		{
+			return false;
+		}
+		
+		/// @brief Returns a pointer to the first element representing the window.
+		/// @details User must be sure to keep inside the window to avoid stack corruption.
+		unsafe public double* GetWindow(int n)
+		{
+			return m_wndData;
+		}
+		
+		virtual public void Dispose()
+		{
+		}
+		
+		abstract public double Factory(int n);
 	}
 }
