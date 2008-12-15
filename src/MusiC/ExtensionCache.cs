@@ -15,7 +15,6 @@ namespace MusiC.Extensions
 		
 		public void Initialize()
 		{
-			_tBaseConfig=typeof(Config);
 		}
 		
 		public void Add(Type t)
