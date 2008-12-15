@@ -25,15 +25,15 @@ Testing premake projects
 	vs2008 - umanaged
 		Windows ... ok - vs2008 express
 		
-	codeblocks gcc
+	code::blocks gcc
 		Linux
 		Mac
 		Windows
 readme
 
-src/config.xml
+*.xml
 	add to projects ... ok
-	copy after build to /bin
+	copy after build to /bin ... ok
 	
 FIXME:
 	premake --clean
