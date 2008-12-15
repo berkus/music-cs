@@ -2,7 +2,7 @@ using System;
 
 namespace MusiC.Exceptions
 {
-	class MissingExtensionException : MCException
+	public class MissingExtensionException : MCException
 	{
 		public MissingExtensionException(String msg) : base(msg)
 		{

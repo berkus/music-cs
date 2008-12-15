@@ -19,6 +19,12 @@ namespace MusiC.Extensions
 		
 		public void Add(Type t)
 		{
+			if(!typeof(Extension).IsAssignableFrom(t))
+			{
+				Message(t.ToString() + " ... [REJECTED]");
+				return;
+			}
+			
 			ExtensionInfo info = new ExtensionInfo(t);
 			_extensionList.Add(t.FullName, info);
 			

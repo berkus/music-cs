@@ -170,7 +170,15 @@ namespace MusiC.Configs
 							paramList.Add(XmlSafeAttribute(param, "name"), className, XmlSafeAttribute(param, "value", true));
 						}
 						
-						algorithm.Add(className, paramList);
+						try
+						{
+							algorithm.Add(className, paramList);
+						} catch (MissingExtensionException e)
+						{
+							Error("Error while loading an algorithm .... Skipping");
+							Error(e);
+							break;
+						}
 					}
 					else
 						Warning("Cant find tag "+child.Name);

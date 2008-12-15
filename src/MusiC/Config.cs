@@ -9,7 +9,7 @@ using MusiC.Extensions;
 
 namespace MusiC
 {
-	abstract public class Config : MusiCObject
+	abstract public class Config : Extension
 	{
 		LinkedList<Algorithm> _algList = new LinkedList<Algorithm>();
 		LinkedList<TrainLabel> _trainList = new LinkedList<TrainLabel>();
