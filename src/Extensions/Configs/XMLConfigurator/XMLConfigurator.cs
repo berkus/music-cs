@@ -8,9 +8,11 @@ using MusiC.Exceptions;
 
 namespace MusiC.Configs
 {
-	///@todo There is no need to have <Declare> tags any more.
-	///@todo Algorithm should have a name to refer errors.
-	/// @brief a XML parser that knows how to configure the library.
+	/// <summary>
+	/// A XML parser that knows how to configure the library.
+	/// </summary>
+	/// @todo There is no need to have "Declare" tags any more.
+	/// @todo Algorithm should have a name to refer errors.
 	public class XMLConfigurator : Config
 	{
 		/// store class alias. Tag <=> classname.
@@ -29,10 +31,18 @@ namespace MusiC.Configs
 			
 			BuildAlgorithmList(cfgFile);
 		}
-		/// @brief Get attributes from a xml node. 
-		/// @detail Safely retrieves an attribute named attName from the node n which may be forced
+		
+		
+		/// <summary> Get attributes from a xml node. </summary>
+		/// <description> 
+		/// Safely retrieves an attribute named attName from the node n which may be forced
 		/// to have it. In case the attribute is missing returns null if it is optional or throw an
 		/// MusiC.MissingAttributeException in case it is mandatory.
+		/// </description>
+		/// <param name="n">The System.XmlNode here the attribute might be</param>
+		/// <param name="attName">The System.Attribute name</param>
+		/// <param name="isOptional">Is it optional ?</param>
+		/// <returns>The attribute value</returns>
 		String XmlSafeAttribute(XmlNode n, String attName, bool isOptional)
 		{
 			if(n==null)
@@ -50,6 +60,13 @@ namespace MusiC.Configs
 			return att.Value;
 		}
 		
+		/// <summary>
+		/// Get attributes from a xml node. 
+		/// </summary>
+		/// <param name="n">The System.XmlNode here the attribute might be</param>
+		/// <param name="attName">The System.Attribute name</param>
+		/// <returns>The attribute value</returns>
+		/// @details This form sets the isOptional to false.
 		String XmlSafeAttribute(XmlNode n, String attName)
 		{
 			return XmlSafeAttribute(n, attName, false);
