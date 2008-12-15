@@ -8,13 +8,13 @@ using MusiC.Exceptions;
 
 namespace MusiC.Configs
 {
-	public class XMLConfig : Config
+	///@todo There is no need to have <Declare> tags any more.
+	///@todo Algorithm should have a name to refer errors.
+	/// @brief a XML parser that knows how to configure the library.
+	public class XMLConfigurator : Config
 	{
+		/// store class alias. Tag <=> classname.
 		Dictionary<String, String> _tagCache = new Dictionary<String, String>();
-		
-		public XMLConfig()
-		{
-		}
 		
 		public override void Load(String cfgPath)
 		{
@@ -29,7 +29,10 @@ namespace MusiC.Configs
 			
 			BuildAlgorithmList(cfgFile);
 		}
-		
+		/// @brief Get attributes from a xml node. 
+		/// @detail Safely retrieves an attribute named attName from the node n which may be forced
+		/// to have it. In case the attribute is missing returns null if it is optional or throw an
+		/// MusiC.MissingAttributeException in case it is mandatory.
 		String XmlSafeAttribute(XmlNode n, String attName, bool isOptional)
 		{
 			if(n==null)
@@ -153,7 +156,7 @@ namespace MusiC.Configs
 						algorithm.Add(className, paramList);
 					}
 					else
-						Warning("Cant find extension "+child.Name);
+						Warning("Cant find tag "+child.Name);
 				}
 				
 				AddAlgorithm(algorithm);
