@@ -1,7 +1,7 @@
 using System;
 using System.Runtime.InteropServices;
 
-namespace MCModule.UnmanagedInterface
+namespace MusiC.Data
 {
 	[StructLayout(LayoutKind.Sequential,Pack = 1)]
 	unsafe public struct MCFeatVector
