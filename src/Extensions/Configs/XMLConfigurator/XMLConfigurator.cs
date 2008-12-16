@@ -167,7 +167,7 @@ namespace MusiC.Configs
 							if(param.Name != "Param")
 								continue;
 							
-							paramList.Add(XmlSafeAttribute(param, "name"), className, XmlSafeAttribute(param, "value", true));
+							paramList.AddParam(XmlSafeAttribute(param, "name"), XmlSafeAttribute(param, "class"), XmlSafeAttribute(param, "value", true));
 						}
 						
 						try
