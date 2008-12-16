@@ -3,13 +3,9 @@
 	
 	<Handler name="WavHandler" class="MCModule.FileHandlers.WavHandler" pattern=".*[.]wav$"/>
 	
-	<Declare name="Hamming" class="MCModule.Windows.Hamming">
-		<Param name="Size" class="System.Int32" />
-		<Param name="Overlap" class="System.Int32" />
-	</Declare>
-
-	<Declare name="RollOff" class="MusiC.Extensions.Features.SpecRollOff"/>
-	<Declare name="Barbedo" class="MCModule.Classifiers.Barbedo"/>
+	<Alias name="Hamming" class="MusiC.Extensions.Windows.Hamming"/>
+	<Alias name="RollOff" class="MusiC.Extensions.Features.SpecRollOff"/>
+	<Alias name="Barbedo" class="MusiC.Extensions.Classifiers.Barbedo"/>
 	
 	<Train dir="/Users/mjsmagalhaes/projeto_final/data">
 		<Label name="classical" input="/Users/mjsmagalhaes/projeto_final/data/classical"/>
@@ -21,8 +17,8 @@
 	<Algorithm>
 		
 		<Hamming>
-			<Param name="Size" value="1024" />
-			<Param name="Overlap" value="512" />
+			<Param name="Size" value="1024" class="System.Int32"/>
+			<Param name="Overlap" value="512" class="System.Int32"/>
 		</Hamming>
 
 		<RollOff/>
