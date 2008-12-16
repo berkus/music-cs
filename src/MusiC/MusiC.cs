@@ -86,6 +86,11 @@ namespace MusiC
 			
 			cfg.Load(_configFile);
 			Message(_configFile + " ... [LOADED]");
+			
+			foreach(Algorithm a in cfg.GetAlgorithmList())
+			{
+				a.Say();
+			}
 		}
 		
 		public void Unload()

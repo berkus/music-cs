@@ -2,10 +2,32 @@ using System;
 using System.Collections.Generic;
 using System.Runtime.InteropServices;
 
+using MusiC.Data;
+
 namespace MusiC
 {
 	abstract public class Classifier : Extension
 	{
+		LinkedList<String> m_classList = new LinkedList<String>();
+		LinkedList<String> m_dirs = new LinkedList<String>();
+		
+		public Classifier(string type)
+		{
+		}
+		
+		public unsafe void Execute(System.Collections.Generic.ICollection<Feature> FeatList, Window wnd)
+		{
+		}
+		
+		virtual unsafe public MCDataCollection * Filter(MCDataCollection * dataIn)
+		{
+			return dataIn;
+		}
+		
+		abstract unsafe public void Train(MCDataCollection * dtCol);
+		abstract public void Classify();		
+		abstract public void TryLoadingParameters();
+		abstract public void Dispose();
 	}
 }
 

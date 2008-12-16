@@ -30,6 +30,12 @@ namespace MusiC
 			if(info == null)
 				throw new Exceptions.MissingExtensionException(extensionClass + " wasn't found.");
 			
+			/// @todo Throw a UnrecognizedExtensionException.
+			if(info.Type == ExtensionType.NotSet)
+			{
+				Warning(extensionClass+": Cant recognize this Extension. This happens when an extension inherits directly from MusiC.Extension");
+			}
+			
 			Extension ext;
 			
 			switch(info.Type)
@@ -65,6 +71,26 @@ namespace MusiC
 			}
 			
 			return true;
+		}
+		
+		public void Say()
+		{
+			Message("Window: " + 
+			        ((_window!=null)?_window.GetType().FullName:"((NULL))")
+			        );
+			
+			Message("Classifier: " +
+			        ((_classifier!=null)?_classifier.GetType().FullName : "((NULL))")
+					);
+			
+			Message("Feature List");ReportIndent();
+			
+			foreach(Feature f in _featureList)
+				Message(
+					(f!=null)?f.GetType().FullName : "((NULL))"
+					);
+			
+			ReportUnindent();
 		}
 	}
 }
