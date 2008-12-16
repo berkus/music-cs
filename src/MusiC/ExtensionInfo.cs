@@ -1,3 +1,27 @@
+/*
+ * The MIT License
+ * Copyright (c) 2008 Marcos José Sant'Anna Magalhães
+ * 
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ * 
+ * The above copyright notice and this permission notice shall be included in
+ * all copies or substantial portions of the Software.
+ * 
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+ * THE SOFTWARE.
+ * 
+ */
+ 
 using System;
 using System.Reflection;
 using System.Xml;
@@ -9,161 +33,6 @@ namespace MusiC
 {
 	public class ParamList : Parametrized
 	{
-	}
-	
-	public class Parametrized : MusiCObject
-	{
-		Boolean _isParamInitiated = false;
-		
-		LinkedList<Instantiable> _paramList = new LinkedList<Instantiable>();
-		
-		public virtual void AddParam(String paramName, String paramClass)
-		{
-			AddParam(paramName, paramClass, null);
-		}
-		
-		public virtual void AddParam(String paramName, String paramClass, String strValue)
-		{
-			Instantiable i = new Instantiable(paramName, paramClass);
-			i.StrValue = strValue;
-			_paramList.AddLast(i);
-		}
-		
-		virtual public void Instantiate()
-		{
-			if(_paramList.Count != 0 && !_isParamInitiated)
-			{
-				foreach(Instantiable i in _paramList)
-					i.Instantiate();
-			}
-		}
-		
-		public Instantiable GetParamByName(String name)
-		{
-			foreach(Instantiable i in _paramList)
-			{
-				if(i.Name == name)
-					return i;
-			}
-			
-			return null;
-			
-			///@todo error handling
-		}
-		
-		public virtual Type[] GetTypes()
-		{
-			int paramCount = _paramList.Count;
-			Type[] paramClassTypes = new Type[paramCount];
-			
-			int i = 0;
-			foreach(Instantiable param in _paramList)
-			{
-				paramClassTypes[i] = param.TypeObj; 
-				i++;
-			}
-			
-			return paramClassTypes;
-		}
-		
-		public virtual Object[] GetParamsValue()
-		{
-			if(_paramList.Count != 0 && !_isParamInitiated)
-			{
-				foreach(Instantiable i in _paramList)
-					i.Instantiate();
-			}
-			
-			Int32 paramCount = _paramList.Count;
-			Object[] paramValue = new Object[paramCount];
-			
-			Int32 j = 0;
-			foreach(Instantiable param in _paramList)
-			{
-				paramValue[j] = param.Value; 
-				j++;
-			}
-			
-			return paramValue;
-		}
-	}
-	
-	public class Instantiable : Parametrized
-	{
-		String _name = null;
-		String _classname = null;
-		Type _class = null;
-		
-		String _strValue = null;
-		Object _value = null;
-		
-		Boolean _isInitiated = false;
-		
-		public Type TypeObj
-		{
-			get { return _class; }
-			set { _class = value; _classname = value.FullName; }
-		}
-		
-		public String Name
-		{
-			get { return _name; }
-			set {_name = value; }
-		}
-		
-		public String Class
-		{
-			get { return _classname; }
-			set { _class = Type.GetType(value, false, false); _classname = value; }
-		}
-		
-		public String StrValue
-		{
-			get { return _strValue; }
-			set { _strValue=value; }
-		}
-		
-		public Object Value
-		{
-			get { return _value; }
-		}
-		
-		public Instantiable(String paramName, String paramClass)
-		{
-			_name=paramName;
-			_classname=paramClass;
-			_class = Type.GetType(paramClass, false, false);
-		}
-		
-		override public void Instantiate()
-		{
-			if( _value != null || _isInitiated)
-				return;
-			
-			///@todo throw exception
-			if(_class == null || _classname == null)
-				return;
-			
-			base.Instantiate();
-			
-			if(_strValue != null)
-			{
-				MethodInfo parse = _class.GetMethod("Parse", new Type[]{typeof(String)});
-				
-				if(parse == null)
-				{
-					Warning(_classname+".Parse wasn't found. This must be a static method. Using declared constructor.");
-				}
-				else
-				{
-					_value = parse.Invoke(null, new Object[] { StrValue } );
-					return;
-				}
-			}
-			
-			ConstructorInfo defaultCtor = _class.GetConstructor(GetTypes());
-			defaultCtor.Invoke(GetParamsValue());
-		}
 	}
 	
 	public enum ExtensionType
