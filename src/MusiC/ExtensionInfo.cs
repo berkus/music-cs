@@ -9,14 +9,6 @@ namespace MusiC
 {
 	public class ParamList : Parametrized
 	{
-		LinkedList<Instantiable> _paramList = new LinkedList<Instantiable>();
-		
-		public void Add(String name, String className, String strValue)
-		{
-			Instantiable i = new Instantiable(name, className);
-			i.StrValue = strValue;
-			_paramList.AddLast(i);
-		}
 	}
 	
 	public class Parametrized : MusiCObject
@@ -27,7 +19,14 @@ namespace MusiC
 		
 		public virtual void AddParam(String paramName, String paramClass)
 		{
-			_paramList.AddLast(new Instantiable(paramName, paramClass));
+			AddParam(paramName, paramClass, null);
+		}
+		
+		public virtual void AddParam(String paramName, String paramClass, String strValue)
+		{
+			Instantiable i = new Instantiable(paramName, paramClass);
+			i.StrValue = strValue;
+			_paramList.AddLast(i);
 		}
 		
 		virtual public void Instantiate()
@@ -129,11 +128,6 @@ namespace MusiC
 			get { return _value; }
 		}
 		
-		public Instantiable(String paramName)
-		{
-			_name=paramName;
-		}
-		
 		public Instantiable(String paramName, String paramClass)
 		{
 			_name=paramName;
@@ -154,7 +148,7 @@ namespace MusiC
 			
 			if(_strValue != null)
 			{
-				MethodInfo parse = _class.GetMethod("Parse");
+				MethodInfo parse = _class.GetMethod("Parse", new Type[]{typeof(String)});
 				
 				if(parse == null)
 				{
@@ -203,8 +197,8 @@ namespace MusiC
 			if(typeof(Config).IsAssignableFrom(t))
 				return ExtensionType.Configuration;
 			
-			//if(typeof(Window).IsAssignableFrom(t))
-			//	return ExtensionType.Classifier;
+			if(typeof(Classifier).IsAssignableFrom(t))
+				return ExtensionType.Classifier;
 			
 			if(typeof(Feature).IsAssignableFrom(t))
 				return ExtensionType.Feature;
@@ -220,7 +214,8 @@ namespace MusiC
 		
 		public Extension Instantiate(ParamList pList)
 		{
-			ConstructorInfo ctor = _class.GetConstructor(pList.GetTypes());
+			Type[] paramTypes = pList.GetTypes();
+			ConstructorInfo ctor = _class.GetConstructor(paramTypes);
 			
 			Extension e = null;
 			
