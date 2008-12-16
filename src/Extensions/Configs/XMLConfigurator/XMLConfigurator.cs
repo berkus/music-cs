@@ -11,8 +11,13 @@ namespace MusiC.Configs
 	/// <summary>
 	/// A XML parser that knows how to configure the library.
 	/// </summary>
-	/// @todo There is no need to have "Declare" tags any more.
+	/// <remarks>
+	/// You can add any non-specified tag to the file and the parser will ignore it. Just try to avoid tags which begins
+	/// by 'MusiC-*'. Those may be used in later revisions. 
+	/// </remarks>
 	/// @todo Algorithm should have a name to refer errors.
+	/// @todo Find MusiC node and use it instead of document.
+	/// @todo Update parser to run each node instead of GetElements.
 	public class XMLConfigurator : Config
 	{
 		/// store class alias. Tag <=> classname.
@@ -74,7 +79,7 @@ namespace MusiC.Configs
 		
 		void BuildHandlerList(XmlDocument cfgFile)
 		{
-			foreach (XmlNode n in cfgFile.GetElementsByTagName("Handler"))
+			foreach (XmlNode n in cfgFile.GetElementsByTagName("MusiC-Handler"))
 			{
 				HandlerInfo hInfo = new HandlerInfo();
 				
@@ -97,7 +102,7 @@ namespace MusiC.Configs
 		
 		void BuildTagCache(XmlDocument cfgFile)
 		{
-			foreach (XmlNode n in cfgFile.GetElementsByTagName("Declare"))
+			foreach (XmlNode n in cfgFile.GetElementsByTagName("MusiC-Alias"))
 			{				
 				_tagCache.Add(XmlSafeAttribute(n, "name"), XmlSafeAttribute(n, "class"));
 			}
@@ -105,7 +110,7 @@ namespace MusiC.Configs
 		
 		void ParseData(XmlDocument cfgFile)
 		{
-			foreach(XmlNode train in cfgFile.GetElementsByTagName("Train"))
+			foreach(XmlNode train in cfgFile.GetElementsByTagName("MusiC-Train"))
 			{
 				String baseDir = XmlSafeAttribute(train, "dir", true);
 				
@@ -138,7 +143,7 @@ namespace MusiC.Configs
 			}
 			
 			// Adding Train/Classify support
-			foreach(XmlNode classifyNode in cfgFile.GetElementsByTagName("Classify"))
+			foreach(XmlNode classifyNode in cfgFile.GetElementsByTagName("MusiC-Classify"))
 			{
 				/// @todo Add support to allow/deny algorithms to use this folder
 				
@@ -151,37 +156,44 @@ namespace MusiC.Configs
 		
 		public void BuildAlgorithmList(XmlDocument cfgFile)
 		{
-			foreach (XmlNode n in cfgFile.GetElementsByTagName("Algorithm"))
+			foreach (XmlNode n in cfgFile.GetElementsByTagName("MusiC-Algorithm"))
 			{
 				Algorithm algorithm = new Algorithm();
+				
+				String className;
 
 				foreach (XmlNode child in n.ChildNodes)
 				{
-					String className;
-					ParamList paramList = new ParamList();
-					
-					if(_tagCache.TryGetValue(child.Name, out className))
+					if(child.Name == "MusiC-Extension")
+						className = XmlSafeAttribute(child, "name");
+					else
 					{
-						foreach(XmlNode param in child.ChildNodes)
+						if(!_tagCache.TryGetValue(child.Name, out className))
 						{
-							if(param.Name != "Param")
-								continue;
-							
-							paramList.AddParam(XmlSafeAttribute(param, "name"), XmlSafeAttribute(param, "class"), XmlSafeAttribute(param, "value", true));
-						}
-						
-						try
-						{
-							algorithm.Add(className, paramList);
-						} catch (MissingExtensionException e)
-						{
-							Error("Error while loading an algorithm .... Skipping");
-							Error(e);
+							Warning("Cant find tag "+child.Name);
 							break;
 						}
 					}
-					else
-						Warning("Cant find tag "+child.Name);
+					
+					ParamList paramList = new ParamList();
+					
+					foreach(XmlNode param in child.ChildNodes)
+					{
+						if(param.Name != "Param")
+							continue;
+						
+						paramList.AddParam(XmlSafeAttribute(param, "name"), XmlSafeAttribute(param, "class"), XmlSafeAttribute(param, "value", true));
+					}
+					
+					try
+					{
+						algorithm.Add(className, paramList);
+					} catch (MissingExtensionException e)
+					{
+						Error("Error while loading an algorithm .... Skipping");
+						Error(e);
+						break;
+					}
 				}
 				
 				AddAlgorithm(algorithm);
