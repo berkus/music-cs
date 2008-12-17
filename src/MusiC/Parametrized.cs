@@ -22,6 +22,9 @@
  * 
  */
 
+using System;
+using System.Collections.Generic;
+
 namespace MusiC
 {
 	public class Parametrized : MusiCObject

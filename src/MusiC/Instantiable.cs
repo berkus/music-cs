@@ -22,6 +22,9 @@
  * 
  */
  
+using System;
+using System.Reflection;
+
 namespace MusiC
 {
 	public class Instantiable : Parametrized
