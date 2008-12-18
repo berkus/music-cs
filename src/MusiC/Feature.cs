@@ -25,118 +25,92 @@
 using System;
 
 using MusiC;
-
 using MCModule.UnmanagedInterface;
 
-namespace MCModule
+namespace MusiC
 {
 	/// @brief Basic feature type.
 	/// @details To implement a new feature you must extended this class.
 	/// @todo Implement IDispose interface
 	abstract unsafe public class Feature : Extension
 	{
-		/// @todo this shouldnt be protected. Add methods(or properties) for access.
-		/// @todo change m_data for another name
-		protected double* m_data;
-		/// @todo change m_temp for another name
-		protected double* m_temp;
-
-		int m_wndSize;
-		int m_wndCount;
-		
-	
-		string m_name;
-		public string Name
+		abstract unsafe public class UnmanagedImpl : Feature
 		{
-			get { return m_name; }
+			Single * _data;
+			Single * _temp;
+		
+			public UnmanagedImpl(String name) : base(name)
+			{
+			}
+			
+			protected Single * OutterExtract(Window.UnmanagedImpl wnd)
+			{
+				if(_temp == null)
+				{
+					_temp = UnsafePtr.dgetmem(wnd.WindowSize);
+					_wndSize = wnd.WindowSize;
+				}
+				
+				if(_data == null)
+				{ 
+					_data = UnsafePtr.dgetmem(wnd.WindowCount);
+					_wndCount = wnd.WindowCount;
+				}
+				
+				if(wnd.WindowSize > _wndSize)
+				{
+					UnsafePtr.free(_temp);
+					_temp = UnsafePtr.dgetmem(wnd.WindowSize);
+				}
+				
+				if(wnd.WindowCount > _wndCount)
+				{
+					UnsafePtr.free(_data);
+					_data = UnsafePtr.dgetmem(wnd.WindowCount);
+				}
+						
+				return Extract(wnd);
+			}
+			
+			/// All frame data must be consecutive
+			abstract public Single * Extract(Window.UnmanagedImpl wnd);
+		}
+		
+		abstract public class ManagedImpl : Feature
+		{
+			public ManagedImpl(String name) : base(name)
+			{
+			}
+			
+			virtual protected Single[] OutterExtract(Window.ManagedImpl wnd)
+			{
+				return Extract(wnd);
+			}
+			
+			virtual public Single[] Extract(Window.ManagedImpl wnd)
+			{
+				return null;
+			}
+		}
+
+		Int32 _wndSize;
+		Int32 _wndCount;
+		String _name;
+		
+		public String Name
+		{
+			get { return _name; }
 		}
 	
-		public Feature(string name)
+		public Feature(String name)
 		{
-			m_name = name;
+			_name = name;
 			Console.WriteLine(name);
 		}
-	
-		public double * OutterExtract(Window wnd)
+		
+		virtual public Int32 FeatureSize(Window wnd)
 		{
-			if(m_temp == null)
-			{
-				m_temp = UnsafePtr.dgetmem(wnd.WindowSize);
-				m_wndSize = wnd.WindowSize;
-			}
-			
-			if(m_data == null)
-			{ 
-				m_data = UnsafePtr.dgetmem(wnd.WindowCount);
-				m_wndCount = wnd.WindowCount;
-			}
-			
-			if(wnd.WindowSize > m_wndSize)
-			{
-				UnsafePtr.free(m_temp);
-				m_temp = UnsafePtr.dgetmem(wnd.WindowSize);
-			}
-			
-			if(wnd.WindowCount > m_wndCount)
-			{
-				UnsafePtr.free(m_data);
-				m_data = UnsafePtr.dgetmem(wnd.WindowCount);
-			}
-					
-			return Extract(wnd);
+			return wnd.WindowCount;
 		}
-		
-		abstract public int FeatureSize(Window wnd);
-		
-		/// All frame data must be consecutive
-		abstract public double * Extract(Window wnd);
-		
-		abstract public void Dispose();
 	} 
-}
-
-namespace MusiC
-{
-	abstract unsafe public class Feature : Extension
-	{
-		public Feature()
-		{
-			Message("Feature ok");
-		}
-		
-		/// @todo this shouldnt be protected. Add methods(or properties) for access.
-		/// @todo change m_data for another name
-		protected double* m_data;
-		/// @todo change m_temp for another name
-		protected double* m_temp;
-
-		int m_wndSize;
-		int m_wndCount;
-		
-		string m_name;
-		public string Name
-		{
-			get { return m_name; }
-		}
-	
-		public Feature(string name)
-		{
-			m_name = name;
-			Message(name);
-		}
-	
-		public double * OutterExtract(Window wnd)
-		{	
-			return Extract(wnd);
-		}
-		
-		abstract public int FeatureSize(Window wnd);
-		
-		/// All frame data must be consecutive
-		abstract public double * Extract(Window wnd);
-		
-		virtual public void Dispose()
-		{
-		}
-	}
 }

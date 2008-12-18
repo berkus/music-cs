@@ -52,10 +52,10 @@ namespace MusiC.Extensions.Windows
 		{
 		}
 		
-		override public double Factory(int n)
+		override public Single Factory(int n)
 		{
 			//return 0.53836 - 0.46164 * (Math.Cos(2 * Math.PI * n / (WindowSize - 1)));
-			return 0.54 - 0.46 * (Math.Cos(2 * Math.PI * n / (WindowSize - 1)));
+			return (Single) (0.54f - 0.46f * (Math.Cos(2.0f * Math.PI * n / (WindowSize - 1))));
 		}
 	}
 }

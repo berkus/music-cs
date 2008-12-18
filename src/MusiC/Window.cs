@@ -33,22 +33,51 @@ namespace MusiC
 	/// Base class of Windows extensions implementation.
 	/// </summary>
 	/// @todo Allow different types.
-	abstract unsafe public class Window : Extension
+	abstract public class Window : Extension
 	{
+		abstract unsafe public class UnmanagedImpl : Window
+		{
+			/// Window Values
+			Single * _wndData = null;
+		
+			/// Windowed Data
+			Single * _dataStream = null;
+			
+			public UnmanagedImpl(String name, Int32 size, Int32 overlap) : base(name, size, overlap)
+			{
+			}
+			
+			unsafe public Single * GetWindow(int n)
+			{
+				return _wndData;
+			}
+		}
+		
+		abstract public class ManagedImpl : Window
+		{
+			/// Window Values
+			Single[] _wndData = null;
+		
+			/// Windowed Data
+			Single[] _dataStream = null;
+			
+			public ManagedImpl(String name, Int32 size, Int32 overlap) : base(name, size, overlap)
+			{
+			}
+			
+			public Single[] GetWindow(int n)
+			{
+				return _dataStream;
+			}
+		}
+		
 		Int32 m_size;
 		Int32 m_nWnd = -1;
 		Int32 m_overlap;
 		Int32 m_step;
 		
 		String m_name;
-		
-		/// Window Values
-		Double * m_wndData = null;
-		
-		/// Windowed Sound Data
-		Double * m_dataStream = null;
 	
-		
 		public string Name
 		{
 			get { return m_name; }
@@ -70,10 +99,6 @@ namespace MusiC
 		{
 		}
 		
-		private void Load()
-		{
-		}
-		
 		virtual public void Attach(Handler file)
 		{
 		}
@@ -87,18 +112,7 @@ namespace MusiC
 			return false;
 		}
 		
-		/// @brief Returns a pointer to the first element representing the window.
-		/// @details User must be sure to keep inside the window to avoid stack corruption.
-		unsafe public double* GetWindow(int n)
-		{
-			return m_wndData;
-		}
-		
-		virtual public void Dispose()
-		{
-		}
-		
-		abstract public double Factory(int n);
+		abstract public Single Factory(int n);
 	}
 }
 

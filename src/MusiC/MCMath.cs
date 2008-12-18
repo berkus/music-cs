@@ -39,13 +39,13 @@ namespace MCModule.UnmanagedInterface
 {
 	unsafe public class UnsafePtr
 	{
-		public static double* dgetmem(int size)
+		public static Single * dgetmem(Int32 size)
 		{
 			IntPtr ptr = Marshal.AllocHGlobal(size * sizeof(double));
-			return (double*)ptr.ToPointer();
+			return (Single*)ptr.ToPointer();
 		}
 		
-		public static void free(void* p)
+		public static void free(void * p)
 		{
 			if (p != null)
 			{
