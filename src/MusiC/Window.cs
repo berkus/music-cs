@@ -23,27 +23,32 @@
  */
 
 using System;
-using System.Runtime.InteropServices;
+using System.Collections.Generic;
 
-using MCModule.UnmanagedInterface;
+using MusiC.Data;
 
 namespace MusiC
 {
+	/// <summary>
+	/// Base class of Windows extensions implementation.
+	/// </summary>
+	/// @todo Allow different types.
 	abstract unsafe public class Window : Extension
 	{
-		/// @todo this shouldnt be protected. Add methods(or properties) for access.
-		protected int m_size;
-		int m_nWnd = -1;
-		int m_overlap;
-		int m_step;
+		Int32 m_size;
+		Int32 m_nWnd = -1;
+		Int32 m_overlap;
+		Int32 m_step;
+		
+		String m_name;
 		
 		/// Window Values
-		double* m_wndData = null;
+		Double * m_wndData = null;
 		
 		/// Windowed Sound Data
-		double* m_dataStream = null;
+		Double * m_dataStream = null;
 	
-		string m_name;
+		
 		public string Name
 		{
 			get { return m_name; }
@@ -69,7 +74,7 @@ namespace MusiC
 		{
 		}
 		
-		virtual public void Attach()
+		virtual public void Attach(Handler file)
 		{
 		}
 		
