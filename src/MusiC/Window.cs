@@ -45,6 +45,16 @@ namespace MusiC
 			
 			public UnmanagedImpl(String name, Int32 size, Int32 overlap) : base(name, size, overlap)
 			{
+				_wndData = UnsafePtr.dgetmem(size);
+				
+				for (int i = 0; i < size; i++)
+					_wndData[i] = Factory(i);
+			}
+			
+			~UnmanagedImpl()
+			{
+				if(_wndData != null)
+					UnsafePtr.free(_wndData);
 			}
 			
 			unsafe public Single * GetWindow(int n)
@@ -63,6 +73,11 @@ namespace MusiC
 			
 			public ManagedImpl(String name, Int32 size, Int32 overlap) : base(name, size, overlap)
 			{
+				_wndData = new Single[size];
+				
+				Int16 i = 0;
+				for(; i < size; i++)
+					_wndData[i] = Factory(i);
 			}
 			
 			public Single[] GetWindow(int n)
@@ -71,32 +86,35 @@ namespace MusiC
 			}
 		}
 		
-		Int32 m_size;
-		Int32 m_nWnd = -1;
-		Int32 m_overlap;
-		Int32 m_step;
+		Int32 _size;
+		Int32 _nWnd = -1;
+		Int32 _overlap;
+		Int32 _step;
 		
-		String m_name;
+		String _name;
 	
-		public string Name
+		public String Name
 		{
-			get { return m_name; }
+			get { return _name; }
 		}
 	
-		public int WindowCount
+		public Int32 WindowCount
 		{
-			get { return m_nWnd; }
+			get { return _nWnd; }
 		}
 	
-		public int WindowSize
+		public Int32 WindowSize
 		{
-			get { return m_size; }
+			get { return _size; }
 		}
-		
-		int m_bytesAllocated = 0;
 	
-		public Window(string name, int size, int overlap)
+		public Window(String name, Int32 size, Int32 overlap)
 		{
+			_name = name;
+			_size = size;
+			_overlap = overlap;
+			
+			_step = size - overlap;
 		}
 		
 		virtual public void Attach(Handler file)
@@ -107,12 +125,12 @@ namespace MusiC
 		{
 		}
 		
-		virtual public bool IsAttached()
+		virtual public Boolean IsAttached()
 		{
 			return false;
 		}
 		
-		abstract public Single Factory(int n);
+		abstract public Single Factory(Int32 n);
 	}
 }
 
