@@ -23,16 +23,10 @@
  */
 
 using System;
-using System.IO;
 using System.Reflection;
-using System.Runtime.Remoting;
 
 namespace MusiC
 {
-	abstract public class Extension : MusiCObject
-	{
-	}
-	
 	class Invoker
 	{
 		public static Extension LoadType()

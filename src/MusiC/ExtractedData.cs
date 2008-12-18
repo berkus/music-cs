@@ -58,8 +58,8 @@ namespace MusiC.Data
 	{
 		public static MCDataCollection * BuildCollection(int nClasses, int nFeatures)
 		{
-			MCDataCollection * data = (MCDataCollection *)System.Runtime.InteropServices.Marshal.AllocHGlobal(sizeof(MCDataCollection)).ToPointer();
-			MCClassData * newEntry = data->pClassData = (MCClassData *)System.Runtime.InteropServices.Marshal.AllocHGlobal(sizeof(MCClassData) * nClasses).ToPointer();
+			MCDataCollection * data = (MCDataCollection *) Marshal.AllocHGlobal(sizeof(MCDataCollection)).ToPointer();
+			MCClassData * newEntry = data->pClassData = (MCClassData *) Marshal.AllocHGlobal(sizeof(MCClassData) * nClasses).ToPointer();
 			
 			for(int i = 0; i < nClasses; i++)
 			{
