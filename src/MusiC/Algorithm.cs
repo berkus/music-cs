@@ -97,6 +97,11 @@ namespace MusiC
 			return true;
 		}
 		
+		public void Execute()
+		{
+			
+		}
+		
 		public void Say()
 		{
 			Message("Window: " + 

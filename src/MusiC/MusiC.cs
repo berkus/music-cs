@@ -101,19 +101,31 @@ namespace MusiC
 		
 		public void Run()
 		{
-			ExtensionCache cache = Global<ExtensionCache>.GetInstance();
-			Config cfg = cache.GetConfig();
-			
-			// Get exec path if user don't provide one.
-			if(_configFile==null)
-				_configFile=Path.Combine(Path.GetDirectoryName(Assembly.GetEntryAssembly().Location), "config.xml");
-			
-			cfg.Load(_configFile);
-			Message(_configFile + " ... [LOADED]");
-			
-			foreach(Algorithm a in cfg.GetAlgorithmList())
+			try
 			{
-				a.Say();
+				ExtensionCache cache = Global<ExtensionCache>.GetInstance();
+				Config cfg = cache.GetConfig();
+				
+				// Get exec path if user don't provide one.
+				if(_configFile==null)
+					_configFile=Path.Combine(Path.GetDirectoryName(Assembly.GetEntryAssembly().Location), "config.xml");
+				
+				cfg.Load(_configFile);
+				Message(_configFile + " ... [LOADED]");
+				
+				foreach(Algorithm a in cfg.GetAlgorithmList())
+				{
+					a.Execute();
+				}
+			
+			}
+			catch(MCException mce)
+			{
+				mce.Report();
+			}
+			catch(Exception e)
+			{
+				Error(e);
 			}
 		}
 		
