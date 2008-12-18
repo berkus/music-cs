@@ -46,16 +46,36 @@ using MusiC;
 
 namespace MusiC.Extensions.Windows
 {
-	public class Hamming : Window
+	class Hamming
 	{
-		public Hamming(int size, int overlap) : base("Hamming", size, overlap)
+		static public Single Factory(Int32 n, Int32 wndSize)
+		{
+			//return 0.53836 - 0.46164 * (Math.Cos(2 * Math.PI * n / (wndSize - 1)));
+			return (Single) (0.54f - 0.46f * (Math.Cos(2.0f * Math.PI * n / (wndSize - 1))));
+		}
+	}
+	
+	public class HammingU : Window.UnmanagedImpl
+	{
+		public HammingU(int size, int overlap) : base("Hamming - Unmanaged", size, overlap)
 		{
 		}
 		
 		override public Single Factory(int n)
 		{
-			//return 0.53836 - 0.46164 * (Math.Cos(2 * Math.PI * n / (WindowSize - 1)));
-			return (Single) (0.54f - 0.46f * (Math.Cos(2.0f * Math.PI * n / (WindowSize - 1))));
+			return Hamming.Factory(n, WindowSize);
+		}
+	}
+	
+	public class HammingM : Window.ManagedImpl
+	{
+		public HammingM(int size, int overlap) : base("Hamming - Managed", size, overlap)
+		{
+		}
+		
+		override public Single Factory(int n)
+		{
+			return Hamming.Factory(n, WindowSize);
 		}
 	}
 }

@@ -3,7 +3,7 @@
 	
 	<MusiC-Handler name="WavHandler" class="MCModule.FileHandlers.WavHandler" pattern=".*[.]wav$"/>
 	
-	<MusiC-Alias name="Hamming" class="MusiC.Extensions.Windows.Hamming"/>
+	<MusiC-Alias name="Hamming" class="MusiC.Extensions.Windows.HammingM"/>
 	<MusiC-Alias name="RollOff" class="MusiC.Extensions.Features.SpecRollOffM"/>
 	<MusiC-Alias name="Barbedo" class="MusiC.Extensions.Classifiers.Barbedo"/>
 	

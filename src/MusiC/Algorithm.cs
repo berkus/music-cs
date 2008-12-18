@@ -76,19 +76,25 @@ namespace MusiC
 				case ExtensionType.Window:
 					ext = info.Instantiate(args);
 					
-					if(typeof(Window).IsAssignableFrom(ext.GetType()))
+					if(
+						typeof(Window.ManagedImpl).IsAssignableFrom(ext.GetType()) ||
+						typeof(Window.UnmanagedImpl).IsAssignableFrom(ext.GetType())
+					  )
 						_window = ext as Window;
 					else
-						Warning("The window "+extensionClass+" doesnt inherit MusiC.Classifier.");
+						Warning("The window "+extensionClass+" doesnt inherit MusiC.Window.ManagedImpl or MusiC.Window.UnmanagedImpl.");
 					break;
 					
 				case ExtensionType.Feature:
 					ext = info.Instantiate(args);
 					
-					if(typeof(Feature).IsAssignableFrom(ext.GetType()))
+					if(
+						typeof(Feature.ManagedImpl).IsAssignableFrom(ext.GetType()) ||
+						typeof(Feature.UnmanagedImpl).IsAssignableFrom(ext.GetType())
+					  )
 						_featureList.AddLast(ext as Feature);
 					else
-						Warning("The feature "+extensionClass+" doesnt inherit MusiC.Classifier.");
+						Warning("The feature "+extensionClass+" doesnt inherit MusiC.Feature.");
 					break;
 				default:
 					return false;

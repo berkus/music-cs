@@ -74,7 +74,7 @@ namespace MusiC.Extensions.Features
 {
 	public class SpecRollOffU : Feature.UnmanagedImpl
 	{	
-		public SpecRollOffU() : base("SpecRolloff")
+		public SpecRollOffU() : base("SpecRolloff - Unmanaged")
 		{
 		}
 		
@@ -86,7 +86,7 @@ namespace MusiC.Extensions.Features
 	
 	public class SpecRollOffM : Feature.ManagedImpl
 	{	
-		public SpecRollOffM() : base("SpecRolloff")
+		public SpecRollOffM() : base("SpecRolloff - Managed")
 		{
 		}
 		
