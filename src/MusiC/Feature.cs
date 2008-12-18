@@ -25,7 +25,6 @@
 using System;
 
 using MusiC;
-using MCModule.UnmanagedInterface;
 
 namespace MusiC
 {

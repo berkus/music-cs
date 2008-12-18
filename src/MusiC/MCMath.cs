@@ -25,18 +25,14 @@
 using System;
 using System.Runtime.InteropServices;
 
-namespace MCModule
+namespace MusiC
 {
-	/// @todo implement in cpp
 	public unsafe class MCMath
 	{		
 		[DllImport("./musiC-uMng.dll", EntryPoint="fftr_mag2")]
 		public extern static int FFTMagnitude(double * sequence, double * magnitude, int size);
 	}
-}
 
-namespace MCModule.UnmanagedInterface
-{
 	unsafe public class UnsafePtr
 	{
 		public static Single * dgetmem(Int32 size)

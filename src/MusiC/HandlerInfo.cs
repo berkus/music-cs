@@ -23,10 +23,7 @@
  */
 
 using System;
-using System.Xml;
 using System.Text.RegularExpressions;
-
-using MCModule.Exceptions;
 
 namespace MusiC
 {
