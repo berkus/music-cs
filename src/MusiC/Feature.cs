@@ -33,60 +33,61 @@ namespace MusiC
 	/// @todo Implement IDispose interface
 	abstract unsafe public class Feature : Extension
 	{
-		abstract unsafe public class UnmanagedImpl : Feature
+		[CLSCompliant(false)]
+		abstract unsafe public class UnmanagedImplementation : Feature
 		{
 			Single * _data;
 			Single * _temp;
 		
-			public UnmanagedImpl(String name) : base(name)
+			protected UnmanagedImplementation(String name) : base(name)
 			{
 			}
 			
-			protected Single * OutterExtract(Window.UnmanagedImpl wnd)
+			protected Single * OuterExtract(Window.UnmanagedImplementation window)
 			{
 				if(_temp == null)
 				{
-					_temp = UnsafePtr.dgetmem(wnd.WindowSize);
-					_wndSize = wnd.WindowSize;
+					_temp = NativeMethods.Pointer.dgetmem(window.WindowSize);
+					_wndSize = window.WindowSize;
 				}
 				
 				if(_data == null)
 				{ 
-					_data = UnsafePtr.dgetmem(wnd.WindowCount);
-					_wndCount = wnd.WindowCount;
+					_data = NativeMethods.Pointer.dgetmem(window.WindowCount);
+					_wndCount = window.WindowCount;
 				}
 				
-				if(wnd.WindowSize > _wndSize)
+				if(window.WindowSize > _wndSize)
 				{
-					UnsafePtr.free(_temp);
-					_temp = UnsafePtr.dgetmem(wnd.WindowSize);
+					NativeMethods.Pointer.free(_temp);
+					_temp = NativeMethods.Pointer.dgetmem(window.WindowSize);
 				}
 				
-				if(wnd.WindowCount > _wndCount)
+				if(window.WindowCount > _wndCount)
 				{
-					UnsafePtr.free(_data);
-					_data = UnsafePtr.dgetmem(wnd.WindowCount);
+					NativeMethods.Pointer.free(_data);
+					_data = NativeMethods.Pointer.dgetmem(window.WindowCount);
 				}
 						
-				return Extract(wnd);
+				return Extract(window);
 			}
 			
 			/// All frame data must be consecutive
-			abstract public Single * Extract(Window.UnmanagedImpl wnd);
+			abstract public Single * Extract(Window.UnmanagedImplementation window);
 		}
 		
-		abstract public class ManagedImpl : Feature
+		abstract public class ManagedImplementation : Feature
 		{
-			public ManagedImpl(String name) : base(name)
+			protected ManagedImplementation(String name) : base(name)
 			{
 			}
 			
-			virtual protected Single[] OutterExtract(Window.ManagedImpl wnd)
+			virtual protected Single[] OuterExtract(Window.ManagedImplementation window)
 			{
-				return Extract(wnd);
+				return Extract(window);
 			}
 			
-			virtual public Single[] Extract(Window.ManagedImpl wnd)
+			virtual public Single[] Extract(Window.ManagedImplementation window)
 			{
 				return null;
 			}
@@ -101,15 +102,15 @@ namespace MusiC
 			get { return _name; }
 		}
 	
-		public Feature(String name)
+		protected Feature(String name)
 		{
 			_name = name;
 			Console.WriteLine(name);
 		}
 		
-		virtual public Int32 FeatureSize(Window wnd)
+		virtual public Int32 FeatureSize(Window window)
 		{
-			return wnd.WindowCount;
+			return window.WindowCount;
 		}
 	} 
 }

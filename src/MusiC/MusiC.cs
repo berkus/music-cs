@@ -30,6 +30,7 @@ using System.Reflection;
 using MusiC.Extensions;
 using MusiC.Exceptions;
 
+[assembly: CLSCompliant(true)]
 namespace MusiC
 {
 	public class MusiC : MusiCObject, IGlobal
@@ -113,7 +114,7 @@ namespace MusiC
 				cfg.Load(_configFile);
 				Message(_configFile + " ... [LOADED]");
 				
-				foreach(Algorithm a in cfg.GetAlgorithmList())
+				foreach(Algorithm a in cfg.AlgorithmList)
 				{
 					a.Execute();
 				}

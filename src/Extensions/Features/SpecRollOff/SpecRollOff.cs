@@ -21,10 +21,68 @@
  * THE SOFTWARE.
  * 
  */
+//using System;
+//using System.Diagnostics.CodeAnalysis;
+//using System.Reflection;
+//using System.Runtime.CompilerServices;
+//using System.Runtime.InteropServices;
+//using System.Resources;
+//using System.Security.Permissions;
 
 using System;
+using System.Reflection;
+using System.Runtime.InteropServices;
+using System.Security.Permissions;
 
-using MusiC;
+[assembly: CLSCompliant(true)]
+[assembly: ComVisible(false)]
+[assembly: AssemblyTitle("MusiC - Feature - SpecRollOff")]
+[assembly: AssemblyVersionAttribute("0.0.*")]
+
+#region Security
+//[assembly: PermissionSetAttribute(SecurityAction.RequestMinimum, Name="Nothing")]
+//[assembly: StrongNameIdentityPermission(SecurityAction.RequestMinimum, PublicKey="{public-key}")]
+
+//[assembly: EnvironmentPermission(SecurityAction.RequestRefuse)]
+//[assembly: FileDialogPermission(SecurityAction.RequestRefuse)]
+//[assembly: FileIOPermission(SecurityAction.RequestRefuse)]
+//[assembly: IsolatedStorageFilePermission(SecurityAction.RequestRefuse)]
+//[assembly: PublisherIdentityPermission(SecurityAction.RequestRefuse)]
+//[assembly: ReflectionPermission(SecurityAction.RequestRefuse)]
+//[assembly: RegistryPermission(SecurityAction.RequestRefuse)]
+//[assembly: SecurityPermission(SecurityAction.RequestRefuse, UnmanagedCode=true)]
+//[assembly: SiteIdentityPermission(SecurityAction.RequestRefuse)]
+//[assembly: UIPermission(SecurityAction.RequestRefuse)]
+//[assembly: ZoneIdentityPermission(SecurityAction.RequestRefuse)]
+#endregion 
+
+namespace MusiC.Extensions.Features
+{
+	[CLSCompliant(false)]
+	public class SpecRollOffU : Feature.UnmanagedImplementation
+	{	
+		public SpecRollOffU() : base("SpecRolloff - Unmanaged")
+		{
+		}
+		
+		override unsafe public Single * Extract(Window.UnmanagedImplementation window)
+		{
+			return null;
+		}
+	}
+	
+	public class SpecRollOffM : Feature.ManagedImplementation
+	{	
+		public SpecRollOffM() : base("SpecRolloff - Managed")
+		{
+		}
+		
+		override public Single[] Extract(Window.ManagedImplementation window)
+		{
+			return null;
+		}
+	}
+}
 
 //namespace MCModule.Features
 //{
@@ -69,30 +127,3 @@ using MusiC;
 //		}
 //	}
 //}
-
-namespace MusiC.Extensions.Features
-{
-	public class SpecRollOffU : Feature.UnmanagedImpl
-	{	
-		public SpecRollOffU() : base("SpecRolloff - Unmanaged")
-		{
-		}
-		
-		override unsafe public Single * Extract(Window.UnmanagedImpl wnd)
-		{
-			return null;
-		}
-	}
-	
-	public class SpecRollOffM : Feature.ManagedImpl
-	{	
-		public SpecRollOffM() : base("SpecRolloff - Managed")
-		{
-		}
-		
-		override public Single[] Extract(Window.ManagedImpl wnd)
-		{
-			return null;
-		}
-	}
-}

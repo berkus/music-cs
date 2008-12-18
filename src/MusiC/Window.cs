@@ -35,7 +35,8 @@ namespace MusiC
 	/// @todo Allow different types.
 	abstract public class Window : Extension
 	{
-		abstract unsafe public class UnmanagedImpl : Window
+		[CLSCompliant(false)]
+		abstract unsafe public class UnmanagedImplementation : Window
 		{
 			/// Window Values
 			Single * _wndData = null;
@@ -43,35 +44,39 @@ namespace MusiC
 			/// Windowed Data
 			Single * _dataStream = null;
 			
-			public UnmanagedImpl(String name, Int32 size, Int32 overlap) : base(name, size, overlap)
+			protected UnmanagedImplementation(String name, Int32 size, Int32 overlap) : base(name, size, overlap)
 			{
-				_wndData = UnsafePtr.dgetmem(size);
-				
-				for (int i = 0; i < size; i++)
+				_wndData = NativeMethods.Pointer.dgetmem(size);
+				Initialize();
+			}
+			
+			void Initialize()
+			{
+				for (Int32 i = 0; i < _size; i++)
 					_wndData[i] = Factory(i);
 			}
 			
-			~UnmanagedImpl()
+			~UnmanagedImplementation()
 			{
 				if(_wndData != null)
-					UnsafePtr.free(_wndData);
+					NativeMethods.Pointer.free(_wndData);
 			}
 			
-			unsafe public Single * GetWindow(int n)
+			unsafe public Single * GetWindow(Int32 windowPos)
 			{
 				return _wndData;
 			}
 		}
 		
-		abstract public class ManagedImpl : Window
+		abstract public class ManagedImplementation : Window
 		{
 			/// Window Values
-			Single[] _wndData = null;
+			Single[] _wndData;
 		
 			/// Windowed Data
-			Single[] _dataStream = null;
+			Single[] _dataStream;
 			
-			public ManagedImpl(String name, Int32 size, Int32 overlap) : base(name, size, overlap)
+			protected ManagedImplementation(String name, Int32 size, Int32 overlap) : base(name, size, overlap)
 			{
 				_wndData = new Single[size];
 				
@@ -80,7 +85,13 @@ namespace MusiC
 					_wndData[i] = Factory(i);
 			}
 			
-			public Single[] GetWindow(int n)
+			void Initialize()
+			{
+				for (Int32 i = 0; i < _size; i++)
+					_wndData[i] = Factory(i);
+			}
+			
+			public Single[] GetWindow(Int32 windowPos)
 			{
 				return _dataStream;
 			}
@@ -108,7 +119,7 @@ namespace MusiC
 			get { return _size; }
 		}
 	
-		public Window(String name, Int32 size, Int32 overlap)
+		protected Window(String name, Int32 size, Int32 overlap)
 		{
 			_name = name;
 			_size = size;
@@ -130,7 +141,7 @@ namespace MusiC
 			return false;
 		}
 		
-		abstract public Single Factory(Int32 n);
+		abstract public Single Factory(Int32 windowPos);
 	}
 }
 

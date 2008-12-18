@@ -30,16 +30,15 @@ using MusiC.Data;
 
 namespace MusiC
 {
+	[CLSCompliant(false)]
 	abstract public class Classifier : Extension
 	{
-		LinkedList<String> m_classList = new LinkedList<String>();
-		LinkedList<String> m_dirs = new LinkedList<String>();
 		
 		public Classifier(string type)
 		{
 		}
 		
-		public unsafe void Execute(System.Collections.Generic.ICollection<Feature> FeatList, Window wnd)
+		public void Execute(System.Collections.Generic.ICollection<Feature> FeatList, Window wnd)
 		{
 		}
 		

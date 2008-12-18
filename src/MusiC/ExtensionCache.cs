@@ -31,8 +31,8 @@ namespace MusiC.Extensions
 {
 	public class ExtensionCache : MusiCObject, IGlobal
 	{
-		Config _objConfig=null;
-		Type _tConfig=null;
+		Config _objConfig;
+		Type _tConfig;
 		
 		//Dictionary<String, Type> _tHandlerCache = new Dictionary<String, Type>();
 		Dictionary<String, ExtensionInfo> _extensionList = new Dictionary<String, ExtensionInfo>();
@@ -41,23 +41,28 @@ namespace MusiC.Extensions
 		{
 		}
 		
-		public void Add(Type t)
+		public void Add(Type extensionType)
 		{
-			if(!typeof(Extension).IsAssignableFrom(t))
+			if(!typeof(Extension).IsAssignableFrom(extensionType))
 			{
-				Message(t.ToString() + " ... [REJECTED]");
+				Message(extensionType.ToString() + " ... [REJECTED]");
 				return;
 			}
 			
-			ExtensionInfo info = new ExtensionInfo(t);
-			_extensionList.Add(t.FullName, info);
+			ExtensionInfo info = new ExtensionInfo(extensionType);
+			_extensionList.Add(extensionType.FullName, info);
 			
-			if(info.Type == ExtensionType.Configuration)
-				_tConfig = t;
+			if(info.Kind == ExtensionKind.Configuration)
+				_tConfig = extensionType;
 			
-			Message(t.ToString() + " ... [ADDED]");
+			Message(extensionType.ToString() + " ... [ADDED]");
 		}
 		
+		/// <summary>
+		/// 
+		/// </summary>
+		/// <exception cref="MusiC.Exceptions.MissingExtensionException"></exception>
+		/// <returns></returns>
 		public Config GetConfig()
 		{
 			if(_objConfig!=null)

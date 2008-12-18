@@ -34,7 +34,7 @@ namespace MCModule
 		private StringDictionary Parameters;
 	
 		// Constructor
-		public Arguments(string[] Args)
+		public Arguments(String[] args)
 		{
 			Parameters = new StringDictionary();
 			Regex Spliter = new Regex(@"^-{1,2}|^/|=|:",
@@ -52,7 +52,7 @@ namespace MCModule
 			// -param1 value1 --param2 /param3:"Test-:-work"
 			//   /param4=happy -param5 '--=nice=--'
 	
-			foreach (string Txt in Args)
+			foreach (string Txt in args)
 			{
 				// Look for new parameters (-,/ or --) and a
 				// possible enclosed value (=,:)
@@ -127,9 +127,9 @@ namespace MCModule
 	
 		// Retrieve a parameter value if it exists
 		// (overriding C# indexer property)
-		public string this[string Param]
+		public String this[String param]
 		{
-			get { return (Parameters[Param]); }
+			get { return (Parameters[param]); }
 		}
 	}
 }

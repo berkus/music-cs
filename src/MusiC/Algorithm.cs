@@ -32,8 +32,8 @@ namespace MusiC
 {
 	public class Algorithm : MusiCObject
 	{
-		Window _window = null;
-		Classifier _classifier = null;
+		Window _window;
+		Classifier _classifier;
 		LinkedList<Feature> _featureList = new LinkedList<Feature>();
 		
 		/// <summary>
@@ -55,16 +55,16 @@ namespace MusiC
 				throw new Exceptions.MissingExtensionException(extensionClass + " wasn't found.");
 			
 			/// @todo Throw a UnrecognizedExtensionException.
-			if(info.Type == ExtensionType.NotSet)
+			if(info.Kind == ExtensionKind.NotSet)
 			{
 				Warning(extensionClass+": Cant recognize this Extension. This happens when an extension inherits directly from MusiC.Extension");
 			}
 			
 			Extension ext;
 			
-			switch(info.Type)
+			switch(info.Kind)
 			{
-				case ExtensionType.Classifier:
+				case ExtensionKind.Classifier:
 					ext = info.Instantiate(args);
 					
 					if(typeof(Classifier).IsAssignableFrom(ext.GetType()))
@@ -73,24 +73,24 @@ namespace MusiC
 						Warning("The classifier "+extensionClass+" doesnt inherit MusiC.Classifier.");
 					break;
 					
-				case ExtensionType.Window:
+				case ExtensionKind.Window:
 					ext = info.Instantiate(args);
 					
 					if(
-						typeof(Window.ManagedImpl).IsAssignableFrom(ext.GetType()) ||
-						typeof(Window.UnmanagedImpl).IsAssignableFrom(ext.GetType())
+						typeof(Window.ManagedImplementation).IsAssignableFrom(ext.GetType()) ||
+						typeof(Window.UnmanagedImplementation).IsAssignableFrom(ext.GetType())
 					  )
 						_window = ext as Window;
 					else
 						Warning("The window "+extensionClass+" doesnt inherit MusiC.Window.ManagedImpl or MusiC.Window.UnmanagedImpl.");
 					break;
 					
-				case ExtensionType.Feature:
+				case ExtensionKind.Feature:
 					ext = info.Instantiate(args);
 					
 					if(
-						typeof(Feature.ManagedImpl).IsAssignableFrom(ext.GetType()) ||
-						typeof(Feature.UnmanagedImpl).IsAssignableFrom(ext.GetType())
+						typeof(Feature.ManagedImplementation).IsAssignableFrom(ext.GetType()) ||
+						typeof(Feature.UnmanagedImplementation).IsAssignableFrom(ext.GetType())
 					  )
 						_featureList.AddLast(ext as Feature);
 					else
@@ -105,7 +105,6 @@ namespace MusiC
 		
 		public void Execute()
 		{
-			
 		}
 		
 		public void Say()

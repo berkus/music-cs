@@ -27,27 +27,38 @@ using System.Runtime.InteropServices;
 
 namespace MusiC
 {
-	public unsafe class MCMath
-	{		
-		[DllImport("./musiC-uMng.dll", EntryPoint="fftr_mag2")]
-		public extern static int FFTMagnitude(double * sequence, double * magnitude, int size);
-	}
-
-	unsafe public class UnsafePtr
+	class NativeMethods
 	{
-		public static Single * dgetmem(Int32 size)
+		public class Math
 		{
-			IntPtr ptr = Marshal.AllocHGlobal(size * sizeof(double));
-			return (Single*)ptr.ToPointer();
+			Math()
+			{	
+			}
+			
+			[DllImport("./musiC-uMng.dll", EntryPoint="fftr_mag2")]
+			extern static unsafe public Int32 FFTMagnitude(double * sequence, double * magnitude, int size);
 		}
-		
-		public static void free(void * p)
+	
+		public class Pointer
 		{
-			if (p != null)
+			Pointer()
 			{
-				IntPtr ptr = new IntPtr(p);
-				Marshal.FreeHGlobal(ptr);
-				p = null;
+			}
+			
+			static unsafe public Single * dgetmem(Int32 size)
+			{
+				IntPtr ptr = Marshal.AllocHGlobal(size * sizeof(double));
+				return (Single*)ptr.ToPointer();
+			}
+			
+			static unsafe public void free(void * p)
+			{
+				if (p != null)
+				{
+					IntPtr ptr = new IntPtr(p);
+					Marshal.FreeHGlobal(ptr);
+					p = null;
+				}
 			}
 		}
 	}

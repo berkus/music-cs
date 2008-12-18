@@ -35,7 +35,7 @@ namespace MusiC
 	{	
 		// Private members
 		LinkedList<BinaryParam> mParam = new LinkedList<BinaryParam>();
-		Type _tAssembly=null;
+		Type _tAssembly;
 		
 		// Constructor
 		public BinaryInfo()

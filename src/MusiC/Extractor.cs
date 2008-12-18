@@ -30,6 +30,7 @@ using MusiC.Data;
 
 namespace MusiC
 {
+	[CLSCompliant(false)]
 	public class Extractor
 	{
 		static unsafe public MCDataCollection * Extract(Window wnd, Feature f)

@@ -42,7 +42,7 @@ namespace MCModule
 			
 		public ActionNode(String actionName, String rootDir)
 		{
-			m_dir = rootDir + ((actionName != String.Empty) ? System.IO.Path.DirectorySeparatorChar + actionName : String.Empty);
+			m_dir = rootDir + (String.IsNullOrEmpty(actionName) ? System.IO.Path.DirectorySeparatorChar + actionName : String.Empty);
 			m_name = actionName;
 		}
 	}

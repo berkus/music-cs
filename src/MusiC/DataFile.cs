@@ -23,13 +23,11 @@
  */
 
 using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Runtime.Serialization.Formatters.Binary;
 using System.Runtime.InteropServices;
 
 namespace MCModule
 {
+	[CLSCompliant(false)]
 	public unsafe class DataFile : IDisposable
 	{
 		string m_file;

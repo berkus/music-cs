@@ -27,14 +27,14 @@ using System.Reflection;
 
 namespace MusiC
 {
-	public class Instantiable : Parametrized
+	public class Instantiable : ParamList
 	{
-		String _name = null;
-		String _classname = null;
-		Type _class = null;
+		String _name;
+		String _classname;
+		Type _class;
 		
-		String _strValue = null;
-		Object _value = null;
+		String _strValue;
+		Object _value;
 		
 		Boolean _isInitiated = false;
 		

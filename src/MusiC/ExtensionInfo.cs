@@ -27,11 +27,7 @@ using System.Reflection;
 
 namespace MusiC
 {
-	public class ParamList : Parametrized
-	{
-	}
-	
-	public enum ExtensionType
+	public enum ExtensionKind
 	{
 		Classifier,
 		Feature,
@@ -44,39 +40,52 @@ namespace MusiC
 	public class ExtensionInfo : MusiCObject
 	{
 		Type _class=null;
-		ExtensionType _type = ExtensionType.NotSet;
+		ExtensionKind _kind = ExtensionKind.NotSet;
 		
-		public ExtensionType Type
+		public ExtensionKind Kind
 		{
-			get { return _type; }
+			get { return _kind; }
 		}
 		
 		public ExtensionInfo(Type t)
 		{
 			_class = t;
-			_type = Identify(t);
+			_kind = Identify();
 		}
 		
-		ExtensionType Identify(Type t)
+		/// <summary>
+		/// Identify the category of an extension.
+		/// </summary>
+		/// <returns>
+		/// The kind of the extension.
+		/// </returns>
+		ExtensionKind Identify()
 		{
-			if(typeof(Config).IsAssignableFrom(t))
-				return ExtensionType.Configuration;
+			// This one should be the most frequent call.
+			if(typeof(Feature).IsAssignableFrom(_class))
+				return ExtensionKind.Feature;
 			
-			if(typeof(Classifier).IsAssignableFrom(t))
-				return ExtensionType.Classifier;
+			if(typeof(Config).IsAssignableFrom(_class))
+				return ExtensionKind.Configuration;
 			
-			if(typeof(Feature).IsAssignableFrom(t))
-				return ExtensionType.Feature;
+			if(typeof(Classifier).IsAssignableFrom(_class))
+				return ExtensionKind.Classifier;
 			
 			//if(typeof(Window).IsAssignableFrom(t))
 			//	return ExtensionType.FileHandler;
 			
-			if(typeof(Window).IsAssignableFrom(t))
-				return ExtensionType.Window;
+			if(typeof(Window).IsAssignableFrom(_class))
+				return ExtensionKind.Window;
 			
-			return ExtensionType.NotSet;
+			return ExtensionKind.NotSet;
 		}
 		
+		/// <summary>
+		/// Creates an instance of the represented extension.
+		/// </summary>
+		/// <param name="pList"></param>
+		/// <returns></returns>
+		/// @todo Use Invoker
 		public Extension Instantiate(ParamList pList)
 		{
 			Type[] paramTypes = pList.GetTypes();

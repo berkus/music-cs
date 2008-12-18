@@ -27,7 +27,7 @@ using System.Collections.Generic;
 
 namespace MusiC
 {
-	public class Parametrized : MusiCObject
+	public class ParamList : MusiCObject
 	{
 		Boolean _isParamInitiated = false;
 		

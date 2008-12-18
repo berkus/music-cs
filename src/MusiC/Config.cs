@@ -40,7 +40,7 @@ namespace MusiC
 		LinkedList<String> _classifyList = new LinkedList<String>();
 		LinkedList<HandlerInfo> _handlerList = new LinkedList<HandlerInfo>();
 		
-		public Config()
+		protected Config()
 		{
 			Message(this.GetType().FullName + " ... [LOADED]");
 		}
@@ -66,19 +66,14 @@ namespace MusiC
 			return returnValue;
 		}
 		
-		protected void AddHandler(HandlerInfo hInfo)
+		protected void AddHandler(HandlerInfo info)
 		{
-			_handlerList.AddLast(hInfo);
+			_handlerList.AddLast(info);
 		}
 		
-		protected ExtensionInfo GetExtensionInfo(String className)
+		public IEnumerable<Algorithm> AlgorithmList
 		{
-			return Global<ExtensionCache>.GetInstance().GetInfo(className);
-		}
-		
-		public IEnumerable<Algorithm> GetAlgorithmList()
-		{
-			return _algList;
+			get { return _algList; }
 		}
 		
 		abstract public void Load(String file);

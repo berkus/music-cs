@@ -27,6 +27,7 @@ using System.Runtime.InteropServices;
 
 namespace MusiC.Data
 {
+	[CLSCompliant(false)]
 	[StructLayout(LayoutKind.Sequential,Pack = 1)]
 	unsafe public struct MCFeatVector
 	{
@@ -36,6 +37,7 @@ namespace MusiC.Data
 		public long next;
 	}	
 	
+	[CLSCompliant(false)]
 	[StructLayout(LayoutKind.Sequential,Pack = 1)]
 	unsafe public struct MCClassData
 	{
@@ -46,6 +48,7 @@ namespace MusiC.Data
 		public MCDataCollection * pCollection;
 	}
 	
+	[CLSCompliant(false)]
 	[StructLayout(LayoutKind.Sequential,Pack = 1)]
 	unsafe public struct MCDataCollection
 	{
@@ -53,7 +56,8 @@ namespace MusiC.Data
 		public long nClasses;
 		public long nFeatures;
 	}
-		
+	
+	[CLSCompliant(false)]
 	unsafe public class MCDataHandler
 	{
 		public static MCDataCollection * BuildCollection(int nClasses, int nFeatures)
