@@ -42,12 +42,12 @@ namespace MusiC
 		{
 		}
 		
-		virtual unsafe public MCDataCollection * Filter(MCDataCollection * dataIn)
-		{
-			return dataIn;
-		}
+//		virtual unsafe public MCDataCollection * Filter(MCDataCollection * dataIn)
+//		{
+//			return dataIn;
+//		}
 		
-		abstract unsafe public void Train(MCDataCollection * dtCol);
+//		abstract unsafe public void Train(MCDataCollection * dtCol);
 		abstract public void Classify();		
 		abstract public void TryLoadingParameters();
 		abstract public void Dispose();

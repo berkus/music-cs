@@ -29,6 +29,7 @@ namespace MusiC
 {
 	abstract public class Handler : Extension
 	{
+		abstract public bool CanHandle(String file);
 	}
 }
 

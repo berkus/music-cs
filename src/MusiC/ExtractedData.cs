@@ -24,8 +24,9 @@
 
 using System;
 using System.Runtime.InteropServices;
+using System.Collections.Generic;
 
-namespace MusiC.Data
+namespace MusiC.Data.Unmanaged
 {
 	[CLSCompliant(false)]
 	[StructLayout(LayoutKind.Sequential,Pack = 1)]
@@ -97,6 +98,80 @@ namespace MusiC.Data
 			(wClass->pVectorList + wClass->nVectorList)->next = 0;
 			wClass->nVectors += nWindows;
 			wClass->nVectorList++;			
+		}
+	}
+}
+
+namespace MusiC.Data.Managed
+{
+	public class MCFeatVector
+	{
+		public double [] pData;
+		public long nVectors = 0;
+		// Unmanaged side only - historical
+		public long next = 0;
+	}	
+	
+	public class MCClassData
+	{
+		public long nVectorListAlloc = 0;
+		public long nVectorList = 0;
+		public long nVectors = 0;
+		
+		public LinkedList<MCFeatVector> pVectorList = new LinkedList<MCFeatVector>();
+		public MCDataCollection pCollection;
+	}
+	
+	public class MCDataCollection
+	{
+		public MCClassData[] pClassData;
+		public long nClasses;
+		public long nFeatures;
+	}
+	
+	public class MCDataHandler
+	{
+		public static MCDataCollection BuildCollection(int nClasses, int nFeatures)
+		{
+			MCDataCollection data = new MCDataCollection();
+			data.pClassData = new MCClassData[nClasses];
+			
+			for(int i = 0; i < nClasses; i++)
+			{
+				data.pClassData[i].pCollection = data;
+			}
+			
+			data.nClasses = nClasses;
+			data.nFeatures = nFeatures;
+			
+			return data;
+		}
+		
+		public static void BuildVectorList(MCClassData wClass, Int32 nLists)
+		{
+			//wClass.pVectorList = ;
+			wClass.nVectorListAlloc = nLists;
+		}
+		
+		/// <summary>
+		/// 
+		/// </summary>
+		/// <remarks>Each list is a new data unit (song, picture, ...) that has been extracted. </remarks>
+		/// <param name="wClass"></param>
+		/// <param name="data"></param>
+		/// <param name="nWindows"></param>
+		public static void AddVectorList(MCClassData wClass, Double[] data, Int64 nWindows)
+		{
+			if(wClass == null )
+				Console.WriteLine("MCClassData is NULL");
+			
+			MCFeatVector vec = new MCFeatVector();
+			vec.pData = data;
+			vec.nVectors = nWindows;
+				
+			wClass.pVectorList.AddLast(vec);
+			wClass.nVectors += nWindows;
+			wClass.nVectorList++;			
 		}
 	}
 }

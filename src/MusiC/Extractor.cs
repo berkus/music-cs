@@ -30,12 +30,23 @@ using MusiC.Data;
 
 namespace MusiC
 {
-	[CLSCompliant(false)]
 	public class Extractor
 	{
-		static unsafe public MCDataCollection * Extract(Window wnd, Feature f)
+		[CLSCompliant(false)]
+		public class UnmanagedImplementation
 		{
-			return null;
+			static unsafe public Data.Unmanaged.MCDataCollection * Extract(Window.UnmanagedImplementation wnd, Feature f)
+			{
+				return null;
+			}
+		}
+		
+		public class ManagedImplementation
+		{
+			static public Data.Managed.MCDataCollection Extract(Window.ManagedImplementation wnd, Feature f)
+			{
+				return null;
+			}
 		}
 	}
 }
