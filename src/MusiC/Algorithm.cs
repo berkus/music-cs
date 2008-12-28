@@ -24,6 +24,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Text;
 
 using MusiC.Extensions;
@@ -35,6 +36,7 @@ namespace MusiC
 		Window _window;
 		Classifier _classifier;
 		LinkedList<Feature> _featureList = new LinkedList<Feature>();
+		ExtensionManagement _managementStatus = ExtensionManagement.NotSet;
 		
 		/// <summary>
 		/// Add a extension to the algorithm.
@@ -55,47 +57,74 @@ namespace MusiC
 				throw new Exceptions.MissingExtensionException(extensionClass + " wasn't found.");
 			
 			/// @todo Throw a UnrecognizedExtensionException.
-			if(info.Kind == ExtensionKind.NotSet)
+			if(info.Kind == ExtensionKind.Error)
 			{
-				Warning(extensionClass+": Cant recognize this Extension. This happens when an extension inherits directly from MusiC.Extension");
+				Error(extensionClass+": Can't recognize this Extension. This may happen when an extension inherits directly from MusiC.Extension");
+				return false;
 			}
 			
-			Extension ext;
+			if(info.Manager == ExtensionManagement.Error)
+			{
+				Error(extensionClass+": Can't recognize if this is a Managed or Unmanaged implementation. Classifiers/Features/Windows must inherit from their subclasses.");
+				return false;
+			}
+			
+			if(
+				info.Kind == ExtensionKind.Classifier ||
+				info.Kind == ExtensionKind.Feature ||
+				info.Kind == ExtensionKind.Window
+			  )
+			{
+				if(_managementStatus == ExtensionManagement.NotSet)
+					_managementStatus = info.Manager;
+				
+				if(info.Manager != _managementStatus)
+				{
+					Error("Cant mix managed and unmanaged classifiers/Features/Windows.");
+					return false;
+				}
+			}
+			
+			Extension ext = info.Instantiate(args);
 			
 			switch(info.Kind)
 			{
 				case ExtensionKind.Classifier:
-					ext = info.Instantiate(args);
+					_classifier = ext as Classifier;
 					
-					if(typeof(Classifier).IsAssignableFrom(ext.GetType()))
-						_classifier = ext as Classifier;
-					else
-						Warning("The classifier "+extensionClass+" doesnt inherit MusiC.Classifier.");
+//					if(typeof(Classifier).IsAssignableFrom(ext.GetType()))
+//						_classifier = ext as Classifier;
+//					else
+//						Error("The classifier "+extensionClass+" doesn't inherit MusiC.Classifier.");
+					
 					break;
 					
 				case ExtensionKind.Window:
-					ext = info.Instantiate(args);
+					_window = ext as Window;
 					
-					if(
-						typeof(Window.ManagedImplementation).IsAssignableFrom(ext.GetType()) ||
-						typeof(Window.UnmanagedImplementation).IsAssignableFrom(ext.GetType())
-					  )
-						_window = ext as Window;
-					else
-						Warning("The window "+extensionClass+" doesnt inherit MusiC.Window.ManagedImpl or MusiC.Window.UnmanagedImpl.");
+//					if(
+//						typeof(Window.ManagedImplementation).IsAssignableFrom(ext.GetType()) ||
+//						typeof(Window.UnmanagedImplementation).IsAssignableFrom(ext.GetType())
+//					  )
+//						_window = ext as Window;
+//					else
+//						Error("The window "+extensionClass+" doesn't inherit MusiC.Window.ManagedImpl nor MusiC.Window.UnmanagedImpl.");
+					
 					break;
 					
 				case ExtensionKind.Feature:
-					ext = info.Instantiate(args);
+					_featureList.AddLast(ext as Feature);
 					
-					if(
-						typeof(Feature.ManagedImplementation).IsAssignableFrom(ext.GetType()) ||
-						typeof(Feature.UnmanagedImplementation).IsAssignableFrom(ext.GetType())
-					  )
-						_featureList.AddLast(ext as Feature);
-					else
-						Warning("The feature "+extensionClass+" doesnt inherit MusiC.Feature.");
+//					if(
+//						typeof(Feature.ManagedImplementation).IsAssignableFrom(ext.GetType()) ||
+//						typeof(Feature.UnmanagedImplementation).IsAssignableFrom(ext.GetType())
+//					  )
+//						_featureList.AddLast(ext as Feature);
+//					else
+//						Error("The feature "+extensionClass+" doesn't inherit MusiC.Feature.ManagedImplementation nor MusiC.Feature.UnmanagedImplementation.");
+					
 					break;
+					
 				default:
 					return false;
 			}
@@ -105,6 +134,18 @@ namespace MusiC
 		
 		public void Execute()
 		{
+			foreach(TrainLabel label in Global<ExtensionCache>.GetInstance().GetConfig().LabelList)
+			{
+				Message("Processing "+label.InputDir);
+				foreach(String file in Directory.GetFiles(label.InputDir,"*.wav"))
+				{
+					Message("Opening "+ file);
+					Handler h = Global<ExtensionCache>.GetInstance().GetHandler(file);
+					
+					if(h == null)
+						Warning(file+": No handler supports this file");
+				}
+			}
 		}
 		
 		public void Say()
