@@ -54,8 +54,6 @@ namespace MusiC.Configs
 			
 			BuildTagCache(cfgFile);
 			
-			BuildHandlerList(cfgFile);
-			
 			ParseData(cfgFile);
 			
 			BuildAlgorithmList(cfgFile);
@@ -101,29 +99,6 @@ namespace MusiC.Configs
 			return XmlSafeAttribute(n, attName, false);
 		}
 		
-		void BuildHandlerList(XmlDocument cfgFile)
-		{
-			foreach (XmlNode n in cfgFile.GetElementsByTagName("MusiC-Handler"))
-			{
-				HandlerInfo hInfo = new HandlerInfo();
-				
-				XmlSafeAttribute(n, "class");
-				XmlSafeAttribute(n, "pattern");
-				
-				/// @todo 2 Parse constructor info
-				XmlNodeList nList = n.ChildNodes;
-				foreach (XmlNode param in nList)
-				{
-					if(param.Name == "Param")
-					{
-						hInfo.AddParam(XmlSafeAttribute(n, "name"), XmlSafeAttribute(n, "class"));
-					}
-				}
-				
-				AddHandler(hInfo);
-			}
-		}
-		
 		void BuildTagCache(XmlDocument cfgFile)
 		{
 			foreach (XmlNode n in cfgFile.GetElementsByTagName("MusiC-Alias"))
@@ -146,16 +121,14 @@ namespace MusiC.Configs
 						TrainLabel l = new TrainLabel();
 						l.Label=XmlSafeAttribute(xmlLabelNode,"name");
 						
-						/// @todo 2 Add support to multiple input dirs
+						/// @todo Add support to multiple input dirs
 						l.InputDir=XmlSafeAttribute(xmlLabelNode,"input", true);
 						if (l.InputDir==null)
 						{
 							/// @todo Check baseDir availability
-							/// @todo Check "/"
-							l.InputDir = baseDir + "/" + l.Label;
+							l.InputDir = System.IO.Path.Combine(baseDir, l.Label);
 						}
 						
-						/// @todo 2 Make it optional. If missing equals to input
 						l.OutputDir=XmlSafeAttribute(xmlLabelNode,"output", true);
 						
 						if(l.OutputDir == null)

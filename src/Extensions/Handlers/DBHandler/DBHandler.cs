@@ -25,6 +25,23 @@
 using System;
 using System.Runtime.InteropServices;
 
+namespace MusiC
+{
+	public class DBHandler : Handler
+	{
+		/// <summary>
+		/// 
+		/// </summary>
+		/// <param name="file"></param>
+		/// <returns></returns>
+		/// <todo>Check if the it can handle the music-db file</todo>
+		override public bool CanHandle(String file)
+		{
+			return true;
+		}
+	}
+}
+
 //namespace MCModule.FileHandlers
 //{
 //	public class dbHandler : Handler

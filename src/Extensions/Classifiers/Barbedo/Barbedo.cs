@@ -26,7 +26,7 @@ using System;
 using System.Runtime.InteropServices;
 
 using MusiC;
-using MusiC.Data;
+using MusiC.Data.Unmanaged;
 
 namespace MusiC.Extensions.Classifiers
 {
@@ -36,17 +36,17 @@ namespace MusiC.Extensions.Classifiers
 		{
 		}
 		
-		override unsafe public void Train(MCDataCollection * dtCol)
-		{
-			IntPtr ptr = new IntPtr(dtCol);
-			Console.WriteLine("Address:"+ptr.ToInt64());
-			//uTrain(ref (*dtCol));
-		}
+//		override unsafe public void Train(MCDataCollection * dtCol)
+//		{
+//			IntPtr ptr = new IntPtr(dtCol);
+//			Console.WriteLine("Address:"+ptr.ToInt64());
+//			//uTrain(ref (*dtCol));
+//		}
 		
-		override unsafe public MCDataCollection * Filter(MCDataCollection * dataIn)
-		{
-			return uFilter(ref *dataIn);
-		}
+//		override unsafe public MCDataCollection * Filter(MCDataCollection * dataIn)
+//		{
+//			return uFilter(ref *dataIn);
+//		}
 		
 		override public void Classify()
 		{
