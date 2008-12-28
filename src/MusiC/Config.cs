@@ -40,6 +40,16 @@ namespace MusiC
 		LinkedList<String> _classifyList = new LinkedList<String>();
 		LinkedList<HandlerInfo> _handlerList = new LinkedList<HandlerInfo>();
 		
+		public LinkedList<Algorithm> AlgorithmList
+		{
+			get { return _algList; }
+		}
+		
+		public LinkedList<TrainLabel> LabelList
+		{
+			get { return _trainList; }
+		}
+		
 		protected Config()
 		{
 			Message(this.GetType().FullName + " ... [LOADED]");
@@ -52,8 +62,8 @@ namespace MusiC
 		
 		protected void AddTrainLabel(TrainLabel label)
 		{
-			label.Validate();
-			_trainList.AddLast(label);
+			if(label.Validate())
+				_trainList.AddLast(label);
 		}
 		
 		protected bool AddDir(String dir)
@@ -69,11 +79,6 @@ namespace MusiC
 		protected void AddHandler(HandlerInfo info)
 		{
 			_handlerList.AddLast(info);
-		}
-		
-		public IEnumerable<Algorithm> AlgorithmList
-		{
-			get { return _algList; }
 		}
 		
 		abstract public void Load(String file);

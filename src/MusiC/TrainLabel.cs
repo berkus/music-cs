@@ -65,19 +65,23 @@ namespace MusiC
 			return obj;
 		} */
 		
-		public void Validate()
+		public bool Validate()
 		{
 			if(!Directory.Exists(_outDir))
 			{
-				/// @todo Throw an Exception
-				Console.WriteLine("The specified output directory isnt available");
+				/// @todo change to a default place
+				Console.WriteLine("The specified output directory isn't available");
+				return false;
 			}
 			
 			if(!Directory.Exists(_inDir))
-				/// @todo Throw an Exception
-				Console.WriteLine("The specified input directory isnt available.");
+			{
+				Console.WriteLine("The specified input directory isn't available.");
+				return false;
+			}
 				
 			Print();
+			return true;
 		}
 	}
 }

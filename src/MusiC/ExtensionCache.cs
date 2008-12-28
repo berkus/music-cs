@@ -36,6 +36,7 @@ namespace MusiC.Extensions
 		
 		//Dictionary<String, Type> _tHandlerCache = new Dictionary<String, Type>();
 		Dictionary<String, ExtensionInfo> _extensionList = new Dictionary<String, ExtensionInfo>();
+		LinkedList<Handler> _handlerList = new LinkedList<Handler>();
 		
 		public void Initialize()
 		{
@@ -50,7 +51,11 @@ namespace MusiC.Extensions
 			}
 			
 			ExtensionInfo info = new ExtensionInfo(extensionType);
-			_extensionList.Add(extensionType.FullName, info);
+			
+			if(info.Kind != ExtensionKind.FileHandler)
+				_extensionList.Add(extensionType.FullName, info);
+			else
+				_handlerList.AddLast(info.Instantiate(null) as Handler);
 			
 			if(info.Kind == ExtensionKind.Configuration)
 				_tConfig = extensionType;
@@ -81,6 +86,17 @@ namespace MusiC.Extensions
 			_extensionList.TryGetValue(className, out info);
 			
 			return info;
+		}
+		
+		public Handler GetHandler(String file)
+		{
+			foreach(Handler h in _handlerList)
+			{
+				if(h.CanHandle(file))
+					return h;
+			}
+			
+			return null;
 		}
 	}
 }
