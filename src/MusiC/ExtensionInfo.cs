@@ -34,23 +34,43 @@ namespace MusiC
 		Window,
 		Configuration,
 		FileHandler,
-		NotSet
+		NotSet,
+		Error
 	}
 	
+	public enum ExtensionManagement
+	{
+		Managed,
+		Unmanaged,
+		NotSet,
+		Error
+	}
+	
+	/// <summary>
+	/// 
+	/// </summary>
+	/// <todo>Inherit from ParamList</todo>
 	public class ExtensionInfo : MusiCObject
 	{
 		Type _class=null;
 		ExtensionKind _kind = ExtensionKind.NotSet;
+		ExtensionManagement _managed = ExtensionManagement.NotSet;
 		
 		public ExtensionKind Kind
 		{
 			get { return _kind; }
 		}
 		
+		public ExtensionManagement Manager
+		{
+			get { return _managed; }
+		}
+		
 		public ExtensionInfo(Type t)
 		{
 			_class = t;
 			_kind = Identify();
+			_managed = IdentifyManagement();
 		}
 		
 		/// <summary>
@@ -71,13 +91,49 @@ namespace MusiC
 			if(typeof(Classifier).IsAssignableFrom(_class))
 				return ExtensionKind.Classifier;
 			
-			//if(typeof(Window).IsAssignableFrom(t))
-			//	return ExtensionType.FileHandler;
+			if(typeof(Handler).IsAssignableFrom(_class))
+				return ExtensionKind.FileHandler;
 			
 			if(typeof(Window).IsAssignableFrom(_class))
 				return ExtensionKind.Window;
 			
-			return ExtensionKind.NotSet;
+			return ExtensionKind.Error;
+		}
+		
+		ExtensionManagement IdentifyManagement()
+		{
+			switch(_kind)
+			{
+				case ExtensionKind.Classifier:
+					return ExtensionManagement.Unmanaged;
+				
+				case ExtensionKind.Configuration:
+					return ExtensionManagement.Managed;
+					
+				case ExtensionKind.Feature:
+					if(typeof(Feature.UnmanagedImplementation).IsAssignableFrom(_class))
+						return ExtensionManagement.Unmanaged;
+					
+					if(typeof(Feature.ManagedImplementation).IsAssignableFrom(_class))
+						return ExtensionManagement.Managed;
+					
+					return ExtensionManagement.Error;
+				
+				case ExtensionKind.FileHandler:
+					return ExtensionManagement.Managed;
+					
+				case ExtensionKind.Window:
+					if(typeof(Window.UnmanagedImplementation).IsAssignableFrom(_class))
+						return ExtensionManagement.Unmanaged;
+					
+					if(typeof(Window.ManagedImplementation).IsAssignableFrom(_class))
+						return ExtensionManagement.Managed;
+					
+					return ExtensionManagement.Error;
+					
+				default:
+					return ExtensionManagement.Error;
+			}
 		}
 		
 		/// <summary>
@@ -88,14 +144,27 @@ namespace MusiC
 		/// @todo Use Invoker
 		public Extension Instantiate(ParamList pList)
 		{
-			Type[] paramTypes = pList.GetTypes();
+			Type[] paramTypes;
+			Object[] paramValues;
+			
+			if(pList == null)
+			{
+				paramTypes = new Type[0]{};
+				paramValues = null;
+			}
+			else
+			{
+				paramTypes = pList.GetTypes();
+				paramValues = pList.GetParamsValue();
+			}
+			
 			ConstructorInfo ctor = _class.GetConstructor(paramTypes);
 			
 			Extension e = null;
 			
 			if(ctor != null)
 			{
-				e = ctor.Invoke(pList.GetParamsValue()) as Extension;
+				e = ctor.Invoke(paramValues) as Extension;
 			}
 			
 			return e;
