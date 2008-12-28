@@ -38,7 +38,6 @@ namespace MusiC
 		LinkedList<Algorithm> _algList = new LinkedList<Algorithm>();
 		LinkedList<TrainLabel> _trainList = new LinkedList<TrainLabel>();
 		LinkedList<String> _classifyList = new LinkedList<String>();
-		LinkedList<HandlerInfo> _handlerList = new LinkedList<HandlerInfo>();
 		
 		public LinkedList<Algorithm> AlgorithmList
 		{
@@ -74,11 +73,6 @@ namespace MusiC
 				_classifyList.AddLast(dir);
 			
 			return returnValue;
-		}
-		
-		protected void AddHandler(HandlerInfo info)
-		{
-			_handlerList.AddLast(info);
 		}
 		
 		abstract public void Load(String file);
