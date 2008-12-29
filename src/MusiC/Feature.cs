@@ -31,39 +31,82 @@ namespace MusiC
 	/// @brief Basic feature type.
 	/// @details To implement a new feature you must extended this class.
 	/// @todo Implement IDispose interface
-	abstract unsafe public class Feature : Extension
+	abstract unsafe public class BaseFeature : Extension
+	{
+		protected Int32 dataSize;
+		protected Int32 bufferSize;
+		String _name;
+		
+		public String Name
+		{
+			get { return _name; }
+		}
+	
+		protected BaseFeature(String name)
+		{
+			_name = name;
+			Console.WriteLine(name);
+		}
+		
+		virtual public Int32 FeatureSize(BaseWindow window)
+		{
+			return window.WindowCount;
+		}
+	} 
+
+	namespace Managed
+	{
+		abstract public class Feature : BaseFeature
+		{
+			protected Feature(String name) : base(name)
+			{
+			}
+			
+			virtual protected Single[] OuterExtract(Managed.Window window)
+			{
+				return Extract(window);
+			}
+			
+			virtual public Single[] Extract(Managed.Window window)
+			{
+				return null;
+			}
+		}
+	}
+	
+	namespace Unmanaged
 	{
 		[CLSCompliant(false)]
-		abstract unsafe public class UnmanagedImplementation : Feature
+		abstract unsafe public class Feature : BaseFeature
 		{
 			Single * _data;
 			Single * _temp;
 		
-			protected UnmanagedImplementation(String name) : base(name)
+			protected Feature(String name) : base(name)
 			{
 			}
 			
-			protected Single * OuterExtract(Window.UnmanagedImplementation window)
+			protected Single * OuterExtract(Unmanaged.Window window)
 			{
 				if(_temp == null)
 				{
 					_temp = NativeMethods.Pointer.dgetmem(window.WindowSize);
-					_wndSize = window.WindowSize;
+					bufferSize = window.WindowSize;
 				}
 				
 				if(_data == null)
 				{ 
 					_data = NativeMethods.Pointer.dgetmem(window.WindowCount);
-					_wndCount = window.WindowCount;
+					dataSize = window.WindowCount;
 				}
 				
-				if(window.WindowSize > _wndSize)
+				if(window.WindowSize > bufferSize)
 				{
 					NativeMethods.Pointer.free(_temp);
 					_temp = NativeMethods.Pointer.dgetmem(window.WindowSize);
 				}
 				
-				if(window.WindowCount > _wndCount)
+				if(window.WindowCount > dataSize)
 				{
 					NativeMethods.Pointer.free(_data);
 					_data = NativeMethods.Pointer.dgetmem(window.WindowCount);
@@ -73,44 +116,7 @@ namespace MusiC
 			}
 			
 			/// All frame data must be consecutive
-			abstract public Single * Extract(Window.UnmanagedImplementation window);
+			abstract public Single * Extract(Unmanaged.Window window);
 		}
-		
-		abstract public class ManagedImplementation : Feature
-		{
-			protected ManagedImplementation(String name) : base(name)
-			{
-			}
-			
-			virtual protected Single[] OuterExtract(Window.ManagedImplementation window)
-			{
-				return Extract(window);
-			}
-			
-			virtual public Single[] Extract(Window.ManagedImplementation window)
-			{
-				return null;
-			}
-		}
-
-		Int32 _wndSize;
-		Int32 _wndCount;
-		String _name;
-		
-		public String Name
-		{
-			get { return _name; }
-		}
-	
-		protected Feature(String name)
-		{
-			_name = name;
-			Console.WriteLine(name);
-		}
-		
-		virtual public Int32 FeatureSize(Window window)
-		{
-			return window.WindowCount;
-		}
-	} 
+	}
 }

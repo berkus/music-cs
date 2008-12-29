@@ -59,25 +59,25 @@ using System.Security.Permissions;
 namespace MusiC.Extensions.Features
 {
 	[CLSCompliant(false)]
-	public class SpecRollOffU : Feature.UnmanagedImplementation
+	public class SpecRollOffU : Unmanaged.Feature
 	{	
 		public SpecRollOffU() : base("SpecRolloff - Unmanaged")
 		{
 		}
 		
-		override unsafe public Single * Extract(Window.UnmanagedImplementation window)
+		override unsafe public Single * Extract(Unmanaged.Window window)
 		{
 			return null;
 		}
 	}
 	
-	public class SpecRollOffM : Feature.ManagedImplementation
+	public class SpecRollOffM : Managed.Feature
 	{	
 		public SpecRollOffM() : base("SpecRolloff - Managed")
 		{
 		}
 		
-		override public Single[] Extract(Window.ManagedImplementation window)
+		override public Single[] Extract(Managed.Window window)
 		{
 			return null;
 		}

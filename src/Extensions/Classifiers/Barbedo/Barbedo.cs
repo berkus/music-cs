@@ -30,9 +30,9 @@ using MusiC.Data.Unmanaged;
 
 namespace MusiC.Extensions.Classifiers
 {
-	public class Barbedo : Classifier
+	public class Barbedo : Unmanaged.Classifier
 	{
-		public Barbedo() : base("Barbedo")
+		public Barbedo()// : base("Barbedo")
 		{
 		}
 		

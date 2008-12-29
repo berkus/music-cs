@@ -29,74 +29,16 @@ using MusiC.Data;
 
 namespace MusiC
 {
+	public interface IWindow
+	{
+	}
+	
 	/// <summary>
 	/// Base class of Windows extensions implementation.
 	/// </summary>
 	/// @todo Allow different types.
-	abstract public class Window : Extension
+	abstract public class BaseWindow : Extension, IWindow
 	{
-		[CLSCompliant(false)]
-		abstract unsafe public class UnmanagedImplementation : Window
-		{
-			/// Window Values
-			Single * _wndData = null;
-		
-			/// Windowed Data
-			Single * _dataStream = null;
-			
-			protected UnmanagedImplementation(String name, Int32 size, Int32 overlap) : base(name, size, overlap)
-			{
-				_wndData = NativeMethods.Pointer.dgetmem(size);
-				Initialize();
-			}
-			
-			void Initialize()
-			{
-				for (Int32 i = 0; i < _size; i++)
-					_wndData[i] = Factory(i);
-			}
-			
-			~UnmanagedImplementation()
-			{
-				if(_wndData != null)
-					NativeMethods.Pointer.free(_wndData);
-			}
-			
-			unsafe public Single * GetWindow(Int32 windowPos)
-			{
-				return _wndData;
-			}
-		}
-		
-		abstract public class ManagedImplementation : Window
-		{
-			/// Window Values
-			Single[] _wndData;
-		
-			/// Windowed Data
-			Single[] _dataStream;
-			
-			protected ManagedImplementation(String name, Int32 size, Int32 overlap) : base(name, size, overlap)
-			{
-				_wndData = new Single[size];
-				
-				Int16 i = 0;
-				for(; i < size; i++)
-					_wndData[i] = Factory(i);
-			}
-			
-			void Initialize()
-			{
-				for (Int32 i = 0; i < _size; i++)
-					_wndData[i] = Factory(i);
-			}
-			
-			public Single[] GetWindow(Int32 windowPos)
-			{
-				return _dataStream;
-			}
-		}
-		
 		Int32 _size;
 		Int32 _nWnd = -1;
 		Int32 _overlap;
@@ -119,7 +61,7 @@ namespace MusiC
 			get { return _size; }
 		}
 	
-		protected Window(String name, Int32 size, Int32 overlap)
+		protected BaseWindow(String name, Int32 size, Int32 overlap)
 		{
 			_name = name;
 			_size = size;
@@ -128,7 +70,7 @@ namespace MusiC
 			_step = size - overlap;
 		}
 		
-		virtual public void Attach(Handler file)
+		virtual public void Attach(IHandler file)
 		{
 		}
 		
@@ -143,11 +85,79 @@ namespace MusiC
 		
 		abstract public Single Factory(Int32 windowPos);
 	}
+	
+	namespace Unmanaged
+	{
+		[CLSCompliant(false)]
+		abstract unsafe public class Window : BaseWindow
+		{
+			/// Window Values
+			Single * _wndData = null;
+		
+			/// Windowed Data
+			Single * _dataStream = null;
+			
+			protected Window(String name, Int32 size, Int32 overlap) : base(name, size, overlap)
+			{
+				_wndData = NativeMethods.Pointer.dgetmem(size);
+				Initialize();
+			}
+			
+			void Initialize()
+			{
+				for (Int32 i = 0; i < WindowSize; i++)
+					_wndData[i] = Factory(i);
+			}
+			
+			~Window()
+			{
+				if(_wndData != null)
+					NativeMethods.Pointer.free(_wndData);
+			}
+			
+			unsafe public Single * GetWindow(Int32 windowPos)
+			{
+				return _wndData;
+			}
+		}
+	}
+	
+	namespace Managed
+	{
+		abstract public class Window : BaseWindow
+		{
+			/// Window Values
+			Single[] _wndData;
+		
+			/// Windowed Data
+			Single[] _dataStream;
+			
+			protected Window(String name, Int32 size, Int32 overlap) : base(name, size, overlap)
+			{
+				_wndData = new Single[size];
+				
+				Int16 i = 0;
+				for(; i < size; i++)
+					_wndData[i] = Factory(i);
+			}
+			
+			void Initialize()
+			{
+				for (Int32 i = 0; i < WindowSize; i++)
+					_wndData[i] = Factory(i);
+			}
+			
+			public Single[] GetWindow(Int32 windowPos)
+			{
+				return _dataStream;
+			}
+		}
+	}
 }
 
 //namespace MCModule
 //{
-///// @brief Basic window type.
+//  /// @brief Basic window type.
 //	/// @details To implement a new window you must extended this class.
 //	abstract unsafe public class Window : Extension, IDisposable
 //	{

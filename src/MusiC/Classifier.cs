@@ -30,27 +30,65 @@ using MusiC.Data;
 
 namespace MusiC
 {
-	[CLSCompliant(false)]
-	abstract public class Classifier : Extension
+	public interface IClassifier
 	{
-		
-		public Classifier(string type)
-		{
-		}
-		
-		public void Execute(System.Collections.Generic.ICollection<Feature> FeatList, Window wnd)
-		{
-		}
-		
 //		virtual unsafe public MCDataCollection * Filter(MCDataCollection * dataIn)
 //		{
 //			return dataIn;
 //		}
 		
 //		abstract unsafe public void Train(MCDataCollection * dtCol);
-		abstract public void Classify();		
-		abstract public void TryLoadingParameters();
-		abstract public void Dispose();
+		
+		void Classify();		
+		void TryLoadingParameters();
+		void Dispose();
+	}
+	
+	namespace Managed
+	{
+		abstract public class Classifier : Extension, IClassifier
+		{
+			virtual public void Execute(ICollection<Feature> FeatList, Window wnd)
+			{
+				throw new NotImplementedException();
+			}
+			
+			virtual public void Classify()
+			{
+				throw new NotImplementedException();
+			}
+			
+			virtual public void TryLoadingParameters()
+			{
+				throw new NotImplementedException();
+			}
+			
+			virtual public void Dispose()
+			{
+				throw new NotImplementedException();
+			}
+		}
+	}
+	
+	namespace Unmanaged
+	{
+		abstract public class Classifier : Extension, IClassifier
+		{
+			virtual public void Classify()
+			{
+				throw new NotImplementedException();
+			}
+			
+			virtual public void TryLoadingParameters()
+			{
+				throw new NotImplementedException();
+			}
+			
+			virtual public void Dispose()
+			{
+				throw new NotImplementedException();
+			}
+		}
 	}
 }
 

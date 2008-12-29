@@ -184,7 +184,8 @@ namespace MusiC.Configs
 					
 					try
 					{
-						algorithm.Add(className, paramList);
+						if(!algorithm.Add(className, paramList))
+							break;
 					} catch (MissingExtensionException e)
 					{
 						Error("Error while loading an algorithm .... Skipping");

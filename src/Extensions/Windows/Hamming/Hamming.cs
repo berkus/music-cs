@@ -39,7 +39,7 @@ namespace MusiC.Extensions.Windows
 		}
 	}
 	
-	public class HammingU : Window.UnmanagedImplementation
+	public class HammingU : Unmanaged.Window
 	{
 		public HammingU(int size, int overlap) : base("Hamming - Unmanaged", size, overlap)
 		{
@@ -51,7 +51,7 @@ namespace MusiC.Extensions.Windows
 		}
 	}
 	
-	public class HammingM : Window.ManagedImplementation
+	public class HammingM : Managed.Window
 	{
 		public HammingM(int size, int overlap) : base("Hamming - Managed", size, overlap)
 		{

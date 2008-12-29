@@ -36,7 +36,7 @@ namespace MusiC.Extensions
 		
 		//Dictionary<String, Type> _tHandlerCache = new Dictionary<String, Type>();
 		Dictionary<String, ExtensionInfo> _extensionList = new Dictionary<String, ExtensionInfo>();
-		LinkedList<Handler> _handlerList = new LinkedList<Handler>();
+		LinkedList<IHandler> _handlerList = new LinkedList<IHandler>();
 		
 		public void Initialize()
 		{
@@ -55,7 +55,7 @@ namespace MusiC.Extensions
 			if(info.Kind != ExtensionKind.FileHandler)
 				_extensionList.Add(extensionType.FullName, info);
 			else
-				_handlerList.AddLast(info.Instantiate(null) as Handler);
+				_handlerList.AddLast(info.Instantiate(null) as IHandler);
 			
 			if(info.Kind == ExtensionKind.Configuration)
 				_tConfig = extensionType;
@@ -88,12 +88,40 @@ namespace MusiC.Extensions
 			return info;
 		}
 		
-		public Handler GetHandler(String file)
+		public Managed.Handler GetManagedHandler(String file)
 		{
-			foreach(Handler h in _handlerList)
+			foreach(IHandler h in _handlerList)
+			{
+				if(h.CanHandle(file) && ExtensionManagement.Managed == ExtensionInfo.IdentifyManagement(h.GetType()))
+				{
+					return h as Managed.Handler;
+				}
+			}
+			
+			return null;
+		}
+		
+		public Unmanaged.Handler GetUnmanagedHandler(String file)
+		{
+			foreach(IHandler h in _handlerList)
+			{
+				if(h.CanHandle(file) && ExtensionManagement.Unmanaged == ExtensionInfo.IdentifyManagement(h.GetType()))
+				{
+					return h as Unmanaged.Handler;
+				}
+			}
+			
+			return null;
+		}
+	
+		public IHandler GetHandler(String file)
+		{
+			foreach(IHandler h in _handlerList)
 			{
 				if(h.CanHandle(file))
+				{
 					return h;
+				}
 			}
 			
 			return null;

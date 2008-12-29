@@ -32,18 +32,25 @@ namespace MusiC
 {
 	public class Extractor
 	{
-		[CLSCompliant(false)]
-		public class UnmanagedImplementation
+	}
+	
+	namespace Managed
+	{
+		public class Extractor
 		{
-			static unsafe public Data.Unmanaged.MCDataCollection * Extract(Window.UnmanagedImplementation wnd, Feature f)
+			static public Data.Managed.MCDataCollection Extract(Window wnd, Feature f)
 			{
 				return null;
 			}
 		}
-		
-		public class ManagedImplementation
+	}
+	
+	namespace Unmanaged
+	{
+		[CLSCompliant(false)]
+		public class Extractor
 		{
-			static public Data.Managed.MCDataCollection Extract(Window.ManagedImplementation wnd, Feature f)
+			static unsafe public Data.Unmanaged.MCDataCollection * Extract(Window wnd, Feature f)
 			{
 				return null;
 			}

@@ -27,9 +27,53 @@ using System.IO;
 
 namespace MusiC
 {
-	abstract public class Handler : Extension
+	public interface IHandler
 	{
-		abstract public bool CanHandle(String file);
+		bool CanHandle(String file);
+		void Attach(String file);
+		void Detach();
+	}
+	
+	namespace Managed
+	{
+		//abstract public class Handler<T> : Extension, IHandler where T : struct
+		abstract public class Handler : Extension, IHandler
+		{
+			
+			virtual public bool CanHandle(string file)
+			{
+				//throw new NotImplementedException();
+				return true;
+			}
+			
+			virtual public void Attach(string file)
+			{
+			}
+			
+			virtual public void Detach()
+			{
+			}
+		}
+	}
+	
+	namespace Unmanaged
+	{
+		abstract public class Handler : Extension, IHandler
+		{
+			
+			virtual public bool CanHandle(string file)
+			{
+				return true;
+			}
+			
+			virtual public void Attach(string file)
+			{
+			}
+			
+			virtual public void Detach()
+			{
+			}
+		}
 	}
 }
 

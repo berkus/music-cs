@@ -27,14 +27,14 @@ using System.Runtime.InteropServices;
 
 namespace MusiC
 {
-	public class DBHandler : Handler
+	public class DBHandler : Unmanaged.Handler
 	{
 		/// <summary>
 		/// 
 		/// </summary>
 		/// <param name="file"></param>
 		/// <returns></returns>
-		/// @todo Check if the it can handle the music-db file
+		/// @todo Check if it can handle the music-db file
 		override public bool CanHandle(String file)
 		{
 			return true;

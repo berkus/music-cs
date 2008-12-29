@@ -31,15 +31,277 @@ using MusiC.Extensions;
 
 namespace MusiC
 {
+	/// <summary>
+	/// 
+	/// </summary>
 	public class Algorithm : MusiCObject
 	{
-		Window _window;
-		Classifier _classifier;
-		LinkedList<Feature> _featureList = new LinkedList<Feature>();
-		ExtensionManagement _managementStatus = ExtensionManagement.NotSet;
+		Pipeline _pipe = new Pipeline();
+		
+		class Pipeline : MusiCObject
+		{
+			mPipeline _mPipe = new mPipeline();
+			uPipeline _uPipe = new uPipeline();
+			
+			ExtensionManagement _status = ExtensionManagement.NotSet;
+			
+			class mPipeline : MusiCObject
+			{
+				Managed.Window _window;
+				Managed.Classifier _classifier;
+				LinkedList<Managed.Feature> _featureList = new LinkedList<Managed.Feature>();
+		
+				public void AddClassifier(Managed.Classifier classifier)
+				{
+					_classifier = classifier;
+				}
+				
+				public void AddWindow(Managed.Window window)
+				{
+					_window = window;
+				}
+				
+				public void AddFeature(Managed.Feature feature)
+				{
+					_featureList.AddLast(feature);
+				}
+				
+				public bool Check()
+				{
+					if(_window == null)
+						return false;
+					
+					if(_featureList.Count == 0)
+						return false;
+					
+					return true;
+				}
+				
+				public void Execute()
+				{
+					
+				}
+				
+				public void Say()
+				{
+					Message("Window: " + 
+			        ((_window!=null)?_window.GetType().FullName:"((NULL))")
+			        );
+				
+					Message("Classifier: " + 
+			        ((_classifier!=null)?_classifier.GetType().FullName:"((NULL))")
+			        );
+					
+					Message("Feature List");ReportIndent();
+					
+					foreach(Managed.Feature f in _featureList)
+						Message(
+							(f!=null)?f.GetType().FullName : "((NULL))"
+							);
+					
+					ReportUnindent();
+				}
+			}
+			
+			class uPipeline : MusiCObject
+			{
+				Unmanaged.Window _window;
+				Unmanaged.Classifier _classifier;
+				LinkedList<Unmanaged.Feature> _featureList = new LinkedList<Unmanaged.Feature>();
+				
+				public void AddClassifier(Unmanaged.Classifier classifier)
+				{
+					_classifier = classifier;
+				}
+				
+				public void AddWindow(Unmanaged.Window window)
+				{
+					_window = window;
+				}
+				
+				public void AddFeature(Unmanaged.Feature feature)
+				{
+					_featureList.AddLast(feature);
+				}
+				
+				public bool Check()
+				{
+					if(_window == null)
+						return false;
+					
+					if(_featureList.Count == 0)
+						return false;
+					
+					return true;
+				}
+			
+				unsafe public void Execute()
+				{
+					foreach(TrainLabel label in Global<ExtensionCache>.GetInstance().GetConfig().LabelList)
+					{
+						Message("Processing "+label.InputDir);
+						foreach(String file in Directory.GetFiles(label.InputDir,"*.wav"))
+						{
+							Message("Opening "+ file);
+							Unmanaged.Handler h = Global<ExtensionCache>.GetInstance().GetUnmanagedHandler(file);
+							
+							if(h == null)
+							{
+								//Warning(file+": No handler supports this file");
+								continue;
+							}
+							
+							h.Attach(file);
+							_window.Attach(h);
+							
+							foreach (Unmanaged.Feature f in _featureList)
+								Unmanaged.Extractor.Extract(_window, f);
+							
+							h.Detach();
+						}
+					}
+				}
+				
+				public void Say()
+				{
+					Message("Window: " + 
+			        ((_window!=null)?_window.GetType().FullName:"((NULL))")
+			        );
+				
+					Message("Classifier: " + 
+			        ((_classifier!=null)?_classifier.GetType().FullName:"((NULL))")
+			        );
+					
+					Message("Feature List");ReportIndent();
+					
+					foreach(Unmanaged.Feature f in _featureList)
+						Message(
+							(f!=null)?f.GetType().FullName : "((NULL))"
+							);
+					
+					ReportUnindent();
+				}
+			}
+			
+			public bool Add(Extension ext, ExtensionInfo info)
+			{
+				switch(info.Manager)
+				{
+					case ExtensionManagement.Managed:
+						switch(info.Kind)
+						{
+							case ExtensionKind.Window:
+								_mPipe.AddWindow(ext as Managed.Window);
+								break;
+							
+							case ExtensionKind.Classifier:
+								_mPipe.AddClassifier(ext as Managed.Classifier);
+								break;
+								
+							case ExtensionKind.Feature:
+								_mPipe.AddFeature(ext as Managed.Feature);
+								break;
+							
+							default:
+								return false;
+					
+					}
+					break;
+			
+					case ExtensionManagement.Unmanaged:
+						switch(info.Kind)
+						{
+							case ExtensionKind.Window:
+								_uPipe.AddWindow(ext as Unmanaged.Window);
+								break;
+							
+							case ExtensionKind.Classifier:
+								_uPipe.AddClassifier(ext as Unmanaged.Classifier);
+								break;
+								
+							case ExtensionKind.Feature:
+								_uPipe.AddFeature(ext as Unmanaged.Feature);
+								break;
+								
+							default:
+								return false;
+						}
+						
+						break;
+						
+					default:
+						return false;
+				}
+				
+				return true;
+			}
+			
+			public ExtensionManagement Check()
+			{
+				bool mStatus = _mPipe.Check();
+				bool uStatus = _uPipe.Check();
+				
+				if(uStatus && mStatus)
+				{
+					_status = ExtensionManagement.Error;
+					return ExtensionManagement.Error;
+				}
+				
+				if(!(uStatus || mStatus))
+				{
+					_status = ExtensionManagement.Error;
+					return ExtensionManagement.NotSet;
+				}
+				
+				if(uStatus)
+				{
+					_status = ExtensionManagement.Unmanaged;
+					return ExtensionManagement.Unmanaged;
+				}
+				
+				if(mStatus)
+				{
+					_status = ExtensionManagement.Managed;
+					return ExtensionManagement.Managed;
+				}
+				
+				// this shouldn't be reached.
+				// conforming to compiler: not all code paths return a value (CS0161)
+				return ExtensionManagement.NotSet;
+			}
+			
+			public void Execute()
+			{
+				if(_status == ExtensionManagement.Managed)
+				{
+					_mPipe.Execute();
+					return;
+				}
+				
+				if(_status == ExtensionManagement.Unmanaged)
+				{
+					_uPipe.Execute();
+					return;
+				}
+				
+				Error("No pipeline can be executed.");
+				Say();
+			}
+			
+			public void Say()
+			{
+				Message("Managed Pipeline"); ReportIndent();
+				_mPipe.Say();
+				ReportUnindent();
+				
+				Message("Unmanaged Pipeline"); ReportIndent();
+				_uPipe.Say();
+				ReportUnindent();
+			}
+		}
 		
 		/// <summary>
-		/// Add a extension to the algorithm.
+		/// Add an extension to the algorithm.
 		/// </summary>
 		/// <description>
 		/// It adds a feature, window or classifier to the algorithm. It supports only one window and one classifier(which is not required).
@@ -56,7 +318,6 @@ namespace MusiC
 			if(info == null)
 				throw new Exceptions.MissingExtensionException(extensionClass + " wasn't found.");
 			
-			/// @todo Throw a UnrecognizedExtensionException.
 			if(info.Kind == ExtensionKind.Error)
 			{
 				Error(extensionClass+": Can't recognize this Extension. This may happen when an extension inherits directly from MusiC.Extension");
@@ -69,103 +330,29 @@ namespace MusiC
 				return false;
 			}
 			
-			if(
-				info.Kind == ExtensionKind.Classifier ||
-				info.Kind == ExtensionKind.Feature ||
-				info.Kind == ExtensionKind.Window
-			  )
-			{
-				if(_managementStatus == ExtensionManagement.NotSet)
-					_managementStatus = info.Manager;
-				
-				if(info.Manager != _managementStatus)
-				{
-					Error("Cant mix managed and unmanaged classifiers/Features/Windows.");
-					return false;
-				}
-			}
-			
 			Extension ext = info.Instantiate(args);
-			
-			switch(info.Kind)
-			{
-				case ExtensionKind.Classifier:
-					_classifier = ext as Classifier;
-					
-//					if(typeof(Classifier).IsAssignableFrom(ext.GetType()))
-//						_classifier = ext as Classifier;
-//					else
-//						Error("The classifier "+extensionClass+" doesn't inherit MusiC.Classifier.");
-					
-					break;
-					
-				case ExtensionKind.Window:
-					_window = ext as Window;
-					
-//					if(
-//						typeof(Window.ManagedImplementation).IsAssignableFrom(ext.GetType()) ||
-//						typeof(Window.UnmanagedImplementation).IsAssignableFrom(ext.GetType())
-//					  )
-//						_window = ext as Window;
-//					else
-//						Error("The window "+extensionClass+" doesn't inherit MusiC.Window.ManagedImpl nor MusiC.Window.UnmanagedImpl.");
-					
-					break;
-					
-				case ExtensionKind.Feature:
-					_featureList.AddLast(ext as Feature);
-					
-//					if(
-//						typeof(Feature.ManagedImplementation).IsAssignableFrom(ext.GetType()) ||
-//						typeof(Feature.UnmanagedImplementation).IsAssignableFrom(ext.GetType())
-//					  )
-//						_featureList.AddLast(ext as Feature);
-//					else
-//						Error("The feature "+extensionClass+" doesn't inherit MusiC.Feature.ManagedImplementation nor MusiC.Feature.UnmanagedImplementation.");
-					
-					break;
-					
-				default:
-					return false;
-			}
-			
-			return true;
+			return _pipe.Add(ext, info);
 		}
 		
 		public void Execute()
 		{
-			foreach(TrainLabel label in Global<ExtensionCache>.GetInstance().GetConfig().LabelList)
+			ExtensionManagement status = _pipe.Check();
+
+			if(
+				status == ExtensionManagement.NotSet ||
+				status == ExtensionManagement.Error
+			)
 			{
-				Message("Processing "+label.InputDir);
-				foreach(String file in Directory.GetFiles(label.InputDir,"*.wav"))
-				{
-					Message("Opening "+ file);
-					Handler h = Global<ExtensionCache>.GetInstance().GetHandler(file);
-					
-					if(h == null)
-						Warning(file+": No handler supports this file");
-				}
+				Error("An error has ocurred. Status = "+status.ToString());
+				Say();
 			}
+			
+			_pipe.Execute();
 		}
 		
 		public void Say()
 		{
-			Message("Window: " + 
-			        ((_window!=null)?_window.GetType().FullName:"((NULL))")
-			        );
-			
-			Message("Classifier: " +
-			        ((_classifier!=null)?_classifier.GetType().FullName : "((NULL))")
-					);
-			
-			Message("Feature List");ReportIndent();
-			
-			foreach(Feature f in _featureList)
-				Message(
-					(f!=null)?f.GetType().FullName : "((NULL))"
-					);
-			
-			ReportUnindent();
+			_pipe.Say();
 		}
 	}
 }

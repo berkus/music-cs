@@ -56,6 +56,11 @@ namespace MusiC
 		ExtensionKind _kind = ExtensionKind.NotSet;
 		ExtensionManagement _managed = ExtensionManagement.NotSet;
 		
+		public Type Class
+		{
+			get { return _class; }
+		}
+		
 		public ExtensionKind Kind
 		{
 			get { return _kind; }
@@ -69,8 +74,8 @@ namespace MusiC
 		public ExtensionInfo(Type t)
 		{
 			_class = t;
-			_kind = Identify();
-			_managed = IdentifyManagement();
+			_kind = Identify(_class);
+			_managed = IdentifyManagement(_class);
 		}
 		
 		/// <summary>
@@ -79,61 +84,49 @@ namespace MusiC
 		/// <returns>
 		/// The kind of the extension.
 		/// </returns>
-		ExtensionKind Identify()
+		static public ExtensionKind Identify(Type t)
 		{
 			// This one should be the most frequent call.
-			if(typeof(Feature).IsAssignableFrom(_class))
+			if(typeof(BaseFeature).IsAssignableFrom(t))
 				return ExtensionKind.Feature;
 			
-			if(typeof(Config).IsAssignableFrom(_class))
+			if(typeof(Config).IsAssignableFrom(t))
 				return ExtensionKind.Configuration;
 			
-			if(typeof(Classifier).IsAssignableFrom(_class))
+			if(typeof(IClassifier).IsAssignableFrom(t))
 				return ExtensionKind.Classifier;
 			
-			if(typeof(Handler).IsAssignableFrom(_class))
+			if(typeof(IHandler).IsAssignableFrom(t))
 				return ExtensionKind.FileHandler;
 			
-			if(typeof(Window).IsAssignableFrom(_class))
+			if(typeof(IWindow).IsAssignableFrom(t))
 				return ExtensionKind.Window;
 			
 			return ExtensionKind.Error;
 		}
 		
-		ExtensionManagement IdentifyManagement()
+		static public ExtensionManagement IdentifyManagement(Type t)
 		{
-			switch(_kind)
-			{
-				case ExtensionKind.Classifier:
-					return ExtensionManagement.Unmanaged;
-				
-				case ExtensionKind.Configuration:
-					return ExtensionManagement.Managed;
+			// Managed
+			if(
+				typeof(Managed.Feature).IsAssignableFrom(t) ||
+				typeof(Managed.Classifier).IsAssignableFrom(t) ||
+				typeof(Managed.Handler).IsAssignableFrom(t) ||
+				typeof(Managed.Window).IsAssignableFrom(t) ||
+				typeof(Config).IsAssignableFrom(t)
+			)
+				return ExtensionManagement.Managed;
+			
+			// Unmanaged
+			if(
+				typeof(Unmanaged.Feature).IsAssignableFrom(t) ||
+				typeof(Unmanaged.Classifier).IsAssignableFrom(t) ||
+				typeof(Unmanaged.Handler).IsAssignableFrom(t) ||
+				typeof(Unmanaged.Window).IsAssignableFrom(t)
+			)
+				return ExtensionManagement.Unmanaged;
 					
-				case ExtensionKind.Feature:
-					if(typeof(Feature.UnmanagedImplementation).IsAssignableFrom(_class))
-						return ExtensionManagement.Unmanaged;
-					
-					if(typeof(Feature.ManagedImplementation).IsAssignableFrom(_class))
-						return ExtensionManagement.Managed;
-					
-					return ExtensionManagement.Error;
-				
-				case ExtensionKind.FileHandler:
-					return ExtensionManagement.Managed;
-					
-				case ExtensionKind.Window:
-					if(typeof(Window.UnmanagedImplementation).IsAssignableFrom(_class))
-						return ExtensionManagement.Unmanaged;
-					
-					if(typeof(Window.ManagedImplementation).IsAssignableFrom(_class))
-						return ExtensionManagement.Managed;
-					
-					return ExtensionManagement.Error;
-					
-				default:
-					return ExtensionManagement.Error;
-			}
+			return ExtensionManagement.Error;
 		}
 		
 		/// <summary>
