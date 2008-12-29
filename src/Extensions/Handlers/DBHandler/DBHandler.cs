@@ -34,7 +34,7 @@ namespace MusiC
 		/// </summary>
 		/// <param name="file"></param>
 		/// <returns></returns>
-		/// <todo>Check if the it can handle the music-db file</todo>
+		/// @todo Check if the it can handle the music-db file
 		override public bool CanHandle(String file)
 		{
 			return true;

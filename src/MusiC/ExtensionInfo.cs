@@ -49,7 +49,7 @@ namespace MusiC
 	/// <summary>
 	/// 
 	/// </summary>
-	/// <todo>Inherit from ParamList</todo>
+	/// @todo Inherit from ParamList
 	public class ExtensionInfo : MusiCObject
 	{
 		Type _class=null;
