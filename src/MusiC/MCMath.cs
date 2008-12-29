@@ -29,6 +29,10 @@ namespace MusiC
 {
 	class NativeMethods
 	{
+		NativeMethods()
+		{	
+		}
+		
 		public class Math
 		{
 			Math()
