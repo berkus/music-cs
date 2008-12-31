@@ -137,17 +137,26 @@ namespace MusiC
 			
 				unsafe public void Execute()
 				{
-					foreach(TrainLabel label in Global<ExtensionCache>.GetInstance().GetConfig().LabelList)
+					LinkedList<TrainLabel> tLabel = Global<ExtensionCache>.GetInstance().GetConfig().LabelList;
+					Data.Unmanaged.DataCollection * dtCol = Data.Unmanaged.DataHandler.BuildCollection();
+					
+					foreach(TrainLabel label in tLabel)
 					{
+						Data.Unmanaged.ClassData * currentClass = Data.Unmanaged.DataHandler.BuildClassData(dtCol);
+						
 						Message("Processing "+label.InputDir);
+						
 						foreach(String file in Directory.GetFiles(label.InputDir,"*.wav"))
 						{
+							Data.Unmanaged.FileData * currentFile = Data.Unmanaged.DataHandler.BuildFileData(currentClass);
+							
 							Message("Opening "+ file);
+							
 							Unmanaged.Handler h = Global<ExtensionCache>.GetInstance().GetUnmanagedHandler(file);
 							
 							if(h == null)
 							{
-								//Warning(file+": No handler supports this file");
+								Warning(file+": No handler supports this file");
 								continue;
 							}
 							
@@ -155,7 +164,7 @@ namespace MusiC
 							_window.Attach(h);
 							
 							foreach (Unmanaged.Feature f in _featureList)
-								Unmanaged.Extractor.Extract(_window, f);
+								Unmanaged.Extractor.Extract(_window, _featureList, currentFile);
 							
 							h.Detach();
 						}

@@ -61,10 +61,10 @@ namespace MusiC.Extensions.Classifiers
 		}
 		
 		[DllImport("./musiC-uMng.dll", EntryPoint="Barbedo_Train")]
-		static extern public void uTrain(ref MCDataCollection dtCol);
+		static extern public void uTrain(ref DataCollection dtCol);
 		
 		[DllImport("./musiC-uMng.dll", EntryPoint="Barbedo_Filter")]
-		static extern unsafe public MCDataCollection * uFilter(ref MCDataCollection dtCol);
+		static extern unsafe public DataCollection * uFilter(ref DataCollection dtCol);
 	}
 }
 

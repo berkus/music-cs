@@ -8,33 +8,39 @@
 
 using namespace std;
 
-typedef long long int64;
+typedef __int64 Int64;
 
-// struct 1 - Dados dos G�neros
-struct MCFeatVector
+struct FrameData
 {
 	double * pData;
-	int64 nVectors;
+	FrameData * next;
+};
+
+struct FileData
+{
+	FrameData * pData;
+	Int64 nVectors;
+	FileData * pNext;
 	///////////////
-	int64 next;
+	Int64 next;
 };
 
-struct MCDataCollection;
+struct DataCollection;
 
-struct MCClassData
+struct ClassData
 {
-	int64 nVectorListAlloc;
-	int64 nVectorList;
-	int64 nVectors;
-	MCFeatVector * pVectorList;
-	MCDataCollection * pCollection;
+	Int64 nVectorListAlloc;
+	Int64 nVectorList;
+	Int64 nVectors;
+	FileData * pVectorList;
+	DataCollection * pCollection;
 };
 
-struct MCDataCollection
+struct DataCollection
 {
-	MCClassData * pClassData;
-	int64 nClasses;
-	int64 nFeatures;
+	ClassData * pClassData;
+	Int64 nClasses;
+	Int64 nFeatures;
 };
 
 // struct 2 - tRefVecIndex
@@ -61,7 +67,7 @@ tRefVecIndex * mc_tRefVecsIndex_alloc(long szA, long szB)
 }
 
 //gsl_matrix * filterCandidates(gsl_matrix *m)
-MCClassData * filterCandidates(MCClassData *m)
+ClassData * filterCandidates(ClassData *m)
 {
 	return m;
 }
@@ -77,7 +83,7 @@ int combine(tRefVecIndex * ref)
 	return GSL_SUCCESS;
 }
 
-double dist(double * src, double * ref, int64 &size)
+double dist(double * src, double * ref, Int64 &size)
 {
 	// column order
 	double ret = 0;
@@ -110,13 +116,13 @@ double dist(double * src, double * ref, int64 &size)
 	return sqrt(ret);
 }
 
-double * mc_random(MCClassData * c, long idx)
+double * mc_random(ClassData * c, Int64 idx)
 {
 	if(c == NULL)
 		cout << "mcRandom:MCClassData is NULL" << endl;
 	
 	//long counter = 0;
-	MCFeatVector * m = c->pVectorList;
+	FileData * m = c->pVectorList;
 	//cout << "mcRandom: Start" << endl;
 
 	while(idx >= m->nVectors)
@@ -141,7 +147,7 @@ double * mc_random(MCClassData * c, long idx)
 	return ret;
 }
 
-double * nextVector(MCFeatVector * vec)
+double * nextVector(FileData * vec)
 {
 	if (vec->next == vec->nVectors)
 	{
@@ -154,7 +160,7 @@ double * nextVector(MCFeatVector * vec)
 
 extern "C"
 {
-	MCDataCollection * Barbedo_Filter(MCDataCollection * extractedData)
+	DataCollection * Barbedo_Filter(DataCollection * extractedData)
 	{
 		//log.open("mcGenreClassifier-Barbedo.log", ios_base::out);
 		cout << "============ Barbedo_Filter ============" << endl;
@@ -165,16 +171,16 @@ extern "C"
 		return extractedData;
 	}
 	
-	void Barbedo_Train(MCDataCollection * extractedData)
+	void Barbedo_Train(DataCollection * extractedData)
 	{
 		ofstream log;
 		double genreCombinationIndex = 0;
 
 		log.open("mcGenreClassifier-Barbedo.log", ios_base::out);
-		cout << "Address:" << reinterpret_cast<long>(extractedData) << endl;
-		cout << "Size of MCClassData:" << sizeof(MCClassData) << endl;
-		cout << "Size of MCClassData *:" << sizeof(MCClassData*) << endl;
-		cout << "Size of int64:" << sizeof(int64) << endl;
+		cout << "Address:" << reinterpret_cast<int>(extractedData) << endl;
+		cout << "Size of MCClassData:" << sizeof(ClassData) << endl;
+		cout << "Size of MCClassData *:" << sizeof(ClassData*) << endl;
+		cout << "Size of Int64:" << sizeof(Int64) << " long:" << sizeof(long) << endl;
 		log << "Received " << extractedData->nClasses << " Classes" << endl;
 		log << "Received " << extractedData->nFeatures << " Features" << endl;
 		
@@ -192,17 +198,17 @@ extern "C"
 			log << "========================" << endl;
 			
 			// Extração
-			MCClassData * vecsA = &extractedData->pClassData[gsl_combination_get(selectedGenres, 0)];
-			MCClassData * vecsB = &extractedData->pClassData[gsl_combination_get(selectedGenres, 1)];
+			ClassData * vecsA = &extractedData->pClassData[gsl_combination_get(selectedGenres, 0)];
+			ClassData * vecsB = &extractedData->pClassData[gsl_combination_get(selectedGenres, 1)];
 
 
 			// Filtragem
 			//gsl_matrix * listOfPotsA = filterCandidates(mA);
 			//gsl_matrix * listOfPotsB = filterCandidates(mB);
 
-			MCClassData * listOfPotsA = filterCandidates(vecsA);
+			ClassData * listOfPotsA = filterCandidates(vecsA);
 			log << "Class A #Vectors: " << listOfPotsA->nVectors << endl;
-			MCClassData * listOfPotsB = filterCandidates(vecsB);
+			ClassData * listOfPotsB = filterCandidates(vecsB);
 			log << "Class B #Vectors: " << listOfPotsB->nVectors << endl;
 
 			log << "============" << endl;
@@ -230,8 +236,8 @@ extern "C"
 
 				// Dist 1
 				// Class A Loop
-				MCFeatVector * refVec = vecsA->pVectorList;
-				for(int64 idx = 0; idx < listOfPotsA->nVectors; idx++)
+				FileData * refVec = vecsA->pVectorList;
+				for(Int64 idx = 0; idx < listOfPotsA->nVectors; idx++)
 				{
 					double dist_loop_min = 1e300;
 					//log << "Idx:" << idx << endl;
@@ -317,7 +323,7 @@ extern "C"
 
 				// Dist 2
 				refVec = vecsB->pVectorList;
-				for(int64 idx = 0; idx < listOfPotsB->nVectors; idx++)
+				for(Int64 idx = 0; idx < listOfPotsB->nVectors; idx++)
 				{
 					double dist_loop_min = 1e300;
 					//log << "Idx:" << idx << endl;

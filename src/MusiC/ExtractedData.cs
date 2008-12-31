@@ -30,74 +30,148 @@ namespace MusiC.Data.Unmanaged
 {
 	[CLSCompliant(false)]
 	[StructLayout(LayoutKind.Sequential,Pack = 1)]
-	unsafe public struct MCFeatVector
+	unsafe public struct FrameData
 	{
-		public double * pData;
-		public long nVectors;
-		// Unmanaged side only
-		public long next;
+		public float * pData;
+		public FrameData * pNext;
 	}	
 	
 	[CLSCompliant(false)]
 	[StructLayout(LayoutKind.Sequential,Pack = 1)]
-	unsafe public struct MCClassData
+	unsafe public struct FileData
+	{
+		// Unmanaged side only
+		public long next;
+		public long nFrames;
+		
+		public FileData * pNext;
+		public FrameData * pFirstFrame;
+		public FrameData * pLastFrame;
+		public ClassData * pClass;
+	}	
+	
+	[CLSCompliant(false)]
+	[StructLayout(LayoutKind.Sequential,Pack = 1)]
+	unsafe public struct ClassData
 	{
 		public long nVectorListAlloc;
-		public long nVectorList;
-		public long nVectors;
-		public MCFeatVector * pVectorList;
-		public MCDataCollection * pCollection;
+		public long nFiles;
+		public long nFrames;
+		
+		public ClassData * pNext;
+		public FileData * pFirstFile;
+		public FileData * pLastFile;
+		public DataCollection * pCollection;
 	}
 	
 	[CLSCompliant(false)]
 	[StructLayout(LayoutKind.Sequential,Pack = 1)]
-	unsafe public struct MCDataCollection
+	unsafe public struct DataCollection
 	{
-		public MCClassData * pClassData;
+		public ClassData * pFirstClass;
+		public ClassData * pLastClass;
 		public long nClasses;
 		public long nFeatures;
 	}
 	
 	[CLSCompliant(false)]
-	unsafe public class MCDataHandler
+	unsafe public class DataHandler
 	{
-		public static MCDataCollection * BuildCollection(int nClasses, int nFeatures)
+		public static DataCollection * BuildCollection()
 		{
-			MCDataCollection * data = (MCDataCollection *) Marshal.AllocHGlobal(sizeof(MCDataCollection)).ToPointer();
-			MCClassData * newEntry = data->pClassData = (MCClassData *) Marshal.AllocHGlobal(sizeof(MCClassData) * nClasses).ToPointer();
+			DataCollection * data = (DataCollection *) Marshal.AllocHGlobal(sizeof(DataCollection)).ToPointer();
+			//ClassData * newEntry = data->pClassData = (ClassData *) Marshal.AllocHGlobal(sizeof(ClassData) * nClasses).ToPointer();
 			
-			for(int i = 0; i < nClasses; i++)
-			{
-				(newEntry)->pCollection = data;
-				(newEntry)->pVectorList = null;
-				(newEntry)->nVectors = 0;
-				(newEntry)->nVectorList = 0;
-				(newEntry)->nVectorListAlloc = 0;
-				newEntry++;
-			}
+//			for(int i = 0; i < nClasses; i++)
+//			{
+//				(newEntry)->pCollection = data;
+//				(newEntry)->pFileList = null;
+//				(newEntry)->nVectors = 0;
+//				(newEntry)->nVectorList = 0;
+//				(newEntry)->nVectorListAlloc = 0;
+//				newEntry++;
+//			}
 			
-			data->nClasses = nClasses;
-			data->nFeatures = nFeatures;
+			//data->nClasses = nClasses;
+			data->nClasses = 0;
+			//data->nFeatures = nFeatures;
+			//data->nFeatures = 0;
+			data->pFirstClass = null;
+			data->pLastClass = null;
 			
 			return data;
 		}
 		
-		public static void BuildVectorList(MCClassData * wClass, int nLists)
+		public static ClassData * BuildClassData(DataCollection * dtCol)
 		{
-			wClass->pVectorList = (MCFeatVector *)System.Runtime.InteropServices.Marshal.AllocHGlobal(sizeof(MCFeatVector) * nLists).ToPointer();
-			wClass->nVectorListAlloc = nLists;
+			ClassData * newClass = (ClassData *) Marshal.AllocHGlobal(sizeof(ClassData)).ToPointer();
+			
+			newClass->pNext = null;
+			newClass->pFirstFile = null;
+			newClass->nFrames = 0;
+			newClass->nFiles = 0;
+			
+			dtCol->nClasses++;
+			
+			if(dtCol->pFirstClass == null)
+			{
+				dtCol->pFirstClass = newClass;
+				dtCol->pLastClass = newClass;
+				
+				return newClass;
+			}
+			
+			dtCol->pLastClass->pNext = newClass;
+			dtCol->pLastClass = newClass;
+			
+			return newClass;
 		}
 		
-		public static void AddVectorList(MCClassData * wClass, double * data, long nWindows)
+		public static FileData * BuildFileData(ClassData * currentClass)
 		{
-			if(wClass == null )
-				Console.WriteLine("MCClassData is NULL");
+			FileData * newFile = (FileData *) Marshal.AllocHGlobal(sizeof(FileData)).ToPointer();
+			newFile->pNext = null;
+			newFile->pFirstFrame = null;
+			newFile->nFrames = 0;
+			newFile->pClass = currentClass;
 			
-			(wClass->pVectorList + wClass->nVectorList)->pData = data;
-			(wClass->pVectorList + wClass->nVectorList)->nVectors = nWindows;
-			(wClass->pVectorList + wClass->nVectorList)->next = 0;
-			wClass->nVectors += nWindows;
-			wClass->nVectorList++;			
+			currentClass->nFiles++;
+			
+			if(currentClass->pFirstFile == null)
+			{
+				currentClass->pFirstFile = newFile;
+				currentClass->pLastFile = newFile;
+				
+				return newFile;
+			}
+			
+			currentClass->pLastFile->pNext = newFile;
+			currentClass->pLastFile = newFile;
+			
+			return newFile;
+		}
+		
+		public static FrameData * BuildFrameData(FileData * currentFile)
+		{
+			FrameData * newFrame = (FrameData *) Marshal.AllocHGlobal(sizeof(FrameData)).ToPointer();
+			newFrame->pNext = null;
+			// allocate data;
+			newFrame->pData = null;
+			
+			currentFile->nFrames++;
+			currentFile->pClass->nFrames++;
+			
+			if(currentFile->pFirstFrame == null)
+			{
+				currentFile->pFirstFrame = newFrame;
+				currentFile->pLastFrame = newFrame;				
+				return newFrame;
+			}
+			
+			currentFile->pLastFrame->pNext = newFrame;
+			currentFile->pLastFrame = newFrame;
+			
+			return newFrame;
 		}
 	}
 }
