@@ -6,44 +6,10 @@
 #include <gsl/gsl_combination.h>
 #include <gsl/gsl_sf.h>
 
+#include <MusiC-Native.h>
+
 using namespace std;
-
-typedef __int64 Int64;
-
-struct FrameData
-{
-	double * pData;
-	FrameData * next;
-};
-
-struct FileData
-{
-	FrameData * pData;
-	Int64 nVectors;
-	FileData * pNext;
-	///////////////
-	Int64 next;
-};
-
-struct DataCollection;
-
-struct ClassData
-{
-	Int64 nVectorListAlloc;
-	Int64 nVectorList;
-	Int64 nVectors;
-	FileData * pVectorList;
-	DataCollection * pCollection;
-};
-
-struct DataCollection
-{
-	ClassData * pClassData;
-	Int64 nClasses;
-	Int64 nFeatures;
-};
-
-// struct 2 - tRefVecIndex
+using namespace MusiC::Native;
 
 struct tRefVecIndex
 {
@@ -122,13 +88,13 @@ double * mc_random(ClassData * c, Int64 idx)
 		cout << "mcRandom:MCClassData is NULL" << endl;
 	
 	//long counter = 0;
-	FileData * m = c->pVectorList;
+	FileData * m = c->pFirstFile;
 	//cout << "mcRandom: Start" << endl;
 
-	while(idx >= m->nVectors)
+	while(idx >= m->nFrames)
 	{
 		//cout << "idx=" << idx << " Section Size:" << m->nVectors << endl;
-		idx -= m->nVectors;
+		idx -= m->nFrames;
 		m++;
 	}
 
@@ -160,15 +126,18 @@ double * nextVector(FileData * vec)
 
 extern "C"
 {
-	DataCollection * Barbedo_Filter(DataCollection * extractedData)
+	void Barbedo_Filter(DataCollection * extractedData)
 	{
 		//log.open("mcGenreClassifier-Barbedo.log", ios_base::out);
+		
+		DataHandler hnd;
+		hnd.Attach(extractedData);
+		
 		cout << "============ Barbedo_Filter ============" << endl;
 		cout << "Address:" << reinterpret_cast<long>(extractedData) << endl;
-		cout << "Received " << extractedData->nClasses << " Classes" << endl;
-		cout << "Received " << extractedData->nFeatures << " Features" << endl;
+		cout << "Received " << hnd.getNumClasses() << " Classes" << endl;
+		cout << "Received " << hnd.getNumFeatures() << " Features" << endl;
 		cout << "====================================" << endl;
-		return extractedData;
 	}
 	
 	void Barbedo_Train(DataCollection * extractedData)

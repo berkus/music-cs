@@ -12,13 +12,15 @@ package.files={
 }
 package.links={
 	"gsl",
-	"gslcblas"
+	"gslcblas",
+	"MusiC.Native"
 }
 package.libpaths={
 	base_deps_dir.."/"..OS.."/lib"
 }
 
 package.includepaths={
+	base_src_dir.."/Native",
 	base_deps_dir.."/include"
 }
 

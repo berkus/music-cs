@@ -169,6 +169,11 @@ namespace MusiC
 							h.Detach();
 						}
 					}
+
+                    if (_classifier == null)
+                        _classifier.Train(dtCol);
+
+                    _classifier.Filter(dtCol);
 				}
 				
 				public void Say()

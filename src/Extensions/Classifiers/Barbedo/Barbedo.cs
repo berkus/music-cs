@@ -35,37 +35,24 @@ namespace MusiC.Extensions.Classifiers
 		public Barbedo()// : base("Barbedo")
 		{
 		}
-		
-//		override unsafe public void Train(MCDataCollection * dtCol)
-//		{
-//			IntPtr ptr = new IntPtr(dtCol);
-//			Console.WriteLine("Address:"+ptr.ToInt64());
-//			//uTrain(ref (*dtCol));
-//		}
-		
-//		override unsafe public MCDataCollection * Filter(MCDataCollection * dataIn)
-//		{
-//			return uFilter(ref *dataIn);
-//		}
-		
-		override public void Classify()
+
+        override unsafe public void Train(DataCollection* dtCol)
 		{
+			uTrain(ref (*dtCol));
+		}
+
+        override unsafe public void Filter(DataCollection* dataIn)
+		{
+			uFilter(ref *dataIn);
 		}
 		
-		override public void TryLoadingParameters()
-		{
-		}
-		
-		override public void Dispose()
-		{
-		}
 		
 		[DllImport("./musiC-uMng.dll", EntryPoint="Barbedo_Train")]
 		static extern public void uTrain(ref DataCollection dtCol);
 		
 		[DllImport("./musiC-uMng.dll", EntryPoint="Barbedo_Filter")]
 		static extern unsafe public DataCollection * uFilter(ref DataCollection dtCol);
-	}
+    }
 }
 
 //namespace MCModule.Classifiers

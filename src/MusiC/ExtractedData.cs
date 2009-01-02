@@ -54,7 +54,6 @@ namespace MusiC.Data.Unmanaged
 	[StructLayout(LayoutKind.Sequential,Pack = 1)]
 	unsafe public struct ClassData
 	{
-		public long nVectorListAlloc;
 		public long nFiles;
 		public long nFrames;
 		
@@ -68,10 +67,11 @@ namespace MusiC.Data.Unmanaged
 	[StructLayout(LayoutKind.Sequential,Pack = 1)]
 	unsafe public struct DataCollection
 	{
-		public ClassData * pFirstClass;
-		public ClassData * pLastClass;
 		public int nClasses;
 		public int nFeatures;
+		
+		public ClassData * pFirstClass;
+		public ClassData * pLastClass;
 	}
 	
 	[CLSCompliant(false)]
