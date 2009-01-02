@@ -1,4 +1,5 @@
 function MakeUnmanagedProjects()
+	dofile("MusiC.Native.lua")
 	dofile("MusiC.Extensions.Classifiers.uBarbedo.lua")
 	dofile("MusiC.Extensions.Handlers.uDBHandler.lua")
 end

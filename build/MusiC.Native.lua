@@ -1,14 +1,14 @@
 -- MusiC.Extensions.Classifiers.uBarbedo
 
 package = newpackage()
-package.name="MusiC.Extensions.Classifiers.uBarbedo"
+package.name="MusiC.Native"
 package.path=project.path
 
 -- Input
 package.language="c++"
 package.files={
-	matchrecursive(base_src_dir.."/Extensions/Classifiers/Barbedo/*.cpp"),
-	matchrecursive(base_src_dir.."/Extensions/Classifiers/Barbedo/*.h")
+	matchrecursive(base_src_dir.."/Native/*.cpp"),
+	matchrecursive(base_src_dir.."/Native/*.h")
 }
 package.links={
 	"gsl",
@@ -28,11 +28,11 @@ package.buildflags={"dylib"}
 
 -- Output
 package.kind="dll"
-package.target="MusiC.Extensions.Classifiers.uBarbedo"
+package.target="MusiC.Native"
 package.targetprefix=""
 package.targetextension="dll"
-package.bindir=base_bin_dir.."/Extensions"
-package.objdir="obj"
+package.bindir=base_bin_dir
+package.objdir=base_bin_dir.."/obj"
 
 -- Debug:MusiC
 package.config["Debug"].defines={"DEBUG"}

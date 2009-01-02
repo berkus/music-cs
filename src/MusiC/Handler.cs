@@ -73,7 +73,7 @@ namespace MusiC
 		[CLSCompliant(false)]
 		abstract public class Handler : BaseHandler
 		{
-			abstract unsafe public Single * Read(Int32 size);
+			abstract unsafe public Single * Read(Int32 windowPos, Int32 windowSize);
 		}
 	}
 }

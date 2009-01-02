@@ -80,11 +80,11 @@ namespace MusiC.Extensions.Features
 	
 			cum = sum;
 	
-			for (sro = wndSize - 1; sro >= 0; sro--)
+			for (sro = wndSize - 1; sro > 0; sro--)
 			{
 				cum -= *(_temp--);
 				
-				if (cum < 0.95 * sum)
+				if (cum < (0.95 * sum))
 					break;
 			}
 			

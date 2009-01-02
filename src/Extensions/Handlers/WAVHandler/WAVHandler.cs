@@ -32,9 +32,15 @@ namespace MusiC.Extensions.Handlers
 		Single * _data = null;
 		// total audio data, loaded audio data, bytes per sample, channels
 		Int32 _streamSz, _dataSz, _bytesInUse, _channels;
-		
+        Int64 _offset;
+
 		BinaryReader rd;
-		
+
+        ~WavHandler()
+        {
+            NativeMethods.Pointer.free(_data);
+        }
+
 		public override bool CanHandle(string file)
 		{
 			return true;
@@ -111,111 +117,71 @@ namespace MusiC.Extensions.Handlers
 			
 			//int samplesPerChannel = m_info.SamplesPerChannel = Convert.ToInt32(dataSz / (m_info.Channels * bytesInUse));
 			Int32 samplesPerChannel = Convert.ToInt32(_streamSz / blockSize);
-			
-			//Byte[] raw_data = rd.ReadBytes(dataSz);
-			
-			///@todo Add size check
-			//if (mData != null)
-			//	UnsafePtr.free(mData);
-			
-			//float * mData = UnsafePtr.fgetmem(samplesPerChannel);
-			
-//			short i = 0;
-//			long count = 0;
-//			short c;
-//	
-//			unsafe
-//			{
-//				double* pData = mData;
-//				Int64 temp;
-//	
-//				fixed (Byte* pB = raw_data)
-//				{
-//					Byte* bitPt = pB; //can't assign to pB
-//	
-//					for (; count < samplesPerChannel; count++)
-//					{
-//						*(pData) = 0;
-//	
-//						for (c = 0; c < channels; c++)
-//						{
-//							byte* m = (byte*)&temp;
-//							// if MSB > 128
-//							temp = (*(bitPt + bytesInUse - 1) > 128) ? -1 : 0;
-//	
-//							for (i = 0; i < bytesInUse; i++)
-//							{
-//								*(m + i) = *(bitPt + i);
-//							}
-//	
-//							bitPt += bytesInUse;
-//							// Increases the number of divisions but avoid overflow problems
-//							// Makes data mono
-//							*pData += temp / channels;
-//						}
-//	
-//						pData++;
-//					}
-//				}
-//			}
-//	
-//			rd.Close();
+
+            _offset = rd.BaseStream.Position;
 		}
 		
-		override unsafe public System.Single* Read(int size)
+		override unsafe public System.Single* Read(int windowPos, int windowSize)
 		{
-			Byte[] raw_data = rd.ReadBytes(size);
-			
-			if(_dataSz < size)
+            rd.BaseStream.Seek(_offset + (windowPos * windowSize * _bytesInUse * _channels), SeekOrigin.Begin);
+            Byte[] raw_data = rd.ReadBytes(windowSize * _bytesInUse * _channels);
+
+            if (_dataSz < windowSize)
 			{
 				if(_data != null)
 					NativeMethods.Pointer.free(_data);
-				
-				_data = NativeMethods.Pointer.fgetmem(size);
-				_dataSz = size;
+
+                _data = NativeMethods.Pointer.fgetmem(windowSize);
+                _dataSz = windowSize;
 			}
 
-			if(raw_data.Length < size)
+            if (raw_data.Length < windowSize)
 				return null;
 			
 			short i = 0;
 			long count = 0;
 			short c;
-	
-			unsafe
-			{
-				float * pData = _data;
-				Int64 temp;
-	
-				fixed (Byte* pB = raw_data)
-				{
-					Byte* bitPt = pB; //can't assign to pB
-	
-					for (; count < size; count++)
-					{
-						*(pData) = 0;
-	
-						for (c = 0; c < _channels; c++)
-						{
-							byte* m = (byte*)&temp;
-							// if MSB > 128
-							temp = (*(bitPt + _bytesInUse - 1) > 128) ? -1 : 0;
-	
-							for (i = 0; i < _bytesInUse; i++)
-							{
-								*(m + i) = *(bitPt + i);
-							}
-	
-							bitPt += _bytesInUse;
-							// Increases the number of divisions but avoid overflow problems
-							// Makes data mono
-							*pData += temp / _channels;
-						}
-	
-						pData++;
-					}
-				}
-			}
+
+            unsafe
+            {
+                float* pData = _data;
+                Int64 temp;
+
+                fixed (Byte* pB = raw_data)
+                {
+                    Byte* bitPt = pB; //can't assign to pB
+                    byte* m = (byte*)&temp;
+
+                    for (; count < windowSize; count++)
+                    {
+                        *(pData) = 0;
+
+                        for (c = 0; c < _channels; c++)
+                        {        
+                            // if it is a negative sample set temp to -1
+                            // to make the value correct.
+                            // if MSB > 128 ---> [[LSB]...[MSB]], ..., [[LSB]...[MSB]]
+                            //              bitPt ^
+                            temp = (*(bitPt + _bytesInUse -1) > 128) ? -1 : 0;
+
+                            // temp = current sample
+                            for (i = 0; i < _bytesInUse; i++)
+                                *(m + i) = *(bitPt + i);
+                            
+                            // next sample
+                            bitPt += _bytesInUse;
+                            
+                            // Increases the number of divisions but avoid overflow problems
+                            // Makes data mono
+                            *pData += temp / _channels;
+                        }
+
+                        pData++;
+                    }
+                }
+            }
+
+            raw_data = null;
 			
 			return _data;
 		}

@@ -103,8 +103,11 @@ namespace MusiC
 			/// Window Values
 			Single * _wndData = null;
 		
-			/// Windowed Data
-			Single * _dataStream = null;
+			/// File Handler Buffer
+			Single * _rawStream = null;
+
+            /// Windowed Data
+            Single* _dataStream = null;
 			
 			protected Handler FileHandler
 			{
@@ -114,6 +117,8 @@ namespace MusiC
 			protected Window(String name, Int32 size, Int32 overlap) : base(name, size, overlap)
 			{
 				_wndData = NativeMethods.Pointer.fgetmem(size);
+                _dataStream = NativeMethods.Pointer.fgetmem(size);
+
 				Initialize();
 			}
 			
@@ -127,16 +132,24 @@ namespace MusiC
 			{
 				if(_wndData != null)
 					NativeMethods.Pointer.free(_wndData);
+
+                if (_dataStream != null)
+                    NativeMethods.Pointer.free(_dataStream);
 			}
 			
 			unsafe public Single * GetWindow(Int32 windowPos)
 			{
-				_dataStream = FileHandler.Read(WindowSize);
-				Single * ptrStream = _dataStream;
+				_rawStream = FileHandler.Read(windowPos, WindowSize);
+
+                if (_rawStream == null)
+                    return _rawStream;
+
+				Single * ptrRawStream = _rawStream;
+                Single * ptrDataStream = _dataStream;
 				Single * ptrWnd = _wndData;
 				
 				for(int i = 0; i < WindowSize; i++)
-					*(ptrStream++) *= *(ptrWnd++);
+					*(ptrDataStream++) = *(ptrRawStream++) * *(ptrWnd++);
 				
 				return _dataStream;
 			}

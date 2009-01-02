@@ -7,7 +7,8 @@ package.path=project.path
 -- Input
 package.language="c++"
 package.files={
-	matchrecursive(base_src_dir.."/Extensions/Handlers/DBHandler/*.cpp")
+	matchrecursive(base_src_dir.."/Extensions/Handlers/DBHandler/*.cpp"),
+	matchrecursive(base_src_dir.."/Extensions/Handlers/DBHandler/*.h")
 }
 package.links={
 	"gsl",
