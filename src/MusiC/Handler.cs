@@ -30,49 +30,50 @@ namespace MusiC
 	public interface IHandler
 	{
 		bool CanHandle(String file);
+		
 		void Attach(String file);
 		void Detach();
+		
+		Int32 GetStreamSize();
+	}
+	
+	abstract public class BaseHandler : Extension, IHandler
+	{
+		private String _file;
+		
+		public String CurrentFile
+		{
+			get { return _file; }
+		}
+		
+		virtual public bool CanHandle(string file)
+		{
+			return false;
+		}
+		
+		virtual public void Attach(string file)
+		{
+			_file = file;
+		}
+		
+		abstract public void Detach();
+		abstract public Int32 GetStreamSize();
 	}
 	
 	namespace Managed
 	{
 		//abstract public class Handler<T> : Extension, IHandler where T : struct
-		abstract public class Handler : Extension, IHandler
+		abstract public class Handler : BaseHandler
 		{
-			
-			virtual public bool CanHandle(string file)
-			{
-				//throw new NotImplementedException();
-				return true;
-			}
-			
-			virtual public void Attach(string file)
-			{
-			}
-			
-			virtual public void Detach()
-			{
-			}
 		}
 	}
 	
 	namespace Unmanaged
 	{
-		abstract public class Handler : Extension, IHandler
+		[CLSCompliant(false)]
+		abstract public class Handler : BaseHandler
 		{
-			
-			virtual public bool CanHandle(string file)
-			{
-				return true;
-			}
-			
-			virtual public void Attach(string file)
-			{
-			}
-			
-			virtual public void Detach()
-			{
-			}
+			abstract unsafe public Single * Read(Int32 size);
 		}
 	}
 }

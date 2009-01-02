@@ -27,12 +27,13 @@ using System.Runtime.InteropServices;
 
 namespace MusiC
 {
-	class NativeMethods
+	public class NativeMethods
 	{
 		NativeMethods()
 		{	
 		}
 		
+		[CLSCompliant(false)]
 		public class Math
 		{
 			Math()
@@ -40,19 +41,20 @@ namespace MusiC
 			}
 			
 			[DllImport("./musiC-uMng.dll", EntryPoint="fftr_mag2")]
-			extern static unsafe public Int32 FFTMagnitude(double * sequence, double * magnitude, int size);
+			extern static unsafe public Int32 FFTMagnitude(Single * sequence, Single * magnitude, Int32 size);
 		}
 	
+		[CLSCompliant(false)]
 		public class Pointer
 		{
 			Pointer()
 			{
 			}
 			
-			static unsafe public Single * dgetmem(Int32 size)
+			static unsafe public Single * fgetmem(Int32 size)
 			{
-				IntPtr ptr = Marshal.AllocHGlobal(size * sizeof(double));
-				return (Single*)ptr.ToPointer();
+				IntPtr ptr = Marshal.AllocHGlobal(size * sizeof(float));
+				return (Single *) ptr.ToPointer();
 			}
 			
 			static unsafe public void free(void * p)

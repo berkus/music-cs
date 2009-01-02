@@ -59,15 +59,36 @@ using System.Security.Permissions;
 namespace MusiC.Extensions.Features
 {
 	[CLSCompliant(false)]
-	public class SpecRollOffU : Unmanaged.Feature
+	unsafe public class SpecRollOffU : Unmanaged.Feature
 	{	
+		float * _temp;
+
 		public SpecRollOffU() : base("SpecRolloff - Unmanaged")
 		{
 		}
 		
-		override unsafe public Single * Extract(Unmanaged.Window window)
+		override unsafe public Single Extract(Single * wndData, int wndSize)
 		{
-			return null;
+			double sum = 0, cum = 0;
+			int sro = 0;
+			
+			_temp = GetBuffer(wndSize);
+			NativeMethods.Math.FFTMagnitude(wndData, _temp, wndSize);
+					
+			for (int i = 0; i < wndSize; i++)
+				sum += *(_temp) * *(_temp++);
+	
+			cum = sum;
+	
+			for (sro = wndSize - 1; sro >= 0; sro--)
+			{
+				cum -= *(_temp--);
+				
+				if (cum < 0.95 * sum)
+					break;
+			}
+			
+			return sro;
 		}
 	}
 	

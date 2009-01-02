@@ -70,14 +70,14 @@ namespace MusiC.Data.Unmanaged
 	{
 		public ClassData * pFirstClass;
 		public ClassData * pLastClass;
-		public long nClasses;
-		public long nFeatures;
+		public int nClasses;
+		public int nFeatures;
 	}
 	
 	[CLSCompliant(false)]
 	unsafe public class DataHandler
 	{
-		public static DataCollection * BuildCollection()
+		public static DataCollection * BuildCollection(int nFeatures)
 		{
 			DataCollection * data = (DataCollection *) Marshal.AllocHGlobal(sizeof(DataCollection)).ToPointer();
 			//ClassData * newEntry = data->pClassData = (ClassData *) Marshal.AllocHGlobal(sizeof(ClassData) * nClasses).ToPointer();
@@ -94,7 +94,7 @@ namespace MusiC.Data.Unmanaged
 			
 			//data->nClasses = nClasses;
 			data->nClasses = 0;
-			//data->nFeatures = nFeatures;
+			data->nFeatures = nFeatures;
 			//data->nFeatures = 0;
 			data->pFirstClass = null;
 			data->pLastClass = null;
@@ -110,6 +110,7 @@ namespace MusiC.Data.Unmanaged
 			newClass->pFirstFile = null;
 			newClass->nFrames = 0;
 			newClass->nFiles = 0;
+			newClass->pCollection = dtCol;
 			
 			dtCol->nClasses++;
 			
@@ -155,8 +156,7 @@ namespace MusiC.Data.Unmanaged
 		{
 			FrameData * newFrame = (FrameData *) Marshal.AllocHGlobal(sizeof(FrameData)).ToPointer();
 			newFrame->pNext = null;
-			// allocate data;
-			newFrame->pData = null;
+			newFrame->pData = (Single *) Marshal.AllocHGlobal( (currentFile->pClass->pCollection->nFeatures) * sizeof(float)).ToPointer();
 			
 			currentFile->nFrames++;
 			currentFile->pClass->nFrames++;

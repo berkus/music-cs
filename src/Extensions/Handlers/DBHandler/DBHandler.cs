@@ -27,7 +27,7 @@ using System.Runtime.InteropServices;
 
 namespace MusiC
 {
-	public class DBHandler : Unmanaged.Handler
+	public class DBHandler
 	{
 		/// <summary>
 		/// 
@@ -35,7 +35,7 @@ namespace MusiC
 		/// <param name="file"></param>
 		/// <returns></returns>
 		/// @todo Check if it can handle the music-db file
-		override public bool CanHandle(String file)
+		public bool CanHandle(String file)
 		{
 			return true;
 		}

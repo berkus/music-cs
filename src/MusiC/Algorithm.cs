@@ -138,7 +138,7 @@ namespace MusiC
 				unsafe public void Execute()
 				{
 					LinkedList<TrainLabel> tLabel = Global<ExtensionCache>.GetInstance().GetConfig().LabelList;
-					Data.Unmanaged.DataCollection * dtCol = Data.Unmanaged.DataHandler.BuildCollection();
+					Data.Unmanaged.DataCollection * dtCol = Data.Unmanaged.DataHandler.BuildCollection(_featureList.Count);
 					
 					foreach(TrainLabel label in tLabel)
 					{

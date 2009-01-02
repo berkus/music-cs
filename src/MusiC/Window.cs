@@ -31,6 +31,8 @@ namespace MusiC
 {
 	public interface IWindow
 	{
+		void Attach(IHandler hnd);
+		void Detach();
 	}
 	
 	/// <summary>
@@ -39,10 +41,13 @@ namespace MusiC
 	/// @todo Allow different types.
 	abstract public class BaseWindow : Extension, IWindow
 	{
-		Int32 _size;
 		Int32 _nWnd = -1;
+		
+		Int32 _size;
 		Int32 _overlap;
 		Int32 _step;
+		
+		IHandler _hnd;
 		
 		String _name;
 	
@@ -60,6 +65,11 @@ namespace MusiC
 		{
 			get { return _size; }
 		}
+		
+		protected IHandler HandlerInterface
+		{
+			get { return _hnd; }
+		}
 	
 		protected BaseWindow(String name, Int32 size, Int32 overlap)
 		{
@@ -72,15 +82,14 @@ namespace MusiC
 		
 		virtual public void Attach(IHandler file)
 		{
+			_hnd = file;
+			_nWnd = (Int32) Math.Floor( (double) (_hnd.GetStreamSize() / _size) );
 		}
 		
 		virtual public void Detach()
 		{
-		}
-		
-		virtual public Boolean IsAttached()
-		{
-			return false;
+			_hnd = null;
+			_nWnd = -1;
 		}
 		
 		abstract public Single Factory(Int32 windowPos);
@@ -97,9 +106,14 @@ namespace MusiC
 			/// Windowed Data
 			Single * _dataStream = null;
 			
+			protected Handler FileHandler
+			{
+				get { return HandlerInterface as Unmanaged.Handler; }
+			}
+			
 			protected Window(String name, Int32 size, Int32 overlap) : base(name, size, overlap)
 			{
-				_wndData = NativeMethods.Pointer.dgetmem(size);
+				_wndData = NativeMethods.Pointer.fgetmem(size);
 				Initialize();
 			}
 			
@@ -117,7 +131,14 @@ namespace MusiC
 			
 			unsafe public Single * GetWindow(Int32 windowPos)
 			{
-				return _wndData;
+				_dataStream = FileHandler.Read(WindowSize);
+				Single * ptrStream = _dataStream;
+				Single * ptrWnd = _wndData;
+				
+				for(int i = 0; i < WindowSize; i++)
+					*(ptrStream++) *= *(ptrWnd++);
+				
+				return _dataStream;
 			}
 		}
 	}

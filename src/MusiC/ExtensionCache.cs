@@ -101,6 +101,7 @@ namespace MusiC.Extensions
 			return null;
 		}
 		
+		[CLSCompliant(false)]
 		public Unmanaged.Handler GetUnmanagedHandler(String file)
 		{
 			foreach(IHandler h in _handlerList)
