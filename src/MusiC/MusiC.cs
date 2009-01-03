@@ -1,6 +1,6 @@
 /*
  * The MIT License
- * Copyright (c) 2008 Marcos José Sant'Anna Magalhães
+ * Copyright (c) 2008 Marcos Josï¿½ Sant'Anna Magalhï¿½es
  * 
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -38,8 +38,6 @@ namespace MusiC
 		UnhandledExceptionEventHandler _UnhandledExceptionHandler;
 		String _configFile;
 		String _extensionsDir;
-		
-//		static MusiC _this=null;
 		
 		public MusiC()
 		{
@@ -86,7 +84,7 @@ namespace MusiC
 				loader.Load(_extensionsDir);
 				ReportUnindent();
 				
-				// TODO: Uncomment protection
+				//@todo Uncomment protection
 				//if( !loader.HasConfig() || !loader.HasFileHandler() )
 				//	throw new MissingExtensionException("MusiC needs at least a Config and a Handler extension.");
 			}

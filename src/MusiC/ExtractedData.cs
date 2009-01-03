@@ -1,6 +1,6 @@
 /*
  * The MIT License
- * Copyright (c) 2008 Marcos José Sant'Anna Magalhães
+ * Copyright (c) 2008 Marcos Josï¿½ Sant'Anna Magalhï¿½es
  * 
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -33,7 +33,9 @@ namespace MusiC.Data.Unmanaged
 	unsafe public struct FrameData
 	{
 		public float * pData;
-		public FrameData * pNext;
+		
+		public FrameData * pNextFrame;
+		public FrameData * pPrevFrame;
 	}	
 	
 	[CLSCompliant(false)]
@@ -44,9 +46,12 @@ namespace MusiC.Data.Unmanaged
 		public long next;
 		public long nFrames;
 		
-		public FileData * pNext;
+		public FileData * pNextFile;
+		public FileData * pPrevFile;
+		
 		public FrameData * pFirstFrame;
 		public FrameData * pLastFrame;
+		
 		public ClassData * pClass;
 	}	
 	
@@ -57,9 +62,11 @@ namespace MusiC.Data.Unmanaged
 		public long nFiles;
 		public long nFrames;
 		
-		public ClassData * pNext;
+		public ClassData * pNextClass;
+		
 		public FileData * pFirstFile;
 		public FileData * pLastFile;
+		
 		public DataCollection * pCollection;
 	}
 	
@@ -80,22 +87,10 @@ namespace MusiC.Data.Unmanaged
 		public static DataCollection * BuildCollection(int nFeatures)
 		{
 			DataCollection * data = (DataCollection *) Marshal.AllocHGlobal(sizeof(DataCollection)).ToPointer();
-			//ClassData * newEntry = data->pClassData = (ClassData *) Marshal.AllocHGlobal(sizeof(ClassData) * nClasses).ToPointer();
-			
-//			for(int i = 0; i < nClasses; i++)
-//			{
-//				(newEntry)->pCollection = data;
-//				(newEntry)->pFileList = null;
-//				(newEntry)->nVectors = 0;
-//				(newEntry)->nVectorList = 0;
-//				(newEntry)->nVectorListAlloc = 0;
-//				newEntry++;
-//			}
-			
-			//data->nClasses = nClasses;
+
 			data->nClasses = 0;
 			data->nFeatures = nFeatures;
-			//data->nFeatures = 0;
+
 			data->pFirstClass = null;
 			data->pLastClass = null;
 			
@@ -106,14 +101,18 @@ namespace MusiC.Data.Unmanaged
 		{
 			ClassData * newClass = (ClassData *) Marshal.AllocHGlobal(sizeof(ClassData)).ToPointer();
 			
-			newClass->pNext = null;
+			newClass->pNextClass = null;
+			
 			newClass->pFirstFile = null;
+			newClass->pLastFile = null;
+				
 			newClass->nFrames = 0;
 			newClass->nFiles = 0;
 			newClass->pCollection = dtCol;
 			
 			dtCol->nClasses++;
 			
+			// first class
 			if(dtCol->pFirstClass == null)
 			{
 				dtCol->pFirstClass = newClass;
@@ -122,7 +121,9 @@ namespace MusiC.Data.Unmanaged
 				return newClass;
 			}
 			
-			dtCol->pLastClass->pNext = newClass;
+			ClassData * prev = dtCol->pLastClass;
+			
+			prev->pNextClass = newClass;
 			dtCol->pLastClass = newClass;
 			
 			return newClass;
@@ -131,13 +132,19 @@ namespace MusiC.Data.Unmanaged
 		public static FileData * BuildFileData(ClassData * currentClass)
 		{
 			FileData * newFile = (FileData *) Marshal.AllocHGlobal(sizeof(FileData)).ToPointer();
-			newFile->pNext = null;
+			
+			newFile->pNextFile = null;
+			newFile->pPrevFile = null;
+			
 			newFile->pFirstFrame = null;
+			newFile->pLastFrame = null;
+			
 			newFile->nFrames = 0;
 			newFile->pClass = currentClass;
 			
 			currentClass->nFiles++;
 			
+			// first file
 			if(currentClass->pFirstFile == null)
 			{
 				currentClass->pFirstFile = newFile;
@@ -146,7 +153,22 @@ namespace MusiC.Data.Unmanaged
 				return newFile;
 			}
 			
-			currentClass->pLastFile->pNext = newFile;
+			FileData * prev = currentClass->pLastFile;
+			
+			if( prev != null )
+			{
+				prev->pNextFile = newFile;
+				newFile->pPrevFile = prev;
+				
+				FileData * next = currentClass->pLastFile->pNextFile;
+				
+				if( next != null )
+				{
+					next->pPrevFile = newFile;
+					newFile->pNextFile = next;
+				}
+			}
+			
 			currentClass->pLastFile = newFile;
 			
 			return newFile;
@@ -155,22 +177,47 @@ namespace MusiC.Data.Unmanaged
 		public static FrameData * BuildFrameData(FileData * currentFile)
 		{
 			FrameData * newFrame = (FrameData *) Marshal.AllocHGlobal(sizeof(FrameData)).ToPointer();
-			newFrame->pNext = null;
+			
+			newFrame->pNextFrame = null;
+			newFrame->pPrevFrame = null;
 			newFrame->pData = (Single *) Marshal.AllocHGlobal( (currentFile->pClass->pCollection->nFeatures) * sizeof(float)).ToPointer();
 			
 			currentFile->nFrames++;
 			currentFile->pClass->nFrames++;
 			
+			// first frame
 			if(currentFile->pFirstFrame == null)
 			{
 				currentFile->pFirstFrame = newFrame;
-				currentFile->pLastFrame = newFrame;				
+				currentFile->pLastFrame = newFrame;
+				
+				// not the first frame of the first file of a class
+				if( currentFile->pPrevFile != null )
+				{
+					currentFile->pPrevFile->pLastFrame->pNextFrame = newFrame;
+					newFrame->pPrevFrame = currentFile->pPrevFile->pLastFrame;
+				}
+				
 				return newFrame;
 			}
 			
-			currentFile->pLastFrame->pNext = newFrame;
-			currentFile->pLastFrame = newFrame;
+			FrameData * prev = currentFile->pLastFrame;
 			
+			if( prev != null )
+			{
+				prev->pNextFrame = newFrame;
+				newFrame->pPrevFrame = prev;
+				
+				FrameData * next = currentFile->pLastFrame->pNextFrame;
+				
+				if( next != null )
+				{
+					next->pPrevFrame = newFrame;
+					newFrame->pNextFrame = next;
+				}
+			}
+			
+			currentFile->pLastFrame = newFrame;
 			return newFrame;
 		}
 	}

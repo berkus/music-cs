@@ -23,7 +23,7 @@ struct tRefVecIndex
 tRefVecIndex * mc_tRefVecsIndex_alloc(long szA, long szB)
 {
 	tRefVecIndex * r = (tRefVecIndex *) malloc(sizeof(tRefVecIndex));
-	
+
 	r->a = gsl_combination_calloc(szA, 3);
 	r->b = gsl_combination_calloc(szB, 3);
 
@@ -45,11 +45,11 @@ int combine(tRefVecIndex * ref)
 		gsl_combination_next(ref->a);
 		gsl_combination_init_first(ref->b);
 	}
-	
+
 	return GSL_SUCCESS;
 }
 
-double dist(double * src, double * ref, Int64 &size)
+double dist(float * src, float * ref, int size)
 {
 	// column order
 	double ret = 0;
@@ -62,7 +62,7 @@ double dist(double * src, double * ref, Int64 &size)
 		cout << "ref is NULL !" << endl;
 
 	//cout << "Distance:Step ... " << size << endl;
-	
+
 	for(int idx=0; idx < size; idx++)
 	{
 		double a = *src;
@@ -70,10 +70,10 @@ double dist(double * src, double * ref, Int64 &size)
 
 		double b = *ref;
 		//cout << "b" << endl;
-		
+
 		cum = a - b;
 		//cout << cum << endl;
-		
+
 		ret += cum * cum;
 	}
 
@@ -82,30 +82,39 @@ double dist(double * src, double * ref, Int64 &size)
 	return sqrt(ret);
 }
 
-double * mc_random(ClassData * c, Int64 idx)
+float * mc_random(ClassData * c, Int64 idx)
 {
 	if(c == NULL)
-		cout << "mcRandom:MCClassData is NULL" << endl;
-	
+		cout << "mcRandom:ClassData is NULL" << endl;
+
 	//long counter = 0;
-	FileData * m = c->pFirstFile;
+	FileData * fi = c->pFirstFile;
 	//cout << "mcRandom: Start" << endl;
 
-	while(idx >= m->nFrames)
+	while(idx >= fi->nFrames)
 	{
 		//cout << "idx=" << idx << " Section Size:" << m->nVectors << endl;
-		idx -= m->nFrames;
-		m++;
+		idx -= fi->nFrames;
+		fi = fi->pNextFile;
 	}
 
 	//cout << "mcRandom: memory Section Found" << endl;
 
-	double * ret = m->pData;
+	FrameData * fr = fi->pFirstFrame;
 
-	for(int i = 0; i < idx; i++)
+	while(idx > 0)
 	{
-		ret += c->pCollection->nFeatures;
+		//cout << "idx=" << idx << " Section Size:" << m->nVectors << endl;
+		idx--;
+		fr = fr->pNextFrame;
 	}
+
+	float * ret = fr->pData;
+
+	//for(int i = 0; i < idx; i++)
+	//{
+	//	ret += c->pCollection->nFeatures;
+	//}
 
 	//cout << "mcRandom: Index Found" << endl;
 	//cout << "mcRandom: End" << endl;
@@ -113,15 +122,16 @@ double * mc_random(ClassData * c, Int64 idx)
 	return ret;
 }
 
-double * nextVector(FileData * vec)
+float * nextVector(FileData * vec)
 {
-	if (vec->next == vec->nVectors)
+	if (vec->next == vec->nFrames)
 	{
 		vec->next = 0;
 		vec++;
 	}
 
-	return (vec->pData + vec->next++);
+	//return (vec->pData + vec->next++);
+    return NULL;
 }
 
 extern "C"
@@ -129,33 +139,35 @@ extern "C"
 	void Barbedo_Filter(DataCollection * extractedData)
 	{
 		//log.open("mcGenreClassifier-Barbedo.log", ios_base::out);
-		
+
 		DataHandler hnd;
 		hnd.Attach(extractedData);
-		
+
 		cout << "============ Barbedo_Filter ============" << endl;
 		cout << "Address:" << reinterpret_cast<long>(extractedData) << endl;
 		cout << "Received " << hnd.getNumClasses() << " Classes" << endl;
 		cout << "Received " << hnd.getNumFeatures() << " Features" << endl;
 		cout << "====================================" << endl;
 	}
-	
+
 	void Barbedo_Train(DataCollection * extractedData)
 	{
 		ofstream log;
 		double genreCombinationIndex = 0;
 
-		log.open("mcGenreClassifier-Barbedo.log", ios_base::out);
-		cout << "Address:" << reinterpret_cast<int>(extractedData) << endl;
-		cout << "Size of MCClassData:" << sizeof(ClassData) << endl;
-		cout << "Size of MCClassData *:" << sizeof(ClassData*) << endl;
-		cout << "Size of Int64:" << sizeof(Int64) << " long:" << sizeof(long) << endl;
-		log << "Received " << extractedData->nClasses << " Classes" << endl;
-		log << "Received " << extractedData->nFeatures << " Features" << endl;
-		
+		DataHandler data;
+		data.Attach(extractedData);
+
+		log.open("GenreClassifier-Barbedo.log", ios_base::out);
+		log << "Address:" << reinterpret_cast<int>(extractedData) << endl;
+		log << "Size of MCClassData:" << sizeof(ClassData) << endl;
+		log << "Size of MCClassData *:" << sizeof(ClassData*) << endl;
+		log << "Size of Int64:" << sizeof(Int64) << " long:" << sizeof(long) << endl;
+		log << "Received " << data.getNumClasses() << " Classes" << endl;
+		log << "Received " << data.getNumFeatures() << " Features" << endl;
+
 		double genreCombinationCount = gsl_sf_choose(extractedData->nClasses, 2);
 		log << "Algorithm Rounds: " << genreCombinationCount << endl;
-
 		log << "========================" << endl << endl;
 
 		// Genre Combination Loop
@@ -165,117 +177,78 @@ extern "C"
 			log << "========================" << endl;
 			log << "   Round " << genreCombinationIndex << endl;
 			log << "========================" << endl;
-			
-			// Extração
-			ClassData * vecsA = &extractedData->pClassData[gsl_combination_get(selectedGenres, 0)];
-			ClassData * vecsB = &extractedData->pClassData[gsl_combination_get(selectedGenres, 1)];
+
+			// Get Classes to Compare
+			ClassData * classA = data.getClass(gsl_combination_get(selectedGenres, 0));
+			ClassData * classB = data.getClass(gsl_combination_get(selectedGenres, 1));
 
 
-			// Filtragem
-			//gsl_matrix * listOfPotsA = filterCandidates(mA);
-			//gsl_matrix * listOfPotsB = filterCandidates(mB);
+			// Filter Classes
+			ClassData * fClassA = filterCandidates(classA);
+			log << "Class A #Vectors: " << fClassA->nFrames << endl;
 
-			ClassData * listOfPotsA = filterCandidates(vecsA);
-			log << "Class A #Vectors: " << listOfPotsA->nVectors << endl;
-			ClassData * listOfPotsB = filterCandidates(vecsB);
-			log << "Class B #Vectors: " << listOfPotsB->nVectors << endl;
+			ClassData * fClassB = filterCandidates(classB);
+			log << "Class B #Vectors: " << fClassB->nFrames << endl;
 
 			log << "============" << endl;
 
-			// Loop das Combinações
+			// ----------- Frames Combintation -----------
 			long score, score_max, winner;
 			long potentialsCombinationIndex = 0;
 			score_max = winner = 0;
-			
+
 			double tmp_dist = 0;
 			int loop_min = 0;
 
-			tRefVecIndex * refVecsIndex = mc_tRefVecsIndex_alloc(listOfPotsA->nVectors, listOfPotsB->nVectors);
-			
+            // Create combination control structure
+			tRefVecIndex * refVecsIndex = mc_tRefVecsIndex_alloc(fClassA->nFrames, fClassB->nFrames);
+
 			if(refVecsIndex == NULL)
 			{
-				printf("FATAL: Couldnt Alloc enough memory for the vectors combination\n");
+				printf("FATAL: Couldn't Alloc enough memory for the vectors combination\n");
 				exit(-1);
 			}
 
-			// 6-Vectors Combination Loop
+			// Frames Combination Loop
 			do
 			{
 				score = 0;
 
 				// Dist 1
 				// Class A Loop
-				FileData * refVec = vecsA->pVectorList;
-				for(Int64 idx = 0; idx < listOfPotsA->nVectors; idx++)
+				FrameData * refVec = classA->pFirstFile->pFirstFrame;
+				for(Int64 idx = 0; idx < fClassA->nFrames; idx++)
 				{
 					double dist_loop_min = 1e300;
-					//log << "Idx:" << idx << endl;
-					//log << "AA:" << endl;
 
 					// dist A - A
 					// Each Vector from class A in the 6-vector combination
 					for(int vec = 0; vec < 3; vec++)
 					{
-						//log << "Vec:" << vec << endl;
-						
 						size_t idx = gsl_combination_get(refVecsIndex->a, vec);
-						//log << "Index:" << idx << endl;
-						
-						double * pTarget = mc_random(listOfPotsA, idx);
-// 						log << "Target Selected" << endl;
-// 
-// 						if(refVec == NULL)
-// 							log << "Ref Vec is NULL" << endl;
-							
-						double *pCurrent = refVec->pData;
-// 						log << "Current Vector Available" << endl;
-// 
-// 						if(pCurrent == NULL)
-// 							log << "Current is NULL" << endl;
 
-						tmp_dist = dist(pCurrent, pTarget, extractedData->nFeatures);
-						//log << "Distance Measured ! .... " << tmp_dist << endl;
+						float * pTarget = mc_random(fClassA, idx);
+
+						float *pCurrent = refVec->pData;
+
+						tmp_dist = dist(pCurrent, pTarget, data.getNumFeatures());
 
 						if(tmp_dist < dist_loop_min)
 						{
 							dist_loop_min = tmp_dist; loop_min = vec;
-							//log << loop_min << endl;
 						}
 					}
-
-					//log << "AB:" << endl;
 
 					// dist A - B
 					for(int vec = 0; vec < 3; vec++)
 					{
-						//log << "Vec:" << vec + 3 << endl;
-						
 						size_t idx = gsl_combination_get(refVecsIndex->b, vec);
-						//log << "Index:" << idx << endl;
-						
-						double * pTarget = mc_random(listOfPotsB, idx);
-						//log << "Target Selected" << endl;
 
-// 						if(refVec == NULL)
-// 							log << "Ref Vec is NULL" << endl;
-// 							else
-// 							log << "refVec is OK" << endl;
-// 
-// 						if(pTarget == NULL)
-// 							log << "Target is NULL" << endl;
-// 							else
-// 							log << "Target is Ok" << endl;
+						float * pTarget = mc_random(fClassB, idx);
 
-						double *pCurrent = refVec->pData;
-						//log << "Current Vector Available" << endl;
+						float *pCurrent = refVec->pData;
 
-// 						if(pCurrent == NULL)
-// 							log << "Current is NULL" << endl;
-// 							else
-// 							log << "Current is Ok" << endl;
-						
 						tmp_dist = dist(pCurrent, pTarget, extractedData->nFeatures);
-						//log << "Distance Measured ! .... " << tmp_dist << endl;
 
 						if(tmp_dist < dist_loop_min)
 						{
@@ -283,42 +256,29 @@ extern "C"
 						}
 					}
 
-					//refVec = refVec->next;
-					//refVec = refVec->prev;
+                    // Get Next Frame
+					nextVector(refVec);
 
 					if(loop_min < 3)
 						score++;
 				}
 
-				// Dist 2
-				refVec = vecsB->pVectorList;
-				for(Int64 idx = 0; idx < listOfPotsB->nVectors; idx++)
+				// Dist 2 - Class B
+				refVec = classB->pFirstFile->pFirstFrame;
+				for(Int64 idx = 0; idx < fClassB->nFrames; idx++)
 				{
 					double dist_loop_min = 1e300;
-					//log << "Idx:" << idx << endl;
-					//log << "BA:" << endl;
-					
+
+                    // Class B-A
 					for(int vec = 0; vec < 3; vec++)
 					{
-						//log << "Vec:" << vec << endl;
-						
 						size_t idx = gsl_combination_get(refVecsIndex->a, vec);
-						//log << "Index:" << idx << endl;
-						
-						double * pTarget = mc_random(listOfPotsA, idx);
-// 						log << "Target Selected" << endl;
-// 
-// 						if(refVec == NULL)
-// 							log << "Ref Vec is NULL" << endl;
-							
-						double *pCurrent = refVec->pData;
-// 						log << "Current Vector Available" << endl;
-// 
-// 						if(pCurrent == NULL)
-// 							log << "Current is NULL" << endl;
+
+						float * pTarget = mc_random(fClassA, idx);
+
+						float *pCurrent = refVec->pData;
 
 						tmp_dist = dist(pCurrent, pTarget, extractedData->nFeatures);
-						//log << "Distance Measured ! .... " << tmp_dist << endl;
 
 						if(tmp_dist < dist_loop_min)
 						{
@@ -327,38 +287,16 @@ extern "C"
 						}
 					}
 
-					//log << "BB:" << endl;
-
+                    // Class B-B
 					for(int vec = 0; vec < 3; vec++)
 					{
-						//log << "Vec:" << vec + 3 << endl;
-						
 						size_t idx = gsl_combination_get(refVecsIndex->b, vec);
-						//log << "Index:" << idx << endl;
-						
-						double * pTarget = mc_random(listOfPotsB, idx);
-						//log << "Target Selected" << endl;
 
-// 						if(refVec == NULL)
-// 							log << "Ref Vec is NULL" << endl;
-// 							else
-// 							log << "refVec is OK" << endl;
-// 
-// 						if(pTarget == NULL)
-// 							log << "Target is NULL" << endl;
-// 							else
-// 							log << "Target is Ok" << endl;
+						float * pTarget = mc_random(classB, idx);
 
-						double *pCurrent = refVec->pData;
-						//log << "Current Vector Available" << endl;
+						float *pCurrent = refVec->pData;
 
-// 						if(pCurrent == NULL)
-// 							log << "Current is NULL" << endl;
-// 							else
-// 							log << "Current is Ok" << endl;
-						
 						tmp_dist = dist(pCurrent, pTarget, extractedData->nFeatures);
-						//log << "Distance Measured ! .... " << tmp_dist << endl;
 
 						if(tmp_dist < dist_loop_min)
 						{
@@ -366,13 +304,13 @@ extern "C"
 						}
 					}
 
-					//refVec = refVec->prev;
 					nextVector(refVec);
+
 					if(loop_min >= 3)
 						score++;
-				}
-	
-				// Avaliação
+				} // Frame Comparison
+
+				// Scoring System
 				if(score > score_max)
 				{
 					score_max = score;
@@ -385,11 +323,10 @@ extern "C"
 				{
 				//	printf("%d - %d\n", potentialsCombinationIndex, winner);
 				}
-			
-			}while(combine(refVecsIndex) == GSL_SUCCESS);
-			
-			// C only
-			if( gsl_combination_next(selectedGenres) == GSL_FAILURE )
+
+			}while(combine(refVecsIndex) == GSL_SUCCESS); // Stop Condition: Class Comparison
+
+			if( gsl_combination_next(selectedGenres) == GSL_FAILURE ) // Stop Condition: Genre Comparison
 				break;
 		}
 

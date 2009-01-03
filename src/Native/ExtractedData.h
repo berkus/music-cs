@@ -1,7 +1,7 @@
 #if !defined(_MUSIC_NATIVE_EXTRACTEDDATA_H_)
 #define _MUSIC_NATIVE_EXTRACTEDDATA_H_
 
-typedef __int64 Int64;
+typedef long long Int64;
 
 namespace MusiC
 {
@@ -10,41 +10,46 @@ namespace MusiC
 		struct FrameData
 		{
 			float * pData;
-			
-			FrameData * next;
+
+			FrameData * pNextFrame;
+			FrameData * pPrevFrame;
 		};
-		
+
 		struct ClassData;
-		
+
 		struct FileData
 		{
 			Int64 next;
 			Int64 nFrames;
-			
-			FileData * pNext;
+
+			FileData * pNextFile;
+			FileData * pPrevFile;
+
 			FrameData * pFirstFrame;
 			FrameData * pLastFrame;
+
 			ClassData * pClass;
 		};
-		
+
 		struct DataCollection;
-		
+
 		struct ClassData
 		{
 			Int64 nFiles;
 			Int64 nFrames;
-			
-			ClassData * pNext;
+
+			ClassData * pNextClass;
+
 			FileData * pFirstFile;
 			FileData * pLastFile;
 			DataCollection * pCollection;
 		};
-		
+
 		struct DataCollection
 		{
 			int nClasses;
 			int nFeatures;
-			
+
 			ClassData * pFirstClass;
 			ClassData * pLastClass;
 		};

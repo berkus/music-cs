@@ -12,13 +12,18 @@ namespace MusiC
 		class DataHandler
 		{
 			DataCollection * _data;
-			
+			ClassData * _curClass;
+
 		public:
 			DataHandler();
-			
+
 			void Attach(DataCollection *);
+
 			int getNumClasses(){ return _data->nFeatures; }
 			int getNumFeatures() { return _data->nClasses; }
+
+			ClassData * getClass(int idx);
+			ClassData * getNextClass();
 		};
 	}
 }
