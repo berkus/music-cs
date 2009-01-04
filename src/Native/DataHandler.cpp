@@ -19,7 +19,7 @@ ClassData * DataHandler::getClass(int idx)
 
     while(idx)
     {
-        c = c->pNext;
+        c = c->pNextClass;
     }
 
     idx--;
@@ -32,5 +32,5 @@ ClassData * DataHandler::getNextClass()
     if(!_curClass)
         return _data->pFirstClass;
 
-    return _curClass = _curClass->pNext;
+    return _curClass = _curClass->pNextClass;
 }

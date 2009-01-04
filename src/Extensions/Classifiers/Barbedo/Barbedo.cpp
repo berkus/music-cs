@@ -257,7 +257,7 @@ extern "C"
 					}
 
                     // Get Next Frame
-					nextVector(refVec);
+					refVec = refVec->pNextFrame;
 
 					if(loop_min < 3)
 						score++;
@@ -304,7 +304,7 @@ extern "C"
 						}
 					}
 
-					nextVector(refVec);
+					refVec = refVec->pNextFrame;
 
 					if(loop_min >= 3)
 						score++;
