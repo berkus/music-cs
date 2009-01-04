@@ -1,6 +1,6 @@
 /*
  * The MIT License
- * Copyright (c) 2008 Marcos José Sant'Anna Magalhães
+ * Copyright (c) 2008 Marcos Josï¿½ Sant'Anna Magalhï¿½es
  * 
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -46,9 +46,15 @@ namespace MusiC
 		static int _globalReportLevel=(int)ReportLevel.Debug;
 		static String _indent = String.Empty;
 		
-		private static readonly log4net.ILog _log = log4net.LogManager.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
+		private static readonly log4net.ILog _log;
 		
 		int _localReportLevel=(int)ReportLevel.NotSet;
+		
+		static MusiCObject()
+		{
+				//log4net.Config.XmlConfigurator.Configure(new System.IO.FileInfo("music.log.xml"));
+				_log = log4net.LogManager.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
+		}
 		
 		override public String ToString()
 		{

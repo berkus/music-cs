@@ -69,9 +69,7 @@ namespace MusiC
 		}
 		
 		public void Load()
-		{
-			log4net.Config.XmlConfigurator.Configure(new System.IO.FileInfo("music.log.xml"));
-			
+		{	
 			Message("Registering Unhandled Exception Event");
 			_UnhandledExceptionHandler = new UnhandledExceptionEventHandler(MusiCObject.UnhandledException);
 			AppDomain.CurrentDomain.UnhandledException += _UnhandledExceptionHandler;
