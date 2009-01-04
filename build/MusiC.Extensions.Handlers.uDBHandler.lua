@@ -23,7 +23,7 @@ package.includepaths={
 
 -- Code Generation
 --package.defines={"TRACE"}
-package.buildflags={"dylib"}
+package.buildflags={"dylib", "no-import-lib"}
 
 -- Output
 package.kind="dll"

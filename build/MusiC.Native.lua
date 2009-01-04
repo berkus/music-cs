@@ -29,9 +29,17 @@ package.targetextension="dll"
 package.bindir=base_bin_dir
 package.objdir=base_bin_dir.."/obj"
 
-package.buildoptions={
-	"/IMPLIB:"..base_bin_dir.."/MusiC.Native.lib"
-}
+if (windows) then
+	package.buildoptions={
+		"/IMPLIB:"..base_bin_dir.."/MusiC.Native.lib"	
+	}
+end
+
+if (linux or macosx) then
+	package.linkoptions={
+		"-Wl,--out-implib,"..base_bin_dir.."/libMusic.Native.a"
+	}
+end
 
 -- Debug:MusiC
 package.config["Debug"].defines={"DEBUG"}
