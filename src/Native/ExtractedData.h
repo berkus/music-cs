@@ -1,7 +1,11 @@
 #if !defined(_MUSIC_NATIVE_EXTRACTEDDATA_H_)
 #define _MUSIC_NATIVE_EXTRACTEDDATA_H_
 
-typedef long long Int64;
+#if defined(_MSC_VER)
+	typedef __int64 Int64;
+#else
+	typedef long long Int64;
+#endif
 
 namespace MusiC
 {
