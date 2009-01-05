@@ -43,38 +43,25 @@ set /p version=      Enter a number:
 if %version%==0 goto menu
 if %version%==1 goto build
 if %version%==2 goto build
-if %version%==3 goto vs-project-selection
-if %version%==4 goto vs-project-selection
-if %version%==5 goto vs-project-selection
+if %version%==3 goto build
+if %version%==4 goto build
+if %version%==5 goto build
 goto visualstudio
-
-:vs-project-selection
-echo.
-echo.
-echo  Which projects should i create ?
-echo.
-echo  m: Managed        u: Unmanaged        b: Both
-echo.
-set /p vsprojects=     Enter a letter:
-
-if %vsprojects%==m goto build
-if %vsprojects%==u goto build
-if %vsprojects%==b goto build
-
-goto vs-project-selection
 
 :codeblocks
 cls
 echo.
 echo Which compiler you would like to use ?
 echo.
-echo n: Go Back             o: Open Watcom
+echo n: Go Back             o: Open Watcom*
 echo g: MinGW (GCC)
+echo.
+echo  *(Not Supported)
 echo.
 set /p version=    Enter an option:
 
 if %version%==n goto menu
-if %version%==o goto build
+if %version%==o goto codeblocks
 if %version%==g goto build
 goto codeblocks
 
