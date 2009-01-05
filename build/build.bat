@@ -99,24 +99,15 @@ if %compiler%==v (
 		goto pause-before-menu
 	)
 	if %version%==3 (
-		if %vsprojects%==m premake --target vs2003
-		if %vsprojects%==u premake --unmanaged --target vs2003
-		if %vsprojects%==b premake --target vs2003
-		if %vsprojects%==b premake --unmanaged --target vs2003
+		premake --target vs2003
 		goto pause-before-menu
 	)
 	if %version%==4 (
-		if %vsprojects%==m premake --target vs2005
-		if %vsprojects%==u premake --unmanaged --target vs2005
-		if %vsprojects%==b premake --target vs2005
-		if %vsprojects%==b premake --unmanaged --target vs2005
+		premake --target vs2005
 		goto pause-before-menu
 	)
 	if %version%==5 (
-		if %vsprojects%==m premake --target vs2008
-		if %vsprojects%==u premake --unmanaged --target vs2008
-		if %vsprojects%==b premake --target vs2008
-		if %vsprojects%==b premake --unmanaged --target vs2008
+		premake --target vs2008
 		goto pause-before-menu
 	)
 )
@@ -143,7 +134,7 @@ if %compiler%==m (
 )
 
 if %compiler%==s (
-	premake --dotnet mono2 --target sharpdev
+	premake --target sharpdev
 	goto pause-before-menu
 )
 
