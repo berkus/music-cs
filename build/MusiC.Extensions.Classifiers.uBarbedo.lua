@@ -13,7 +13,6 @@ package.files={
 package.links={
 	"gsl",
 	"gslcblas",
-	"MusiC.Native"
 }
 package.libpaths={
 	base_deps_dir.."/"..OS.."/lib",
@@ -36,6 +35,12 @@ package.targetprefix=""
 package.targetextension="dll"
 package.bindir=base_bin_dir.."/Extensions"
 package.objdir=base_bin_dir.."/obj"
+
+if(compiler == "gcc") then
+	package.linkoptions={
+		"../../bin/MusiC.Native.dll"
+	}
+end
 
 -- Debug:MusiC
 package.config["Debug"].defines={"DEBUG"}

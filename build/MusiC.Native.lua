@@ -35,11 +35,5 @@ if (compiler=="vs") then
 	}
 end
 
-if (compiler=="gcc") then
---	package.linkoptions={
---		"-Wl,--out-implib,"..base_bin_dir.."/libMusic.Native.a"
---	}
-end
-
 -- Debug:MusiC
 package.config["Debug"].defines={"DEBUG"}
