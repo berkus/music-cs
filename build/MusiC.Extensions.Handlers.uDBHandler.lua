@@ -31,7 +31,7 @@ package.target="MusiC.Extensions.Handlers.uDBHandler"
 package.targetprefix=""
 package.targetextension="dll"
 package.bindir=base_bin_dir.."/Extensions"
-package.objdir="obj"
+package.objdir=base_bin_dir.."/obj"
 
 -- Debug:MusiC
 package.config["Debug"].defines={"DEBUG"}

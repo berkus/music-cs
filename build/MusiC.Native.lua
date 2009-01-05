@@ -19,7 +19,7 @@ package.includepaths={
 
 -- Code Generation
 --package.defines={"TRACE"}
-package.buildflags={"dylib"}
+package.buildflags={"dylib", "no-import-lib"}
 
 -- Output
 package.kind="dll"
@@ -29,16 +29,16 @@ package.targetextension="dll"
 package.bindir=base_bin_dir
 package.objdir=base_bin_dir.."/obj"
 
-if (windows) then
-	package.buildoptions={
-		"/IMPLIB:"..base_bin_dir.."/MusiC.Native.lib"	
+if (compiler=="vs") then
+	package.linkoptions={
+		"/IMPLIB:"..base_bin_dir.."/MusiC.Native.lib"
 	}
 end
 
-if (linux or macosx) then
-	package.linkoptions={
-		"-Wl,--out-implib,"..base_bin_dir.."/libMusic.Native.a"
-	}
+if (compiler=="gcc") then
+--	package.linkoptions={
+--		"-Wl,--out-implib,"..base_bin_dir.."/libMusic.Native.a"
+--	}
 end
 
 -- Debug:MusiC

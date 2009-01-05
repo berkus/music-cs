@@ -16,7 +16,8 @@ package.links={
 	"MusiC.Native"
 }
 package.libpaths={
-	base_deps_dir.."/"..OS.."/lib"
+	base_deps_dir.."/"..OS.."/lib",
+	base_bin_dir
 }
 
 package.includepaths={
@@ -26,7 +27,7 @@ package.includepaths={
 
 -- Code Generation
 --package.defines={"TRACE"}
-package.buildflags={"dylib"}
+package.buildflags={"dylib", "no-import-lib"}
 
 -- Output
 package.kind="dll"
@@ -34,7 +35,7 @@ package.target="MusiC.Extensions.Classifiers.uBarbedo"
 package.targetprefix=""
 package.targetextension="dll"
 package.bindir=base_bin_dir.."/Extensions"
-package.objdir="obj"
+package.objdir=base_bin_dir.."/obj"
 
 -- Debug:MusiC
 package.config["Debug"].defines={"DEBUG"}

@@ -34,6 +34,8 @@ function CreateProject()
 	target=="vs2005" or
 	target=="vs2008"
 	then
+		compiler = "vs"
+		
 		--Visual Studio supports both managed and unmanaged, but separately
 		
 		project.path=base_prj_dir.."-unmanaged"
@@ -48,21 +50,31 @@ function CreateProject()
 		-- Those support only managed
 		MakeManagedProjects()
 	elseif
-	target=="cb-gcc" or
-	target=="cb-ow" or
-	target=="cl-gcc" or
 	target=="vs2002" or
 	target=="vs6"
 	then
+		compiler="vs"
 		-- Those support only unmanaged code
 		-- vs2002 dont support .net 2.0
 		MakeUnmanagedProjects()
 	elseif
+	target=="cb-gcc" or
+	target=="cl-gcc"
+	then
+		compiler="gcc"
+		-- Those support only unmanaged code
+		MakeUnmanagedProjects()
+	elseif
 	target=="gnu"
 	then
+		compiler = "gcc"
 		-- Build both
 		MakeManagedProjects()
 		MakeUnmanagedProjects()
+	elseif
+	target=="cb-ow"
+	then
+		print("Sorry, Unsupported. Please use gcc or Visual Studio.")
 	end
 end
 
