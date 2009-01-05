@@ -21,6 +21,8 @@ function CreateProject()
 	base_deps_dir="../../deps"
 	base_src_dir="../../src"
 	base_bin_dir="../../bin"
+	base_prj_dir="./"..target;
+
 
 	project.name="MusiC"
 	project.bindir=base_bin_dir
@@ -33,13 +35,12 @@ function CreateProject()
 	target=="vs2008"
 	then
 		--Visual Studio supports both managed and unmanaged, but separately
-		if options["unmanaged"] then
-			project.path=project.path.."-unmanaged"
-			MakeUnmanagedProjects()
-		else
-			project.path=project.path.."-managed"
-			MakeManagedProjects()
-		end
+		
+		project.path=base_prj_dir.."-unmanaged"
+		MakeUnmanagedProjects()
+		
+		project.path=base_prj_dir.."-managed"
+		MakeManagedProjects()
 	elseif
 	target=="sharpdev" or
 	target=="monodev"
