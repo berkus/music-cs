@@ -72,7 +72,7 @@ REM echo [Options] Compiler:%compiler%, Version:%version%, Projects:%vsprojects%
 echo.
 
 if %compiler%==g (
-	premake --dotnet mono2 --target gnu
+	premake --target gnu
 	goto pause-before-menu
 )
 
@@ -119,7 +119,7 @@ if %compiler%==C (
 )
 
 if %compiler%==m (
-	premake --dotnet mono2 --target monodev
+	premake --target monodev
 	goto pause-before-menu
 )
 
