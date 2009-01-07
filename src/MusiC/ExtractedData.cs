@@ -1,4 +1,4 @@
-/*
+﻿/*
  * The MIT License
  * Copyright (c) 2008 Marcos Jos� Sant'Anna Magalh�es
  * 
@@ -157,16 +157,15 @@ namespace MusiC.Data.Unmanaged
 			
 			if( prev != null )
 			{
+				FileData * next = prev->pNextFile;
+				
 				prev->pNextFile = newFile;
 				newFile->pPrevFile = prev;
 				
-				FileData * next = currentClass->pLastFile->pNextFile;
+				newFile->pNextFile = next;
 				
 				if( next != null )
-				{
 					next->pPrevFile = newFile;
-					newFile->pNextFile = next;
-				}
 			}
 			
 			currentClass->pLastFile = newFile;

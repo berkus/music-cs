@@ -169,11 +169,38 @@ namespace MusiC
 							h.Detach();
 						}
 					}
+					
+					Message("Extraction Done.");
+					
+					Summarize(dtCol);
 
-                    if (_classifier == null)
-                        _classifier.Train(dtCol);
-
-                    _classifier.Filter(dtCol);
+					if (_classifier != null)
+                    {
+                    	Message("Beginning Classification");
+                    	_classifier.Filter(dtCol);
+                        //_classifier.Train(dtCol);
+                    }
+                    
+                    Message("All Tasks Done");
+				}
+				
+				unsafe public void Summarize(Data.Unmanaged.DataCollection * dtCol)
+				{
+					Message("Extraction Report"); ReportIndent();
+					Message("Classes Found: " + dtCol->nClasses);
+					Message("Features Found: " + dtCol->nFeatures);
+					
+					Data.Unmanaged.ClassData * c = dtCol->pFirstClass;
+					
+					int i = 1;
+					while(c != null)
+					{
+						Message("Class " + i + " has " + c->nFiles + " files with " + c->nFrames + " frames.");
+						c = c->pNextClass;
+						i++;
+					}
+					
+					ReportUnindent();
 				}
 				
 				public void Say()
