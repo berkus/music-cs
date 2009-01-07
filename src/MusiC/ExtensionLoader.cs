@@ -44,7 +44,8 @@ namespace MusiC.Extensions
 		{
 			// Get exec path if user don't provide one.
 			if(extensionsDir==null)
-				extensionsDir=Path.Combine(Path.GetDirectoryName(Assembly.GetEntryAssembly().Location), "Extensions");
+				//extensionsDir=Path.Combine(Path.GetDirectoryName(Assembly.GetEntryAssembly().Location), "Extensions");
+				extensionsDir=Path.GetDirectoryName(Assembly.GetEntryAssembly().Location);
 			
 			ExtensionCache cache = Global<ExtensionCache>.GetInstance();
 			

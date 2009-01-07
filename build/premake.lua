@@ -23,11 +23,10 @@ function CreateProject()
 	base_bin_dir="../../bin"
 	base_prj_dir="./"..target;
 
-
 	project.name="MusiC"
 	project.bindir=base_bin_dir
 	project.configs={"Debug", "Release"}
-	project.path="./"..target
+	project.path=base_prj_dir
 	
 	if
 	target=="vs2003" or
@@ -36,13 +35,14 @@ function CreateProject()
 	then
 		compiler = "vs"
 		
-		--Visual Studio supports both managed and unmanaged, but separately
-		
-		project.path=base_prj_dir.."-unmanaged"
-		MakeUnmanagedProjects()
-		
-		project.path=base_prj_dir.."-managed"
-		MakeManagedProjects()
+		--Visual Studio supports both managed and unmanaged, but separately	
+		if(options["unmanaged"]) then
+			project.path=base_prj_dir.."-unmanaged"
+			MakeUnmanagedProjects()
+		else
+			project.path=base_prj_dir.."-managed"
+			MakeManagedProjects()
+		end
 	elseif
 	target=="sharpdev" or
 	target=="monodev"
@@ -79,6 +79,7 @@ function CreateProject()
 end
 
 function main()
+	addoption("unmanaged", "If creating a VS 2003, 2005 or 2008 project creates the unmanaged solution.")
 	if target~=nil then CreateProject() end
 end
 

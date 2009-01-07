@@ -52,7 +52,7 @@ namespace MusiC
 		
 		static MusiCObject()
 		{
-				//log4net.Config.XmlConfigurator.Configure(new System.IO.FileInfo("music.log.xml"));
+				log4net.Config.XmlConfigurator.Configure(new System.IO.FileInfo("music.log.xml"));
 				_log = log4net.LogManager.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
 		}
 		

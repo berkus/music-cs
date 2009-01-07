@@ -21,7 +21,7 @@ package.kind="dll"
 package.target="MusiC.Extensions.Features.SpecRollOff"
 package.targetprefix=""
 package.targetextension="dll"
-package.bindir=base_bin_dir.."/Extensions"
+package.bindir=base_bin_dir
 package.objdir=base_bin_dir.."/obj"
 
 -- Debug:MusiC

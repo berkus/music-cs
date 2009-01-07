@@ -201,7 +201,7 @@ extern "C"
 			int loop_min = 0;
 
             // Create combination control structure
-			tRefVecIndex * refVecsIndex = mc_tRefVecsIndex_alloc(fClassA->nFrames, fClassB->nFrames);
+			tRefVecIndex * refVecsIndex = mc_tRefVecsIndex_alloc((long)fClassA->nFrames, (long)fClassB->nFrames);
 
 			if(refVecsIndex == NULL)
 			{
