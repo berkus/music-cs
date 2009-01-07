@@ -1,0 +1,7 @@
+os=$(uname -s)
+
+if [ "$os" = "Darwin" ]; then
+	export DYLD_LIBRARY_PATH=./;$DYLD_LIBRARY_PATH
+fi
+export
+mono MusiC.Apps.GenreC.exe
