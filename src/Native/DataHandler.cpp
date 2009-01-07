@@ -20,9 +20,8 @@ ClassData * DataHandler::getClass(int idx)
     while(idx)
     {
         c = c->pNextClass;
+        idx--;
     }
-
-    idx--;
 
     return c;
 }

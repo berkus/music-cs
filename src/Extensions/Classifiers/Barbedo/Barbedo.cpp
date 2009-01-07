@@ -138,16 +138,67 @@ extern "C"
 {
 	void Barbedo_Filter(DataCollection * extractedData)
 	{
-		//log.open("mcGenreClassifier-Barbedo.log", ios_base::out);
+	    ofstream log;
+		log.open("Barbedo_Filter.txt", ios_base::out);
 
 		DataHandler hnd;
 		hnd.Attach(extractedData);
 
-		cout << "============ Barbedo_Filter ============" << endl;
-		cout << "Address:" << reinterpret_cast<long>(extractedData) << endl;
-		cout << "Received " << hnd.getNumClasses() << " Classes" << endl;
-		cout << "Received " << hnd.getNumFeatures() << " Features" << endl;
-		cout << "====================================" << endl;
+		log << "============ Barbedo_Filter ============" << endl;
+		//log << "Address (target):" << reinterpret_cast<long>(extractedData) << endl;
+		//log << "Address (pointer):" << reinterpret_cast<long>(&extractedData) << endl;
+		log << "Received " << hnd.getNumClasses() << " Classes" << endl;
+		log << "Received " << hnd.getNumFeatures() << " Features" << endl;
+		log << "====================================" << endl;
+
+		const int targetFrameCount = 2944;
+		int toRemove = 0;
+
+		ClassData * cl = extractedData->pFirstClass;
+		FileData * fl;
+		while(cl)
+		{
+		    fl = cl->pFirstFile;
+		    while(fl)
+		    {
+		        if ( fl->nFrames < targetFrameCount )
+                    continue;
+
+                log << "Total Frames: " << fl->nFrames << endl;
+
+		        int firstSecHalf = (int) ceil( (fl->nFrames-1) / 2);
+		        int firstFrameIdx = firstSecHalf - (int) floor(targetFrameCount / 2);
+		        int lastFrameIdx = firstSecHalf + (int) floor(targetFrameCount / 2) - 1;
+
+		        log << "First Frame Index: " << firstFrameIdx << endl;
+		        log << "Last Frame Index: " << lastFrameIdx << endl;
+		        log << "Count (theoric): " << lastFrameIdx - firstFrameIdx + 1 << endl;
+
+		        FrameData * fr = fl->pFirstFrame;
+
+		        while(firstFrameIdx > 0)
+		        {
+		            firstFrameIdx--;
+		            fr = fr->pNextFrame;
+		        }
+
+		        int count = 0;
+
+		        while(lastFrameIdx > 0)
+		        {
+		            count++;
+		            lastFrameIdx--;
+		            fr = fr->pNextFrame;
+		        }
+
+		        log << "Count = " << count << endl;
+
+		        fl = fl->pNextFile;
+		    }
+		    cl = cl->pNextClass;
+		}
+
+		log.close();
 	}
 
 	void Barbedo_Train(DataCollection * extractedData)
@@ -158,7 +209,7 @@ extern "C"
 		DataHandler data;
 		data.Attach(extractedData);
 
-		log.open("GenreClassifier-Barbedo.log", ios_base::out);
+		log.open("Barbedo_Train.txt", ios_base::out);
 		log << "Address:" << reinterpret_cast<int>(extractedData) << endl;
 		log << "Size of MCClassData:" << sizeof(ClassData) << endl;
 		log << "Size of MCClassData *:" << sizeof(ClassData*) << endl;
@@ -179,9 +230,14 @@ extern "C"
 			log << "========================" << endl;
 
 			// Get Classes to Compare
-			ClassData * classA = data.getClass(gsl_combination_get(selectedGenres, 0));
-			ClassData * classB = data.getClass(gsl_combination_get(selectedGenres, 1));
+			int a = gsl_combination_get(selectedGenres, 0);
+			int b = gsl_combination_get(selectedGenres, 1);
 
+			log << "Class A bound to index " << a << endl;
+			log << "Class B bound to index " << b << endl;
+
+			ClassData * classA = data.getClass(a);
+			ClassData * classB = data.getClass(b);
 
 			// Filter Classes
 			ClassData * fClassA = filterCandidates(classA);

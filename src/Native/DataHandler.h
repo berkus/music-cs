@@ -19,8 +19,8 @@ namespace MusiC
 
 			void Attach(DataCollection *);
 
-			int getNumClasses(){ return _data->nFeatures; }
-			int getNumFeatures() { return _data->nClasses; }
+			int getNumClasses(){ return _data->nClasses; }
+			int getNumFeatures() { return _data->nFeatures; }
 
 			ClassData * getClass(int idx);
 			ClassData * getNextClass();
