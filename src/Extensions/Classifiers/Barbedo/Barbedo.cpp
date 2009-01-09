@@ -138,8 +138,8 @@ extern "C"
 {
 	void Barbedo_Filter(DataCollection * extractedData)
 	{
-	    ofstream log;
-		log.open("Barbedo_Filter.txt", ios_base::out);
+	    ostream & log = cout;
+		//log.open("Barbedo_Filter.txt", ios_base::out);
 
 		DataHandler hnd;
 		hnd.Attach(extractedData);
@@ -152,43 +152,69 @@ extern "C"
 		log << "====================================" << endl;
 
 		const int targetFrameCount = 2944;
-		int toRemove = 0;
 
 		ClassData * cl = extractedData->pFirstClass;
 		FileData * fl;
+
 		while(cl)
 		{
 		    fl = cl->pFirstFile;
 		    while(fl)
 		    {
+		        log.flush();
+
 		        if ( fl->nFrames < targetFrameCount )
                     continue;
 
                 log << "Total Frames: " << fl->nFrames << endl;
 
-		        int firstSecHalf = (int) ceil( (fl->nFrames-1) / 2);
-		        int firstFrameIdx = firstSecHalf - (int) floor(targetFrameCount / 2);
-		        int lastFrameIdx = firstSecHalf + (int) floor(targetFrameCount / 2) - 1;
+		        int firstFrameIdx = (int) ceil( (fl->nFrames-1) / 2) - (int) floor(targetFrameCount / 2);
 
-		        log << "First Frame Index: " << firstFrameIdx << endl;
-		        log << "Last Frame Index: " << lastFrameIdx << endl;
-		        log << "Count (theoric): " << lastFrameIdx - firstFrameIdx + 1 << endl;
+		        log << "First Frame: " << firstFrameIdx << endl;
+		        log << "Last Frame: " << firstFrameIdx + targetFrameCount - 1 << endl;
 
 		        FrameData * fr = fl->pFirstFrame;
+		        FrameData * prox;
 
 		        while(firstFrameIdx > 0)
 		        {
 		            firstFrameIdx--;
+
+		            prox = fr->pNextFrame;
+
+                    fr->pNextFrame = fl->pFiltered;
+                    fr->pPrevFrame = NULL;
+
+                    if(fl->pFiltered) fl->pFiltered->pPrevFrame = fr;
+
+                    fl->pFiltered = fr;
+
+                    fr = prox;
+		        }
+
+		        int count = 1;
+		        fl->pFirstFrame = fr;
+
+		        while(count != targetFrameCount)
+		        {
+		            count++;
 		            fr = fr->pNextFrame;
 		        }
 
-		        int count = 0;
+		        fl->pLastFrame = fr;
+		        fr = fr->pNextFrame;
 
-		        while(lastFrameIdx > 0)
+		        while(fr)
 		        {
-		            count++;
-		            lastFrameIdx--;
-		            fr = fr->pNextFrame;
+		            prox = fr->pNextFrame;
+
+                    fr->pNextFrame = fl->pFiltered;
+                    fr->pPrevFrame = NULL;
+
+                    if(fl->pFiltered) fl->pFiltered->pPrevFrame = fr;
+                    fl->pFiltered = fr;
+
+                    fr = prox;
 		        }
 
 		        log << "Count = " << count << endl;
@@ -198,7 +224,8 @@ extern "C"
 		    cl = cl->pNextClass;
 		}
 
-		log.close();
+        log << "Done" << endl;
+		//log.close();
 	}
 
 	void Barbedo_Train(DataCollection * extractedData)
@@ -220,6 +247,8 @@ extern "C"
 		double genreCombinationCount = gsl_sf_choose(extractedData->nClasses, 2);
 		log << "Algorithm Rounds: " << genreCombinationCount << endl;
 		log << "========================" << endl << endl;
+
+		log.flush();
 
 		// Genre Combination Loop
 		gsl_combination * selectedGenres = gsl_combination_calloc(extractedData->nClasses, 2);
