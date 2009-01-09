@@ -1,4 +1,4 @@
-﻿/*
+/*
  * The MIT License
  * Copyright (c) 2008 Marcos Jos� Sant'Anna Magalh�es
  * 
@@ -51,6 +51,8 @@ namespace MusiC.Data.Unmanaged
 		
 		public FrameData * pFirstFrame;
 		public FrameData * pLastFrame;
+		
+		public FrameData * pFiltered;
 		
 		public ClassData * pClass;
 	}	
@@ -138,6 +140,7 @@ namespace MusiC.Data.Unmanaged
 			
 			newFile->pFirstFrame = null;
 			newFile->pLastFrame = null;
+			newFile->pFiltered = null;
 			
 			newFile->nFrames = 0;
 			newFile->pClass = currentClass;

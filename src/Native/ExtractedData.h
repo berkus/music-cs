@@ -32,6 +32,8 @@ namespace MusiC
 			FrameData * pFirstFrame;
 			FrameData * pLastFrame;
 
+			FrameData * pFiltered;
+
 			ClassData * pClass;
 		};
 
