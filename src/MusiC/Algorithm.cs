@@ -1,6 +1,6 @@
 /*
  * The MIT License
- * Copyright (c) 2008 Marcos José Sant'Anna Magalhães
+ * Copyright (c) 2008 Marcos Josï¿½ Sant'Anna Magalhï¿½es
  * 
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -163,8 +163,7 @@ namespace MusiC
 							h.Attach(file);
 							_window.Attach(h);
 							
-							foreach (Unmanaged.Feature f in _featureList)
-								Unmanaged.Extractor.Extract(_window, _featureList, currentFile);
+							Unmanaged.Extractor.Extract(_window, _featureList, currentFile);
 							
 							h.Detach();
 						}
@@ -178,7 +177,7 @@ namespace MusiC
                     {
                     	Message("Beginning Classification");
                     	_classifier.Filter(dtCol);
-                        //_classifier.Train(dtCol);
+                        _classifier.Train(dtCol);
                     }
                     
                     Message("All Tasks Done");
