@@ -65,8 +65,9 @@ namespace MusiC
         [CLSCompliant(false)]
 		abstract public class Classifier : Extension, IClassifier
 		{
-            virtual unsafe public void Filter(Data.Unmanaged.DataCollection * dataIn)
+            virtual unsafe public Data.Unmanaged.DataCollection * Filter(Data.Unmanaged.DataCollection * dataIn)
             {
+            	return null;
             }
 
             abstract unsafe public void Train(Data.Unmanaged.DataCollection* dtCol);
