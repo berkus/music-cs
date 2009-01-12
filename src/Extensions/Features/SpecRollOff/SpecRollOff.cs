@@ -74,7 +74,7 @@ namespace MusiC.Extensions.Features
 			
 			_temp = GetBuffer(wndSize);
 			NativeMethods.Math.FFTMagnitude(wndData, _temp, wndSize);
-					
+
 			for (int i = 0; i < wndSize; i++)
 				sum += *(_temp) * *(_temp++);
 	
@@ -82,7 +82,7 @@ namespace MusiC.Extensions.Features
 	
 			for (sro = wndSize - 1; sro > 0; sro--)
 			{
-				cum -= *(_temp--);
+				cum -= *(_temp) * *(_temp--);
 				
 				if (cum < (0.95 * sum))
 					break;

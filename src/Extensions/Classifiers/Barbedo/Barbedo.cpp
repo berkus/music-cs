@@ -235,8 +235,8 @@ extern "C"
 {
 	DataCollection * Barbedo_Filter (DataCollection * extractedData)
 	{
-	    ofstream nlog;
-	    nlog.open ("Barbedo_Filter_dataIn.txt", ios_base::out);
+		ofstream nlog;
+		nlog.open ("Barbedo_Filter_dataIn.txt", ios_base::out);
 
 		ofstream log;
 		log.open ("Barbedo_Filter.txt", ios_base::out);
@@ -325,7 +325,7 @@ extern "C"
 				for ( frame_counter = 0; frame_counter < firstFrameIdx; frame_counter++)
 				{
 				    //nlog << fd->pData[0] << endl;
-					fd = fd->pNextFrame;
+				    fd = fd->pNextFrame;
 				}
 
 				for ( cluster_counter = 0; cluster_counter < clusterCount; cluster_counter++)
@@ -337,11 +337,11 @@ extern "C"
 					nlog << "Cluster " << cluster_counter << endl << endl;
 
 					for (idx = 0; idx < nFeat; idx++)
-                    {
-                        mean[idx] = 0;
-                        var[idx] = 0;
-                        max[idx] = -INFINITY;
-                    }
+					{
+						mean[idx] = 0;
+						var[idx] = 0;
+						max[idx] = -INFINITY;
+					}
 
 					for ( cluster_sz_counter = 0; cluster_sz_counter < clusterSz; cluster_sz_counter++ )
 					{

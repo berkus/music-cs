@@ -173,7 +173,8 @@ namespace MusiC.Extensions.Handlers
                             
                             // Increases the number of divisions but avoid overflow problems
                             // Makes data mono
-                            *pData += temp / _channels;
+                            // long / int = int .... need to cast to float.
+                            *pData += (float) temp / _channels;
                         }
 
                         pData++;

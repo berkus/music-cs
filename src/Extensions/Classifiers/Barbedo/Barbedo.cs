@@ -41,9 +41,9 @@ namespace MusiC.Extensions.Classifiers
 			uTrain(ref (*dtCol));
 		}
 
-        override unsafe public void Filter(DataCollection* dataIn)
+        override unsafe public Data.Unmanaged.DataCollection * Filter(DataCollection* dataIn)
 		{
-			uFilter(ref *dataIn);
+			return uFilter(ref *dataIn);
 		}
 		
 		
