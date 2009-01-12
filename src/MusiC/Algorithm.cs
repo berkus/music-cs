@@ -1,4 +1,4 @@
-/*
+﻿/*
  * The MIT License
  * Copyright (c) 2008 Marcos Jos� Sant'Anna Magalh�es
  * 
@@ -148,10 +148,9 @@ namespace MusiC
 						
 						foreach(String file in Directory.GetFiles(label.InputDir,"*.wav"))
 						{
-							Data.Unmanaged.FileData * currentFile = Data.Unmanaged.DataHandler.BuildFileData(currentClass);
-							
 							Message("Opening "+ file);
 							
+							Data.Unmanaged.FileData * currentFile = Data.Unmanaged.DataHandler.BuildFileData(currentClass);
 							Unmanaged.Handler h = Global<ExtensionCache>.GetInstance().GetUnmanagedHandler(file);
 							
 							if(h == null)
@@ -176,8 +175,12 @@ namespace MusiC
 					if (_classifier != null)
                     {
                     	Message("Beginning Classification");
-                    	_classifier.Filter(dtCol);
-                        _classifier.Train(dtCol);
+                    	Data.Unmanaged.DataCollection * filteredData = _classifier.Filter(dtCol);
+                    	
+                    	if (filteredData == null)
+                        	_classifier.Train(dtCol);
+                    	else
+                    		_classifier.Train(filteredData);
                     }
                     
                     Message("All Tasks Done");

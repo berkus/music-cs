@@ -1,4 +1,4 @@
-/*
+﻿/*
  * The MIT License
  * Copyright (c) 2008 Marcos Jos� Sant'Anna Magalh�es
  * 
@@ -33,24 +33,18 @@ namespace MusiC.Data.Unmanaged
 	unsafe public struct FrameData
 	{
 		public float * pData;
-		
 		public FrameData * pNextFrame;
-		public FrameData * pPrevFrame;
 	}	
 	
 	[CLSCompliant(false)]
 	[StructLayout(LayoutKind.Sequential,Pack = 1)]
 	unsafe public struct FileData
 	{
-		// Unmanaged side only
-		public long next;
 		public long nFrames;
 		
 		public FileData * pNextFile;
-		public FileData * pPrevFile;
 		
 		public FrameData * pFirstFrame;
-		public FrameData * pLastFrame;
 		
 		public FrameData * pFiltered;
 		
@@ -67,7 +61,6 @@ namespace MusiC.Data.Unmanaged
 		public ClassData * pNextClass;
 		
 		public FileData * pFirstFile;
-		public FileData * pLastFile;
 		
 		public DataCollection * pCollection;
 	}
@@ -80,7 +73,6 @@ namespace MusiC.Data.Unmanaged
 		public int nFeatures;
 		
 		public ClassData * pFirstClass;
-		public ClassData * pLastClass;
 	}
 	
 	[CLSCompliant(false)]
@@ -94,7 +86,6 @@ namespace MusiC.Data.Unmanaged
 			data->nFeatures = nFeatures;
 
 			data->pFirstClass = null;
-			data->pLastClass = null;
 			
 			return data;
 		}
@@ -106,7 +97,6 @@ namespace MusiC.Data.Unmanaged
 			newClass->pNextClass = null;
 			
 			newClass->pFirstFile = null;
-			newClass->pLastFile = null;
 				
 			newClass->nFrames = 0;
 			newClass->nFiles = 0;
@@ -118,15 +108,12 @@ namespace MusiC.Data.Unmanaged
 			if(dtCol->pFirstClass == null)
 			{
 				dtCol->pFirstClass = newClass;
-				dtCol->pLastClass = newClass;
 				
 				return newClass;
 			}
 			
-			ClassData * prev = dtCol->pLastClass;
-			
-			prev->pNextClass = newClass;
-			dtCol->pLastClass = newClass;
+			newClass->pNextClass = dtCol->pFirstClass;
+			dtCol->pFirstClass = newClass;
 			
 			return newClass;
 		}
@@ -136,10 +123,7 @@ namespace MusiC.Data.Unmanaged
 			FileData * newFile = (FileData *) Marshal.AllocHGlobal(sizeof(FileData)).ToPointer();
 			
 			newFile->pNextFile = null;
-			newFile->pPrevFile = null;
-			
 			newFile->pFirstFrame = null;
-			newFile->pLastFrame = null;
 			newFile->pFiltered = null;
 			
 			newFile->nFrames = 0;
@@ -147,31 +131,8 @@ namespace MusiC.Data.Unmanaged
 			
 			currentClass->nFiles++;
 			
-			// first file
-			if(currentClass->pFirstFile == null)
-			{
-				currentClass->pFirstFile = newFile;
-				currentClass->pLastFile = newFile;
-				
-				return newFile;
-			}
-			
-			FileData * prev = currentClass->pLastFile;
-			
-			if( prev != null )
-			{
-				FileData * next = prev->pNextFile;
-				
-				prev->pNextFile = newFile;
-				newFile->pPrevFile = prev;
-				
-				newFile->pNextFile = next;
-				
-				if( next != null )
-					next->pPrevFile = newFile;
-			}
-			
-			currentClass->pLastFile = newFile;
+			newFile->pNextFile = currentClass->pFirstFile;
+			currentClass->pFirstFile = newFile;
 			
 			return newFile;
 		}
@@ -180,46 +141,26 @@ namespace MusiC.Data.Unmanaged
 		{
 			FrameData * newFrame = (FrameData *) Marshal.AllocHGlobal(sizeof(FrameData)).ToPointer();
 			
-			newFrame->pNextFrame = null;
-			newFrame->pPrevFrame = null;
 			newFrame->pData = (Single *) Marshal.AllocHGlobal( (currentFile->pClass->pCollection->nFeatures) * sizeof(float)).ToPointer();
 			
 			currentFile->nFrames++;
 			currentFile->pClass->nFrames++;
 			
-			// first frame
-			if(currentFile->pFirstFrame == null)
+			if( currentFile->pFirstFrame != null )
 			{
-				currentFile->pFirstFrame = newFrame;
-				currentFile->pLastFrame = newFrame;
-				
-				// not the first frame of the first file of a class
-				if( currentFile->pPrevFile != null )
-				{
-					currentFile->pPrevFile->pLastFrame->pNextFrame = newFrame;
-					newFrame->pPrevFrame = currentFile->pPrevFile->pLastFrame;
-				}
-				
-				return newFrame;
+				newFrame->pNextFrame = currentFile->pFirstFrame;
+			}
+			else
+			{
+				// First frame of the file links the last frame of the previous file.
+				if(currentFile->pNextFile != null)
+					newFrame->pNextFrame = currentFile->pNextFile->pFirstFrame;
+				else
+					// First frame of the class.
+					newFrame->pNextFrame = null;
 			}
 			
-			FrameData * prev = currentFile->pLastFrame;
-			
-			if( prev != null )
-			{
-				prev->pNextFrame = newFrame;
-				newFrame->pPrevFrame = prev;
-				
-				FrameData * next = currentFile->pLastFrame->pNextFrame;
-				
-				if( next != null )
-				{
-					next->pPrevFrame = newFrame;
-					newFrame->pNextFrame = next;
-				}
-			}
-			
-			currentFile->pLastFrame = newFrame;
+			currentFile->pFirstFrame = newFrame;
 			return newFrame;
 		}
 	}

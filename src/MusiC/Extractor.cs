@@ -50,26 +50,25 @@ namespace MusiC
 		[CLSCompliant(false)]
 		public class Extractor
 		{
-			static unsafe public Data.Unmanaged.FileData * Extract(Window wnd, IEnumerable<Feature> featList, Data.Unmanaged.FileData * dataStg)
+			static unsafe public void Extract(Window wnd, IEnumerable<Feature> featList, Data.Unmanaged.FileData * dataStg)
 			{
 				int fIdx;
                 float * windowBuffer;
 
 				for(int i = 0; i < wnd.WindowCount; i++)
 				{
-                    Data.Unmanaged.FrameData* frame = Data.Unmanaged.DataHandler.BuildFrameData(dataStg);
-
                     fIdx = 0;
                     foreach (Feature f in featList)
                     {
                         windowBuffer = wnd.GetWindow(i);
 
                         if (windowBuffer != null)
+                        {
+                        	Data.Unmanaged.FrameData* frame = Data.Unmanaged.DataHandler.BuildFrameData(dataStg);
                             *(frame->pData + fIdx) = f.Extract(windowBuffer, wnd.WindowSize);
+                        }
                     }
 				}
-				
-				return null;
 			}
 		}
 	}
