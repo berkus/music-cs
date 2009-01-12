@@ -22,24 +22,39 @@
  *
  */
 
+#ifndef MATH_H_INCLUDED
+#define MATH_H_INCLUDED
+
 #include "MemoryManager.h"
-#include "MathF.h"
 
-#include <iostream>
-using namespace std;
-
-extern "C"
+namespace MusiC
 {
-	MusiC::Native::MemoryManager mgr;
-	MusiC::Native::Math math;
-
-	int fftr_mag(float* x, float* mag, int m)
+	namespace Native
 	{
-		memcpy(mag, x, m * sizeof(int));
-		int ret = math.fftr_mag(mag, m);
+		class Math
+		{
+			private:
 
-		return ret;
+				MusiC::Native::MemoryManager mgr;
+
+				float * _sintbl;
+				float * cplx;
+				int maxfftsize;
+
+				int checkm (int m);
+
+			public:
+
+                Math() : _sintbl(NULL), cplx(NULL), maxfftsize(0)
+                {}
+
+				int fft (float *x, float *y, const int m);
+				int fftr (float* x, int m);
+				int fftr_mag (float * x, int m);
+
+				~Math();
+		};
 	}
 }
 
-// END OF FILE
+#endif // MATH_H_INCLUDED
