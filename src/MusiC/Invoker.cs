@@ -34,11 +34,6 @@ namespace MusiC
 			return null;
 		}
 		
-		public static Extension LoadType(BinaryInfo t)
-		{
-			return null;
-		}
-		
 		public static Extension LoadType(Instantiable i)
 		{
 			return null;
