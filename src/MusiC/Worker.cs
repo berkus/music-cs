@@ -1,6 +1,6 @@
-Ôªø/*
+/*
  * The MIT License
- * Copyright (c) 2008 Marcos Jos√© Sant'Anna Magalh√£es
+ * Copyright (c) 2008 Marcos JosÈ Sant'Anna Magalh„es
  * 
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -39,7 +39,7 @@
 //			{
 //				if (opt["file"] == null)
 //				{
-//					Console.WriteLine("Arquivo n√£o definido.");
+//					Console.WriteLine("Arquivo n„o definido.");
 //					cfg = Config.LoadConfig("../data/config.xml");
 //				}
 //				else

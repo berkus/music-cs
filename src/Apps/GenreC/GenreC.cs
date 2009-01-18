@@ -45,7 +45,7 @@ namespace MusiC.Apps
 /// @mainpage
 /// System Basic Information:
 ///
-/// @author Marcos JosŽ S. Magalh‹es
+/// @author Marcos José S. Magalhães
 /// @version 0.1
 /// @date 22.04.08
 ///
