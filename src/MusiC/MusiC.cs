@@ -33,19 +33,15 @@ using MusiC.Exceptions;
 [assembly: CLSCompliant(true)]
 namespace MusiC
 {
-	public class MusiC : MusiCObject, IGlobal
+	public class MusiC : MusiCObject
 	{		
 		UnhandledExceptionEventHandler _UnhandledExceptionHandler;
 		String _configFile;
 		String _extensionsDir;
 		
-		public MusiC()
-		{
-		}
-		
-		public void Initialize()
-		{
-		}
+		ExtensionCache _cache = new ExtensionCache();
+		ExtensionLoader _loader = new ExtensionLoader();
+		Configurator _cfg;
 		
 		public String ExtensionsDir
 		{
@@ -78,8 +74,7 @@ namespace MusiC
 			{
 				// Grab an ExtensionLoader instance
 				Message("Starting Extension Loading");ReportIndent();
-				ExtensionLoader loader = Global<ExtensionLoader>.GetInstance();
-				loader.Load(_extensionsDir);
+				_loader.Load(_extensionsDir, _cache);
 				ReportUnindent();
 				
 				//@todo Uncomment protection
@@ -100,19 +95,18 @@ namespace MusiC
 		{
 			try
 			{
-				ExtensionCache cache = Global<ExtensionCache>.GetInstance();
-				Config cfg = cache.GetConfig();
+				_cfg = _cache.GetConfigurator();
 				
 				// Get exec path if user don't provide one.
-				if(_configFile==null)
+				if(_configFile == null)
 					_configFile=Path.Combine(Path.GetDirectoryName(Assembly.GetEntryAssembly().Location), "config.xml");
 				
-				cfg.Load(_configFile);
+				_cfg.Load(_configFile);
 				Message(_configFile + " ... [LOADED]");
 				
-				foreach(Algorithm a in cfg.AlgorithmList)
+				foreach(Algorithm a in _cfg.AlgorithmList)
 				{
-					a.Execute();
+					a.Execute(_cache);
 				}
 			
 			}

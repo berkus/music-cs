@@ -27,7 +27,7 @@ using System.Reflection;
 
 namespace MusiC
 {
-	public enum ExtensionKind
+	enum ExtensionKind
 	{
 		Classifier,
 		Feature,
@@ -38,7 +38,7 @@ namespace MusiC
 		Error
 	}
 	
-	public enum ExtensionManagement
+	enum ExtensionManagement
 	{
 		Managed,
 		Unmanaged,
@@ -50,7 +50,7 @@ namespace MusiC
 	/// 
 	/// </summary>
 	/// @todo Inherit from ParamList
-	public class ExtensionInfo : MusiCObject
+	class ExtensionInfo : MusiCObject
 	{
 		Type _class=null;
 		ExtensionKind _kind = ExtensionKind.NotSet;
@@ -90,7 +90,7 @@ namespace MusiC
 			if(typeof(BaseFeature).IsAssignableFrom(t))
 				return ExtensionKind.Feature;
 			
-			if(typeof(Config).IsAssignableFrom(t))
+			if(typeof(Configurator).IsAssignableFrom(t))
 				return ExtensionKind.Configuration;
 			
 			if(typeof(IClassifier).IsAssignableFrom(t))
@@ -113,7 +113,7 @@ namespace MusiC
 				typeof(Managed.Classifier).IsAssignableFrom(t) ||
 				typeof(Managed.Handler).IsAssignableFrom(t) ||
 				typeof(Managed.Window).IsAssignableFrom(t) ||
-				typeof(Config).IsAssignableFrom(t)
+				typeof(Configurator).IsAssignableFrom(t)
 			)
 				return ExtensionManagement.Managed;
 			

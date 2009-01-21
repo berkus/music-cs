@@ -27,7 +27,7 @@ using System.Reflection;
 
 namespace MusiC
 {
-	public class Instantiable : ParamList
+	class Instantiable : ParamList
 	{
 		String _name;
 		String _classname;

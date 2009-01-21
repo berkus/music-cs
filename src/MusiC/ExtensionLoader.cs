@@ -30,24 +30,14 @@ using MusiC.Exceptions;
 
 namespace MusiC.Extensions
 {
-	public class ExtensionLoader : MusiCObject, IGlobal
-	{		
-		public ExtensionLoader()
-		{
-		}
-		
-		public void Initialize()
-		{
-		}
-		
-		public void Load(String extensionsDir)
+	class ExtensionLoader : MusiCObject
+	{
+		public void Load(String extensionsDir, ExtensionCache cache)
 		{
 			// Get exec path if user don't provide one.
 			if(extensionsDir==null)
 				//extensionsDir=Path.Combine(Path.GetDirectoryName(Assembly.GetEntryAssembly().Location), "Extensions");
 				extensionsDir=Path.GetDirectoryName(Assembly.GetEntryAssembly().Location);
-			
-			ExtensionCache cache = Global<ExtensionCache>.GetInstance();
 			
 			foreach(String ext in Directory.GetFiles(extensionsDir, "*.dll"))
 			{

@@ -29,18 +29,13 @@ using MusiC;
 
 namespace MusiC.Extensions
 {
-	public class ExtensionCache : MusiCObject, IGlobal
+	class ExtensionCache : MusiCObject
 	{
-		Config _objConfig;
-		Type _tConfig;
+		Configurator _objConfig;
 		
-		//Dictionary<String, Type> _tHandlerCache = new Dictionary<String, Type>();
-		Dictionary<String, ExtensionInfo> _extensionList = new Dictionary<String, ExtensionInfo>();
-		LinkedList<IHandler> _handlerList = new LinkedList<IHandler>();
-		
-		public void Initialize()
-		{
-		}
+		static readonly private Dictionary<String, ExtensionInfo> _extensionList = new Dictionary<String, ExtensionInfo>();
+		static readonly private LinkedList<ExtensionInfo> _configList = new LinkedList<ExtensionInfo>();
+		static readonly private LinkedList<IHandler> _handlerList = new LinkedList<IHandler>();
 		
 		public void Add(Type extensionType)
 		{
@@ -58,34 +53,11 @@ namespace MusiC.Extensions
 				_handlerList.AddLast(info.Instantiate(null) as IHandler);
 			
 			if(info.Kind == ExtensionKind.Configuration)
-				_tConfig = extensionType;
+			{
+				_configList.AddLast(info);
+			}
 			
 			Message(extensionType.ToString() + " ... [ADDED]");
-		}
-		
-		/// <summary>
-		/// 
-		/// </summary>
-		/// <exception cref="MusiC.Exceptions.MissingExtensionException"></exception>
-		/// <returns></returns>
-		public Config GetConfig()
-		{
-			if(_objConfig!=null)
-				return _objConfig;
-			
-			if(_tConfig == null)
-				throw new Exceptions.MissingExtensionException("MusiC doesn't know how to load a configuration extension. Seems none was provided or aproved.");
-			
-			_objConfig = Invoker.LoadConfig(_tConfig);
-			return _objConfig;
-		}
-		
-		public ExtensionInfo GetInfo(String className)
-		{
-			ExtensionInfo info;
-			_extensionList.TryGetValue(className, out info);
-			
-			return info;
 		}
 		
 		public Managed.Handler GetManagedHandler(String file)
@@ -101,7 +73,6 @@ namespace MusiC.Extensions
 			return null;
 		}
 		
-		[CLSCompliant(false)]
 		public Unmanaged.Handler GetUnmanagedHandler(String file)
 		{
 			foreach(IHandler h in _handlerList)
@@ -115,7 +86,30 @@ namespace MusiC.Extensions
 			return null;
 		}
 	
-		public IHandler GetHandler(String file)
+		/// <summary>
+		/// 
+		/// </summary>
+		/// <exception cref="MusiC.Exceptions.MissingExtensionException"></exception>
+		/// <returns></returns>
+		public Configurator GetConfigurator()
+		{
+			if(_objConfig!=null)
+				return _objConfig;
+			
+			if(_configList.Count == 0)
+				throw new Exceptions.MissingExtensionException("MusiC doesn't know how to load a configuration extension. Seems none was provided or aproved.");
+			
+			_objConfig = Invoker.LoadConfig(_configList.First.Value.Class);
+			
+			return _objConfig;
+		}
+		
+		public void SetConfigurator(Configurator configObj)
+		{
+			_objConfig = configObj;
+		}
+		
+		static public IHandler GetHandler(String file)
 		{
 			foreach(IHandler h in _handlerList)
 			{
@@ -126,6 +120,14 @@ namespace MusiC.Extensions
 			}
 			
 			return null;
+		}
+		
+		static public ExtensionInfo GetInfo(String className)
+		{
+			ExtensionInfo info;
+			_extensionList.TryGetValue(className, out info);
+			
+			return info;
 		}
 	}
 }

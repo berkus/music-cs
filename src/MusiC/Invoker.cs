@@ -39,12 +39,12 @@ namespace MusiC
 			return null;
 		}
 		
-		public static Config LoadConfig(Type tConfig)
+		public static Configurator LoadConfig(Type tConfig)
 		{
 			// TODO: Check if this type match expected config.
 			ConstructorInfo configCtor = tConfig.GetConstructor(new Type[0]);
 			if(configCtor!=null)
-				return configCtor.Invoke(null) as Config;
+				return configCtor.Invoke(null) as Configurator;
 			// TODO: Implement MusiC.Invoker.LoadConfig())
 			return null;
 		}

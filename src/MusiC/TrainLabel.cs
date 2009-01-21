@@ -27,31 +27,28 @@ using System.IO;
 
 namespace MusiC
 {
-	public class TrainLabel : MusiCObject
+	class TrainLabel : MusiCObject, ILabel
 	{
-		String _label;
-		String _inDir;
-		String _outDir;
-		
-		public String Label
-		{
-			get {return _label;}
-			set {_label=value;}
+		string _label;
+		string _inDir;
+		string _outDir;
+
+		public string Label {
+			get { return _label; }
+			set { _label = value; }
 		}
-		
-		public String OutputDir
-		{
-			get {return _outDir;}
-			set {_outDir=value;}
+
+		public string OutputDir {
+			get { return _outDir; }
+			set { _outDir = value; }
 		}
-		
-		public String InputDir
-		{
-			get {return _inDir;}
-			set {_inDir=value;}
+
+		public string InputDir {
+			get { return _inDir; }
+			set { _inDir = value; }
 		}
-		
-		/* override public String ToString()
+
+/* override public String ToString()
 		{
 			String obj=PrintHeader();
 			
@@ -64,22 +61,20 @@ namespace MusiC
 			
 			return obj;
 		} */
-		
+
 		public bool Validate()
 		{
-			if(!Directory.Exists(_outDir))
-			{
+			if (!Directory.Exists(_outDir)) {
 				/// @todo change to a default place
 				Console.WriteLine("The specified output directory isn't available");
 				return false;
 			}
-			
-			if(!Directory.Exists(_inDir))
-			{
+
+			if (!Directory.Exists(_inDir)) {
 				Console.WriteLine("The specified input directory isn't available.");
 				return false;
 			}
-				
+
 			Print();
 			return true;
 		}

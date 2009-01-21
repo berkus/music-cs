@@ -27,79 +27,73 @@ using System.Collections.Generic;
 
 namespace MusiC
 {
-	public class ParamList : MusiCObject
+	class ParamList : MusiCObject, IParamList
 	{
-		Boolean _isParamInitiated = false;
-		
+		bool _isParamInitiated = false;
+
 		LinkedList<Instantiable> _paramList = new LinkedList<Instantiable>();
-		
-		public virtual void AddParam(String paramName, String paramClass)
+
+		public virtual void AddParam(string paramName, string paramClass)
 		{
 			AddParam(paramName, paramClass, null);
 		}
-		
-		public virtual void AddParam(String paramName, String paramClass, String strValue)
+
+		public virtual void AddParam(string paramName, string paramClass, string strValue)
 		{
 			Instantiable i = new Instantiable(paramName, paramClass);
 			i.StrValue = strValue;
 			_paramList.AddLast(i);
 		}
-		
-		virtual public void Instantiate()
+
+		public virtual void Instantiate()
 		{
-			if(_paramList.Count != 0 && !_isParamInitiated)
-			{
-				foreach(Instantiable i in _paramList)
+			if (_paramList.Count != 0 && !_isParamInitiated) {
+				foreach (Instantiable i in _paramList)
 					i.Instantiate();
 			}
 		}
-		
-		public Instantiable GetParamByName(String name)
+
+		public Instantiable GetParamByName(string name)
 		{
-			foreach(Instantiable i in _paramList)
-			{
-				if(i.Name == name)
-					return i;
+			foreach (Instantiable i in _paramList) {
+				if (i.Name == name) return i; 
 			}
-			
+
 			return null;
-			
+
 			///@todo error handling
 		}
-		
+
 		public virtual Type[] GetTypes()
 		{
 			int paramCount = _paramList.Count;
 			Type[] paramClassTypes = new Type[paramCount];
-			
+
 			int i = 0;
-			foreach(Instantiable param in _paramList)
-			{
-				paramClassTypes[i] = param.TypeObj; 
+			foreach (Instantiable param in _paramList) {
+				paramClassTypes[i] = param.TypeObj;
 				i++;
 			}
-			
+
 			return paramClassTypes;
 		}
-		
-		public virtual Object[] GetParamsValue()
+
+		public virtual object[] GetParamsValue()
 		{
-			if(_paramList.Count != 0 && !_isParamInitiated)
-			{
-				foreach(Instantiable i in _paramList)
+			if (_paramList.Count != 0 && !_isParamInitiated) {
+				foreach (Instantiable i in _paramList)
 					i.Instantiate();
 			}
-			
+
 			Int32 paramCount = _paramList.Count;
-			Object[] paramValue = new Object[paramCount];
-			
+			object[] paramValue = new object[paramCount];
+
 			Int32 j = 0;
-			foreach(Instantiable param in _paramList)
-			{
-				paramValue[j] = param.Value; 
+			foreach (Instantiable param in _paramList) {
+				paramValue[j] = param.Value;
 				j++;
 			}
-			
+
 			return paramValue;
 		}
 	}

@@ -33,33 +33,53 @@ using MusiC.Extensions;
 
 namespace MusiC
 {
-	abstract public class Config : Extension
+	abstract public class Configurator : Extension
 	{
-		LinkedList<Algorithm> _algList = new LinkedList<Algorithm>();
-		LinkedList<TrainLabel> _trainList = new LinkedList<TrainLabel>();
+		LinkedList<IAlgorithm> _algList = new LinkedList<IAlgorithm>();
+		LinkedList<ILabel> _trainList = new LinkedList<ILabel>();
 		LinkedList<String> _classifyList = new LinkedList<String>();
 		
-		public LinkedList<Algorithm> AlgorithmList
+		static readonly protected Intantiator New = new Intantiator();
+		
+		protected class Intantiator
+		{
+			public IAlgorithm Algorithm()
+			{
+				return new Algorithm();
+			}
+			
+			public ILabel Label()
+			{
+				return new TrainLabel();
+			}
+			
+			public IParamList ParamList()
+			{
+				return new ParamList();
+			}
+		}
+		
+		public LinkedList<IAlgorithm> AlgorithmList
 		{
 			get { return _algList; }
 		}
 		
-		public LinkedList<TrainLabel> LabelList
+		public LinkedList<ILabel> LabelList
 		{
 			get { return _trainList; }
 		}
 		
-		protected Config()
+		protected Configurator()
 		{
 			Message(this.GetType().FullName + " ... [LOADED]");
 		}
 		
-		protected void AddAlgorithm(Algorithm algorithm)
+		protected void AddAlgorithm(IAlgorithm algorithm)
 		{
 			_algList.AddLast(algorithm);
 		}
 		
-		protected void AddTrainLabel(TrainLabel label)
+		protected void AddTrainLabel(ILabel label)
 		{
 			if(label.Validate())
 				_trainList.AddLast(label);

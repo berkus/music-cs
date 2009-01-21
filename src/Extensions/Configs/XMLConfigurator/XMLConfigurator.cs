@@ -37,12 +37,12 @@ namespace MusiC.Configs
 	/// </summary>
 	/// <remarks>
 	/// You can add any non-specified tag to the file and the parser will ignore it. Just try to avoid tags which begins
-	/// by 'MusiC-*'. Those may be used in later revisions. 
+	/// by 'MusiC-*' because those may be used later. 
 	/// </remarks>
 	/// @todo Algorithm should have a name to refer errors.
 	/// @todo Find MusiC node and use it instead of document.
 	/// @todo Update parser to run each node instead of GetElements.
-	public class XMLConfigurator : Config
+	public class XMLConfigurator : Configurator
 	{
 		/// store class alias. Tag <=> classname.
 		Dictionary<String, String> _tagCache = new Dictionary<String, String>();
@@ -58,7 +58,6 @@ namespace MusiC.Configs
 			
 			BuildAlgorithmList(cfgFile);
 		}
-		
 		
 		/// <summary> Get attributes from a xml node. </summary>
 		/// <description> 
@@ -118,7 +117,7 @@ namespace MusiC.Configs
 				{
 					if(xmlLabelNode.Name == "Label")
 					{
-						TrainLabel l = new TrainLabel();
+						ILabel l = New.Label();
 						l.Label=XmlSafeAttribute(xmlLabelNode,"name");
 						
 						/// @todo Add support to multiple input dirs
@@ -155,8 +154,7 @@ namespace MusiC.Configs
 		{
 			foreach (XmlNode n in cfgFile.GetElementsByTagName("MusiC-Algorithm"))
 			{
-				Algorithm algorithm = new Algorithm();
-				
+				IAlgorithm algorithm = New.Algorithm();
 				String className;
 
 				foreach (XmlNode child in n.ChildNodes)
@@ -172,7 +170,7 @@ namespace MusiC.Configs
 						}
 					}
 					
-					ParamList paramList = new ParamList();
+					IParamList paramList = New.ParamList();
 					
 					foreach(XmlNode param in child.ChildNodes)
 					{

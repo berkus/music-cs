@@ -35,7 +35,7 @@ namespace MusiC.Apps
 	{
 		static void Main(String[] args)
 		{
-			MusiC m = Global<MusiC>.GetInstance();
+			MusiC m = new MusiC();
 			m.Load();
 			m.Run();
 			m.Unload();
