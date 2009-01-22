@@ -24,22 +24,52 @@
 
 using System;
 using System.Collections.Generic;
-
-using MusiC;
+using System.IO;
+using System.Reflection;
 
 namespace MusiC.Extensions
 {
 	class ExtensionCache : MusiCObject
 	{
-		Configurator _objConfig;
+		// Attributes
+		private Configurator _objConfig;
 		
+		#region Static Attributes
 		static readonly private Dictionary<String, ExtensionInfo> _extensionList = new Dictionary<String, ExtensionInfo>();
 		static readonly private LinkedList<ExtensionInfo> _configList = new LinkedList<ExtensionInfo>();
 		static readonly private LinkedList<IHandler> _handlerList = new LinkedList<IHandler>();
+		#endregion
+		
+		#region Extension Handling
+		public void Load(String extensionsDir)
+		{
+			foreach(String ext in Directory.GetFiles(extensionsDir, "*.dll"))
+			{
+				// FIX: When MusiC.dll is loaded the Type.IsSubClassOf() fails.
+				if(Path.GetFileName(ext) == "MusiC.dll")
+					continue;
+					
+				try {
+					Assembly l = Assembly.LoadFrom(ext);
+					BeginReportSection(ext+" ... [LOADED]");
+					
+					foreach(Type t in l.GetExportedTypes())
+					{
+						Add(t);
+					}
+					
+					EndReportSection(true);
+				}
+				catch {
+					// Probably trying to load an unmanaged assembly.
+					Warning(ext+" ... [LOADING FAILED]");
+				}
+			}
+		}
 		
 		public void Add(Type extensionType)
 		{
-			if(!typeof(Extension).IsAssignableFrom(extensionType))
+			if(ExtensionInfo.Identify(extensionType) == ExtensionKind.Error)
 			{
 				Message(extensionType.ToString() + " ... [REJECTED]");
 				return;
@@ -47,19 +77,48 @@ namespace MusiC.Extensions
 			
 			ExtensionInfo info = new ExtensionInfo(extensionType);
 			
-			if(info.Kind != ExtensionKind.FileHandler)
-				_extensionList.Add(extensionType.FullName, info);
-			else
-				_handlerList.AddLast(info.Instantiate(null) as IHandler);
-			
-			if(info.Kind == ExtensionKind.Configuration)
+			switch(info.Kind)
 			{
-				_configList.AddLast(info);
+				case ExtensionKind.Configuration :
+					bool unique = true;
+					
+					// Compare Type objects to find different objects representing the same type.
+					foreach(ExtensionInfo i in _configList)
+					{
+						if(i.Class == info.Class) 
+						{	
+							unique = false;
+							break;
+						}	
+					}
+					
+					if(unique)
+						_configList.AddLast(info);
+					
+					break;
+				
+				case ExtensionKind.Classifier:
+				case ExtensionKind.Feature:
+				case ExtensionKind.Window:
+					if (!_extensionList.ContainsKey(extensionType.FullName))
+						_extensionList.Add(extensionType.FullName, info);
+					break;
+					
+				case ExtensionKind.FileHandler:
+					_handlerList.AddLast(info.Instantiate(null) as IHandler);
+					break;
+				
+				case ExtensionKind.NotSet:
+				case ExtensionKind.Error:
+					Error("Please report this event at our site, http://sites.google.com/site/music-cs.");
+					break;
 			}
 			
 			Message(extensionType.ToString() + " ... [ADDED]");
 		}
+		#endregion
 		
+		#region FileHandlers Handling
 		public Managed.Handler GetManagedHandler(String file)
 		{
 			foreach(IHandler h in _handlerList)
@@ -85,7 +144,9 @@ namespace MusiC.Extensions
 			
 			return null;
 		}
-	
+		#endregion
+		
+		#region Configurator Handling
 		/// <summary>
 		/// 
 		/// </summary>
@@ -108,26 +169,30 @@ namespace MusiC.Extensions
 		{
 			_objConfig = configObj;
 		}
+		#endregion
 		
-		static public IHandler GetHandler(String file)
-		{
-			foreach(IHandler h in _handlerList)
-			{
-				if(h.CanHandle(file))
-				{
-					return h;
-				}
-			}
-			
-			return null;
-		}
-		
+		#region Info Handling
 		static public ExtensionInfo GetInfo(String className)
 		{
 			ExtensionInfo info;
+			
+			// info is null if there isn't a class with that name.
 			_extensionList.TryGetValue(className, out info);
 			
 			return info;
 		}
+		#endregion
+		
+		#region Checkers
+		public bool HasConfig()
+		{
+			return (_configList.Count > 0);
+		}
+		
+		public bool HasFileHandler()
+		{
+			return (_handlerList.Count > 0);
+		}
+		#endregion
 	}
 }

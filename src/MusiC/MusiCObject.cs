@@ -46,14 +46,14 @@ namespace MusiC
 		static int _globalReportLevel=(int)ReportLevel.Debug;
 		static String _indent = String.Empty;
 		
-		private static readonly log4net.ILog _log;
+		 static readonly private log4net.ILog _log;
 		
 		int _localReportLevel=(int)ReportLevel.NotSet;
 		
 		static MusiCObject()
 		{
-				log4net.Config.XmlConfigurator.Configure(new System.IO.FileInfo("music.log.xml"));
-				_log = log4net.LogManager.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
+			log4net.Config.XmlConfigurator.Configure(new System.IO.FileInfo("music.log.xml"));
+			_log = log4net.LogManager.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
 		}
 		
 		override public String ToString()
@@ -87,116 +87,7 @@ namespace MusiC
 			Message(tObject.ToString() + " [" + f.Name + "]: " + o.GetType().ToString() + " [" +	o.ToString() + "]");
 		}
 		
-		public void Print()
-		{	
-			Message("+------- {" + this.GetType().ToString() + "} --------");
-			Type t = this.GetType();
-			
-			ReportIndent();
-			while(t != typeof(MusiCObject))
-			{
-				FieldInfo[] fields = t.GetFields(BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance);
-	
-				for(int i = 0; i < fields.Length; i++)
-				{
-					ToScreen(fields[i]);
-				}
-				
-				t=t.BaseType;
-			}
-			ReportUnindent(false);
-			Message("+-------------------------------------------------------------");
-			Report("","");
-		}
-		
-		public void Error(String msg)
-		{
-			int currentLvl = (_localReportLevel==(int)ReportLevel.NotSet) ? _globalReportLevel : _localReportLevel;
-			
-			if(currentLvl >= (int)ReportLevel.Error)
-				Report(msg, "ERROR");
-		}
-		
-		public void Error(MCException ex)
-		{
-			Error("[ MCException ]");
-			
-			foreach(string message in ex.MessageList)
-				Error(message);
-			
-			StackFrame entry;
-			StackTrace st = new StackTrace(ex, true);
-			
-			Error("[ MCException: STACK TRACE ]");
-			
-			for(int idx=0; idx < st.FrameCount; idx++)
-			{
-				entry = st.GetFrame(idx);
-				Error("[" + entry.GetMethod().Name+"] - " +
-					System.IO.Path.GetFileName(entry.GetFileName()) +
-					" (L" + entry.GetFileLineNumber().ToString()+
-					", C"+entry.GetFileColumnNumber()+")");
-			}
-		}
-		
-		public void Error(Exception ex)
-		{
-			Error("[ System Exception ]");
-			
-			Error(ex.Message);
-			
-			StackFrame entry;
-			StackTrace st = new StackTrace(ex, true);
-			
-			Error("[ StackTrace ]");
-			
-			for(int idx=0; idx < st.FrameCount; idx++)
-			{
-				entry = st.GetFrame(idx);
-				Error("[" + entry.GetMethod().Name+"] - " +
-					System.IO.Path.GetFileName(entry.GetFileName()) +
-					" (L" + entry.GetFileLineNumber().ToString()+
-					", C"+entry.GetFileColumnNumber()+")");
-			}
-		}
-		
-		static public void UnhandledException(Object sender, UnhandledExceptionEventArgs args)
-		{
-			MCException ex = args.ExceptionObject as MCException;
-			
-			if(ex != null)
-			{
-				ex.Reporter.Error("This library or one of its components generated an unhandled exception.");
-				ex.Reporter.Error("Please report this event at our site, http://sites.google.com/site/music-cs");
-				ex.Report();
-			}
-		}
-		
-		public void Warning(String msg)
-		{
-			int currentLvl = (_localReportLevel==(int)ReportLevel.NotSet) ? _globalReportLevel : _localReportLevel;
-			
-			if(currentLvl >= (int)ReportLevel.Warning)
-				Report(msg, "WARNING");
-		}
-		
-		public void Message(String msg)
-		{
-			int currentLvl = (_localReportLevel==(int)ReportLevel.NotSet) ? _globalReportLevel : _localReportLevel;
-			
-			if(currentLvl >= (int)ReportLevel.Message)
-				Report(msg, "MESSAGE");
-		}
-		
-		public void Debug(String msg)
-		{
-			int currentLvl = (_localReportLevel==(int)ReportLevel.NotSet) ? _globalReportLevel : _localReportLevel;
-			
-			if(currentLvl >= (int)ReportLevel.Debug)
-				Report(msg, "DEBUG");
-		}
-				
-		void Report(String msg, String msgLvl)
+		private void Report(String msg, String msgLvl)
 		{
 			String logLine = _indent + "[" + this.GetType().Name + "] [" + msgLvl + "]:" + msg;
 			
@@ -220,25 +111,114 @@ namespace MusiC
 			}
 		}
 		
-		public void ReportIndent()
+		public void Print()
+		{	
+			BeginReportSection("+------- {" + this.GetType().ToString() + "} --------");
+			Type t = this.GetType();
+			
+			while(t != typeof(MusiCObject))
+			{
+				FieldInfo[] fields = t.GetFields(BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance);
+	
+				for(int i = 0; i < fields.Length; i++)
+				{
+					ToScreen(fields[i]);
+				}
+				
+				t=t.BaseType;
+			}
+			EndReportSection(true);
+		}
+		
+		protected void Error(String msg)
+		{
+			int currentLvl = (_localReportLevel==(int)ReportLevel.NotSet) ? _globalReportLevel : _localReportLevel;
+			
+			if(currentLvl >= (int)ReportLevel.Error)
+				Report(msg, "ERROR");
+		}
+		
+		protected void Error(MCException ex)
+		{
+			Error("[ MCException ]");
+			
+			foreach(string message in ex.MessageList)
+				Error(message);
+			
+			StackFrame entry;
+			StackTrace st = new StackTrace(ex, true);
+			
+			Error("[ MCException: STACK TRACE ]");
+			
+			for(int idx=0; idx < st.FrameCount; idx++)
+			{
+				entry = st.GetFrame(idx);
+				Error("[" + entry.GetMethod().Name+"] - " +
+					System.IO.Path.GetFileName(entry.GetFileName()) +
+					" (L" + entry.GetFileLineNumber().ToString()+
+					", C"+entry.GetFileColumnNumber()+")");
+			}
+		}
+		
+		protected void Error(Exception ex)
+		{
+			Error("[ System Exception ]");
+			
+			Error(ex.Message);
+			
+			StackFrame entry;
+			StackTrace st = new StackTrace(ex, true);
+			
+			Error("[ StackTrace ]");
+			
+			for(int idx=0; idx < st.FrameCount; idx++)
+			{
+				entry = st.GetFrame(idx);
+				Error("[" + entry.GetMethod().Name+"] - " +
+					System.IO.Path.GetFileName(entry.GetFileName()) +
+					" (L" + entry.GetFileLineNumber().ToString()+
+					", C"+entry.GetFileColumnNumber()+")");
+			}
+		}
+		
+		protected void Warning(String msg)
+		{
+			int currentLvl = (_localReportLevel==(int)ReportLevel.NotSet) ? _globalReportLevel : _localReportLevel;
+			
+			if(currentLvl >= (int)ReportLevel.Warning)
+				Report(msg, "WARNING");
+		}
+		
+		protected void Message(String msg)
+		{
+			int currentLvl = (_localReportLevel==(int)ReportLevel.NotSet) ? _globalReportLevel : _localReportLevel;
+			
+			if(currentLvl >= (int)ReportLevel.Message)
+				Report(msg, "MESSAGE");
+		}
+		
+		protected void Debug(String msg)
+		{
+			int currentLvl = (_localReportLevel==(int)ReportLevel.NotSet) ? _globalReportLevel : _localReportLevel;
+			
+			if(currentLvl >= (int)ReportLevel.Debug)
+				Report(msg, "DEBUG");
+		}
+		
+		protected void BeginReportSection(String sectionName)
 		{
 			int currentLvl = (_localReportLevel==(int)ReportLevel.NotSet) ? _globalReportLevel : _localReportLevel;
 			
 			if(currentLvl != (int)ReportLevel.NotSet)
 			{
-				//Console.WriteLine
+				_log.Info(_indent+sectionName);
 				_log.Info(_indent+"{");
 				_level++;
 				_indent=_indent+".   ";
 			}
 		}
 		
-		public void ReportUnindent()
-		{
-			ReportUnindent(true);
-		}
-		
-		public void ReportUnindent(bool extraNewLine)
+		protected void EndReportSection(bool addNewLine)
 		{
 			int currentLvl = (_localReportLevel==(int)ReportLevel.NotSet) ? _globalReportLevel : _localReportLevel;
 			
@@ -246,11 +226,27 @@ namespace MusiC
 			{
 				_indent=_indent.Remove(0,4);
 				_level--;
-				//Console.WriteLine
 				_log.Info(_indent + "}");
-				
-				if(extraNewLine)
-					_log.Error("");
+			}
+			
+			if(addNewLine)
+				AddNewLine();
+		}
+		
+		protected void AddNewLine()
+		{
+			_log.Info("");
+		}
+	
+		static public void UnhandledException(Object sender, UnhandledExceptionEventArgs args)
+		{
+			MCException ex = args.ExceptionObject as MCException;
+			
+			if(ex != null)
+			{
+				//ex.Reporter.Error("This library or one of its components generated an unhandled exception.");
+				//ex.Reporter.Error("Please report this event at our site, http://sites.google.com/site/music-cs");
+				ex.Report();
 			}
 		}
 	}

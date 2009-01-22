@@ -28,18 +28,22 @@ namespace MusiC.Exceptions
 {
 	public class MCException : ApplicationException
 	{
-		public class MCExceptionReporter : MusiCObject
+		class MCExceptionReporter : MusiCObject
 		{
+			public void ReportException(MCException e)
+			{
+				Error(e);
+			}
 		}
 		
 		int msgCounter = 0;
 		System.Collections.Generic.Queue<String> m_message = new System.Collections.Generic.Queue<String>();
 		MCExceptionReporter _reporter = new MCExceptionReporter();
 		
-		public MCExceptionReporter Reporter
-		{
-			get {return _reporter;}
-		}
+//		public MCExceptionReporter Reporter
+//		{
+//			get {return _reporter;}
+//		}
 		
 		public System.Collections.Generic.IEnumerable<String> MessageList {
 			get { return m_message; }
@@ -71,7 +75,7 @@ namespace MusiC.Exceptions
 		
 		public void Report()
 		{
-			_reporter.Error(this);
+			_reporter.ReportException(this);
 		}
 	}
 }

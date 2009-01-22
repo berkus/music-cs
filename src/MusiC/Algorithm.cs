@@ -25,7 +25,6 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Text;
 
 using MusiC.Extensions;
 
@@ -77,22 +76,19 @@ namespace MusiC
 
 				public void Execute(ExtensionCache cache)
 				{
-
 				}
 
 				public void Say()
 				{
 					Message("Window: " + ((_window != null) ? _window.GetType().FullName : "((NULL))"));
-
 					Message("Classifier: " + ((_classifier != null) ? _classifier.GetType().FullName : "((NULL))"));
 
-					Message("Feature List");
-					ReportIndent();
-
+					BeginReportSection("Feature List");
+					
 					foreach (Managed.Feature f in _featureList)
 						Message((f != null) ? f.GetType().FullName : "((NULL))");
 
-					ReportUnindent();
+					EndReportSection(true);
 				}
 			}
 
@@ -129,7 +125,6 @@ namespace MusiC
 				/// <summary>
 				/// 
 				/// </summary>
-				/// <param name="tLabel"></param>
 				/// <param name="cache"></param>
 				/// @todo Create a handler cache and pass it here.
 				unsafe public void Execute(ExtensionCache cache)
@@ -178,8 +173,7 @@ namespace MusiC
 
 				unsafe public void Summarize(Data.Unmanaged.DataCollection* dtCol)
 				{
-					Message("Extraction Report");
-					ReportIndent();
+					BeginReportSection("Extraction Report");
 					Message("Classes Found: " + dtCol->nClasses);
 					Message("Features Found: " + dtCol->nFeatures);
 
@@ -192,7 +186,7 @@ namespace MusiC
 						i++;
 					}
 
-					ReportUnindent();
+					EndReportSection(true);
 				}
 
 				public void Say()
@@ -201,13 +195,12 @@ namespace MusiC
 
 					Message("Classifier: " + ((_classifier != null) ? _classifier.GetType().FullName : "((NULL))"));
 
-					Message("Feature List");
-					ReportIndent();
+					BeginReportSection("Feature List");
 
 					foreach (Unmanaged.Feature f in _featureList)
-Message((f != null) ? f.GetType().FullName : "((NULL))");
+						Message((f != null) ? f.GetType().FullName : "((NULL))");
 
-					ReportUnindent();
+					EndReportSection(true);
 				}
 			}
 
@@ -309,15 +302,13 @@ Message((f != null) ? f.GetType().FullName : "((NULL))");
 
 			public void Say()
 			{
-				Message("Managed Pipeline");
-				ReportIndent();
+				BeginReportSection("Managed Pipeline");
 				_mPipe.Say();
-				ReportUnindent();
+				EndReportSection(false);
 
-				Message("Unmanaged Pipeline");
-				ReportIndent();
+				BeginReportSection("Unmanaged Pipeline");
 				_uPipe.Say();
-				ReportUnindent();
+				EndReportSection(true);
 			}
 		}
 

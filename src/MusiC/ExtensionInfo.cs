@@ -27,6 +27,9 @@ using System.Reflection;
 
 namespace MusiC
 {
+	/// <summary>
+	/// Identifies the kind of the extension.
+	/// </summary>
 	enum ExtensionKind
 	{
 		Classifier,
@@ -34,10 +37,19 @@ namespace MusiC
 		Window,
 		Configuration,
 		FileHandler,
+		/// <summary>
+		/// Default value.
+		/// </summary>
 		NotSet,
+		/// <summary>
+		/// Identification wasn't possible.
+		/// </summary>
 		Error
 	}
 	
+	/// <summary>
+	/// Identifies to which Pipeline an extension should go.
+	/// </summary>
 	enum ExtensionManagement
 	{
 		Managed,
@@ -47,15 +59,28 @@ namespace MusiC
 	}
 	
 	/// <summary>
-	/// 
+	/// Holds information about available extensions.
 	/// </summary>
-	/// @todo Inherit from ParamList
 	class ExtensionInfo : MusiCObject
 	{
+		# Attributes
+		/// <summary>
+		/// The type of the represented class.
+		/// </summary>
 		Type _class=null;
-		ExtensionKind _kind = ExtensionKind.NotSet;
-		ExtensionManagement _managed = ExtensionManagement.NotSet;
 		
+		/// <summary>
+		/// The kind of the represented extension.
+		/// </summary>
+		ExtensionKind _kind = ExtensionKind.NotSet;
+		
+		/// <summary>
+		/// 
+		/// </summary>
+		ExtensionManagement _managed = ExtensionManagement.NotSet;
+		#endregion
+		
+		#region Properties
 		public Type Class
 		{
 			get { return _class; }
@@ -70,14 +95,18 @@ namespace MusiC
 		{
 			get { return _managed; }
 		}
+		#endregion
 		
+		#region Contructor
 		public ExtensionInfo(Type t)
 		{
 			_class = t;
 			_kind = Identify(_class);
 			_managed = IdentifyManagement(_class);
 		}
+		#endregion
 		
+		#region Identification Routines
 		/// <summary>
 		/// Identify the category of an extension.
 		/// </summary>
@@ -90,14 +119,14 @@ namespace MusiC
 			if(typeof(BaseFeature).IsAssignableFrom(t))
 				return ExtensionKind.Feature;
 			
+			if(typeof(IHandler).IsAssignableFrom(t))
+				return ExtensionKind.FileHandler;
+			
 			if(typeof(Configurator).IsAssignableFrom(t))
 				return ExtensionKind.Configuration;
 			
 			if(typeof(IClassifier).IsAssignableFrom(t))
 				return ExtensionKind.Classifier;
-			
-			if(typeof(IHandler).IsAssignableFrom(t))
-				return ExtensionKind.FileHandler;
 			
 			if(typeof(IWindow).IsAssignableFrom(t))
 				return ExtensionKind.Window;
@@ -128,7 +157,9 @@ namespace MusiC
 					
 			return ExtensionManagement.Error;
 		}
+		#endregion
 		
+		#region Instantiate
 		/// <summary>
 		/// Creates an instance of the represented extension.
 		/// </summary>
@@ -162,5 +193,6 @@ namespace MusiC
 			
 			return e;
 		}
+		#endregion
 	}
 }
