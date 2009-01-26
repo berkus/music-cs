@@ -39,7 +39,11 @@ namespace MusiC
 		Message,
 		Debug,
 	}
-	
+	/// <summary>
+	/// Base class to ALL other classes.
+	/// 
+	/// This class provides useful methods (notably logging) to other classes.
+	/// </summary>
 	public class MusiCObject
 	{
 		static int _level=0;
@@ -61,6 +65,7 @@ namespace MusiC
 			return base.ToString();
 		}
 		
+#region Not-In-Use
 		private void ToScreen(FieldInfo f)
 		{
 			Object o = f.GetValue(this);
@@ -86,6 +91,7 @@ namespace MusiC
 			
 			Message(tObject.ToString() + " [" + f.Name + "]: " + o.GetType().ToString() + " [" +	o.ToString() + "]");
 		}
+#endregion
 		
 		private void Report(String msg, String msgLvl)
 		{

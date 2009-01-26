@@ -1,35 +1,58 @@
+--------------------
+-- Project: MusiC --
+--------------------
 
--- MusiC
+project("MusiC")
+location(base_prj_dir)
 
-package = newpackage()
-package.name="MusiC"
-package.path=project.path
+-----------
+-- Input --
+-----------
 
--- Input
-package.language="c#"
-package.files={
-	matchrecursive(base_src_dir.."/Music/*.cs"),
-	matchrecursive(base_src_dir.."/*.xml")
-}
-package.links={
+language("c#")
+
+files({
+	base_src_dir.."/MusiC/**.cs",
+	base_src_dir.."/MusiC/**.xml"
+})
+
+includedirs({
+})
+
+links({
 	"System",
 	"System.Xml",
 	"log4net"
-}
-package.libpaths={
-	base_deps_dir.."/DotNet"
-}
--- Code Generation
-package.defines={"TRACE"}
-package.buildflags={"unsafe"}
+})
 
--- Output
-package.kind="dll"
-package.target="MusiC"
-package.targetprefix=""
-package.targetextension="dll"
-package.bindir=base_bin_dir
-package.objdir=base_bin_dir.."/obj"
-package.config[matchrecursive(base_src_dir.."/*.xml")].buildaction="Content"
--- Debug:MusiC
-package.config["Debug"].defines={"DEBUG"}
+libdirs({
+	base_deps_dir.."/DotNet"
+})
+
+---------------------
+-- Code Generation --
+---------------------
+
+defines({"TRACE"})
+
+configuration({"Debug"})
+	defines({"DEBUG"})
+configuration({})
+
+flags({"Unsafe"})
+
+-- linkoptions({})
+
+------------
+-- Output --
+------------
+
+kind("SharedLib")
+
+targetname("MusiC")
+--targetprefix("")
+--targetextension="dll"
+targetdir(base_bin_dir)
+objdir(base_bin_dir.."/obj")
+
+-- package.config[matchrecursive(base_src_dir.."/*.xml")].buildaction="Content"

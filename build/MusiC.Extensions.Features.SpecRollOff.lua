@@ -1,28 +1,53 @@
--- MusiC.Extensions.Features.SpecRollOff
+----------------------------------------------------
+-- Project: MusiC.Extensions.Features.SpecRollOff --
+----------------------------------------------------
 
-package = newpackage()
-package.name="MusiC.Extensions.Features.SpecRollOff"
-package.path=project.path
--- Input
-package.language="c#"
-package.files={
-	matchrecursive(base_src_dir.."/Extensions/Features/SpecRollOff/*.cs")
-}
-package.links={
-	"System",
+project("MusiC.Extensions.Features.SpecRollOff")
+location(base_prj_dir)
+
+-----------
+-- Input --
+-----------
+
+language("c#")
+
+files({
+	base_src_dir.."/Extensions/Features/SpecRollOff/**.cs"
+})
+
+includedirs({
+})
+
+links({
 	"MusiC"
-}
--- Code Generation
-package.defines={"TRACE"}
-package.buildflags={"unsafe"}
+})
 
--- Output
-package.kind="dll"
-package.target="MusiC.Extensions.Features.SpecRollOff"
-package.targetprefix=""
-package.targetextension="dll"
-package.bindir=base_bin_dir
-package.objdir=base_bin_dir.."/obj"
+libdirs({
+	base_bin_dir
+})
 
--- Debug:MusiC
-package.config["Debug"].defines={"DEBUG"}
+---------------------
+-- Code Generation --
+---------------------
+
+defines({"TRACE"})
+
+configuration({"Debug"})
+	defines({"DEBUG"})
+configuration({})
+
+flags({"Unsafe"})
+
+-- linkoptions({})
+
+------------
+-- Output --
+------------
+
+kind("SharedLib")
+
+targetname("MusiC.Extensions.Features.SpecRollOff")
+--targetprefix("")
+--targetextension="dll"
+targetdir(base_bin_dir)
+objdir(base_bin_dir.."/obj")

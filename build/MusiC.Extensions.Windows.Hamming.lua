@@ -1,29 +1,53 @@
--- MusiC.Extensions.Windows.Hamming
+-----------------------------------------------
+-- Project: MusiC.Extensions.Windows.Hamming --
+-----------------------------------------------
 
-package = newpackage()
-package.name="MusiC.Extensions.Windows.Hamming"
-package.path=project.path
+project("MusiC.Extensions.Windows.Hamming")
+location(base_prj_dir)
 
--- Input
-package.language="c#"
-package.files={
-	matchrecursive(base_src_dir.."/Extensions/Windows/Hamming/*.cs")
-}
-package.links={
-	"System",
+-----------
+-- Input --
+-----------
+
+language("c#")
+
+files({
+	base_src_dir.."/Extensions/Windows/Hamming/**.cs"
+})
+
+includedirs({
+})
+
+links({
 	"MusiC"
-}
--- Code Generation
-package.defines={"TRACE"}
-package.buildflags={"unsafe"}
+})
 
--- Output
-package.kind="dll"
-package.target="MusiC.Extensions.Windows.Hamming"
-package.targetprefix=""
-package.targetextension="dll"
-package.bindir=base_bin_dir
-package.objdir=base_bin_dir.."/obj"
+libdirs({
+	base_bin_dir
+})
 
--- Debug:MusiC
-package.config["Debug"].defines={"DEBUG"}
+---------------------
+-- Code Generation --
+---------------------
+
+defines({"TRACE"})
+
+configuration({"Debug"})
+	defines({"DEBUG"})
+configuration({})
+
+flags({"Unsafe"})
+
+-- linkoptions({})
+
+------------
+-- Output --
+------------
+
+kind("SharedLib")
+
+targetname("MusiC.Extensions.Windows.Hamming")
+--targetprefix("")
+--targetextension="dll"
+targetdir(base_bin_dir)
+objdir(base_bin_dir.."/obj")

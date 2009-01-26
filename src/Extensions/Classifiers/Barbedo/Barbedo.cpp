@@ -404,7 +404,7 @@ extern "C"
         data.Attach (extractedData);
 
         log.open ("Barbedo_Train.txt", ios_base::out);
-        log << "Address:" << reinterpret_cast<int> (extractedData) << endl;
+        log << "Address:" << reinterpret_cast<size_t> (extractedData) << endl;
         log << "Size of MCClassData:" << sizeof (ClassData) << endl;
         log << "Size of MCClassData *:" << sizeof (ClassData*) << endl;
         log << "Size of Int64:" << sizeof (Int64) << " long:" << sizeof (long) << endl;

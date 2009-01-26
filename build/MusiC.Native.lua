@@ -1,39 +1,46 @@
--- MusiC.Extensions.Classifiers.uBarbedo
+---------------------------
+-- Project: MusiC.Native --
+---------------------------
 
-package = newpackage()
-package.name="MusiC.Native"
-package.path=project.path
+project("MusiC.Native")
+location(base_prj_dir)
 
--- Input
-package.language="c++"
-package.files={
-	matchrecursive(base_src_dir.."/Native/*.cpp"),
-	matchrecursive(base_src_dir.."/Native/*.h")
-}
-package.links={
-}
-package.libpaths={
-}
-package.includepaths={
-}
+-----------
+-- Input --
+-----------
 
--- Code Generation
---package.defines={"TRACE"}
-package.buildflags={"dylib", "no-import-lib"}
+language("c++")
 
--- Output
-package.kind="dll"
-package.target="MusiC.Native"
-package.targetprefix=""
-package.targetextension="dll"
-package.bindir=base_bin_dir
-package.objdir=base_bin_dir.."/obj"
+files({
+	base_src_dir.."/Native/**.cpp",
+	base_src_dir.."/Native/**.h"
+})
 
-if (compiler=="vs") then
-	package.linkoptions={
-		"/IMPLIB:"..base_bin_dir.."/MusiC.Native.lib"
-	}
-end
+includedirs({
+})
 
--- Debug:MusiC
-package.config["Debug"].defines={"DEBUG"}
+links({
+})
+
+libdirs({
+})
+
+---------------------
+-- Code Generation --
+---------------------
+
+flags({"Unicode", "NoImportLib"})
+
+-- linkoptions({})
+
+------------
+-- Output --
+------------
+
+kind("SharedLib")
+
+targetname("MusiC.Native")
+--targetprefix("")
+--targetextension="dll"
+targetdir(base_bin_dir)
+objdir(base_bin_dir.."/obj")

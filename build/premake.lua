@@ -1,7 +1,7 @@
 function MakeUnmanagedProjects()
 	dofile("MusiC.Native.lua")
 	dofile("MusiC.Extensions.Classifiers.uBarbedo.lua")
-	dofile("MusiC.Extensions.Handlers.uDBHandler.lua")
+	--dofile("MusiC.Extensions.Handlers.uDBHandler.lua")
 end
 
 function MakeManagedProjects()
@@ -10,77 +10,52 @@ function MakeManagedProjects()
 	dofile("MusiC.Extensions.Classifiers.Barbedo.lua")
 	dofile("MusiC.Extensions.Configs.XMLConfigurator.lua")
 	dofile("MusiC.Extensions.Features.SpecRollOff.lua")
-	dofile("MusiC.Extensions.Handlers.DBHandler.lua")
+	--dofile("MusiC.Extensions.Handlers.DBHandler.lua")
 	dofile("MusiC.Extensions.Handlers.WAVHandler.lua")
 	dofile("MusiC.Extensions.Windows.Hamming.lua")
 end
 
 function CreateProject()
-	addoption("unmanaged", "Switch to build CPP code when it is available.")
+	base_deps_dir = "../deps"
+	base_src_dir = "../src"
+	base_bin_dir = "../bin"
+	base_prj_dir = _ACTION;
 
-	base_deps_dir="../../deps"
-	base_src_dir="../../src"
-	base_bin_dir="../../bin"
-	base_prj_dir="./"..target;
-
-	project.name="MusiC"
-	project.bindir=base_bin_dir
-	project.configs={"Debug", "Release"}
-	project.path=base_prj_dir
+	solution("MusiC")
+	configurations({"Debug", "Release"})
+	location(base_prj_dir)
 	
-	if
-	target=="vs2003" or
-	target=="vs2005" or
-	target=="vs2008"
+	if 
+	_ACTION == "vs2008" or
+	_ACTION == "vs2005" 
 	then
-		compiler = "vs"
+		MakeManagedProjects()
 		
-		--Visual Studio supports both managed and unmanaged, but separately	
-		if(options["unmanaged"]) then
-			project.path=base_prj_dir.."-unmanaged"
-			MakeUnmanagedProjects()
-		else
-			project.path=base_prj_dir.."-managed"
-			MakeManagedProjects()
-		end
+		solution("uMusiC")
+		configurations({"Debug", "Release"})
+		location(base_prj_dir.."u")
+		
+		MakeUnmanagedProjects()
 	elseif
-	target=="sharpdev" or
-	target=="monodev"
+	_ACTION == "vs2003" or
+	_ACTION == "vs2002" 
 	then
-		-- Those support only managed
 		MakeManagedProjects()
 	elseif
-	target=="vs2002" or
-	target=="vs6"
+	_ACTION == "codeblocks" or
+	_ACTION == "codelite"
 	then
-		compiler="vs"
-		-- Those support only unmanaged code
-		-- vs2002 dont support .net 2.0
 		MakeUnmanagedProjects()
 	elseif
-	target=="cb-gcc" or
-	target=="cl-gcc"
+	_ACTION == "gmake"
 	then
-		compiler="gcc"
-		-- Those support only unmanaged code
-		MakeUnmanagedProjects()
-	elseif
-	target=="gnu"
-	then
-		compiler = "gcc"
-		-- Build both
 		MakeManagedProjects()
 		MakeUnmanagedProjects()
-	elseif
-	target=="cb-ow"
-	then
-		print("Sorry, Unsupported. Please use gcc or Visual Studio.")
 	end
 end
 
 function main()
-	addoption("unmanaged", "If creating a VS 2003, 2005 or 2008 project creates the unmanaged solution.")
-	if target~=nil then CreateProject() end
+	CreateProject()
 end
 
 main()

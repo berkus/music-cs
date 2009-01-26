@@ -1,46 +1,51 @@
--- MusiC.Extensions.Classifiers.uBarbedo
+----------------------------------------------------
+-- Project: MusiC.Extensions.Classifiers.uBarbedo --
+----------------------------------------------------
 
-package = newpackage()
-package.name="MusiC.Extensions.Classifiers.uBarbedo"
-package.path=project.path
+project("MusiC.Extensions.Classifiers.uBarbedo")
+location(base_prj_dir)
 
--- Input
-package.language="c++"
-package.files={
-	matchrecursive(base_src_dir.."/Extensions/Classifiers/Barbedo/*.cpp"),
-	matchrecursive(base_src_dir.."/Extensions/Classifiers/Barbedo/*.h")
-}
-package.links={
-	"gsl",
-	"gslcblas",
-}
-package.libpaths={
-	base_deps_dir.."/"..OS.."/lib",
-	base_bin_dir
-}
+-----------
+-- Input --
+-----------
 
-package.includepaths={
+language("c++")
+
+files({
+	base_src_dir.."/Extensions/Classifiers/Barbedo/**.cpp",
+	base_src_dir.."/Extensions/Classifiers/Barbedo/**.h"
+})
+
+includedirs({
 	base_src_dir.."/Native",
 	base_deps_dir.."/include"
-}
+})
 
--- Code Generation
---package.defines={"TRACE"}
-package.buildflags={"dylib", "no-import-lib"}
+links({
+	"gsl",
+	"gslcblas",
+})
 
--- Output
-package.kind="dll"
-package.target="MusiC.Extensions.Classifiers.uBarbedo"
-package.targetprefix=""
-package.targetextension="dll"
-package.bindir=base_bin_dir
-package.objdir=base_bin_dir.."/obj"
+libdirs({
+	base_deps_dir.."/"..os.get().."/lib",
+})
 
-if(compiler == "gcc") then
-	package.linkoptions={
-		"../../bin/MusiC.Native.dll"
-	}
-end
+---------------------
+-- Code Generation --
+---------------------
 
--- Debug:MusiC
-package.config["Debug"].defines={"DEBUG"}
+flags({"Unicode", "NoImportLib"})
+
+-- linkoptions({})
+
+------------
+-- Output --
+------------
+
+kind("SharedLib")
+
+targetname("MusiC.Extensions.Classifiers.uBarbedo")
+--targetprefix("")
+--targetextension="dll"
+targetdir(base_bin_dir)
+objdir(base_bin_dir.."/obj")

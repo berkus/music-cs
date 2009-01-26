@@ -25,7 +25,7 @@
 #include "MemoryManager.h"
 #include "MathF.h"
 
-#include <iostream>
+#include <cstring>
 using namespace std;
 
 extern "C"

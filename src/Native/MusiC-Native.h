@@ -27,7 +27,7 @@
 
 #include "DataHandler.h"
 #include "ExtractedData.h"
-#include "Math.h"
+#include "MathF.h"
 
 #endif // MUSIC_NATIVE_H_INCLUDED
 

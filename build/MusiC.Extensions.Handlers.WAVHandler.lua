@@ -1,29 +1,53 @@
--- MusiC.Extensions.Handlers.WAVHandler
+----------------------------------------------------
+-- Project: MusiC.Extensions.Handlers.WAVHandlers --
+----------------------------------------------------
 
-package = newpackage()
-package.name="MusiC.Extensions.Handlers.WAVHandler"
-package.path=project.path
+project("MusiC.Extensions.Handlers.WAVHandlers")
+location(base_prj_dir)
 
--- Input
-package.language="c#"
-package.files={
-	matchrecursive(base_src_dir.."/Extensions/Handlers/WAVHandler/*.cs")
-}
-package.links={
-	"System",
+-----------
+-- Input --
+-----------
+
+language("c#")
+
+files({
+	base_src_dir.."/Extensions/Handlers/WAVHandlers/**.cs"
+})
+
+includedirs({
+})
+
+links({
 	"MusiC"
-}
--- Code Generation
-package.defines={"TRACE"}
-package.buildflags={"unsafe"}
+})
 
--- Output
-package.kind="dll"
-package.target="MusiC.Extensions.Handlers.WAVHandler"
-package.targetprefix=""
-package.targetextension="dll"
-package.bindir=base_bin_dir
-package.objdir=base_bin_dir.."/obj"
+libdirs({
+	base_bin_dir
+})
 
--- Debug:MusiC
-package.config["Debug"].defines={"DEBUG"}
+---------------------
+-- Code Generation --
+---------------------
+
+defines({"TRACE"})
+
+configuration({"Debug"})
+	defines({"DEBUG"})
+configuration({})
+
+flags({"Unsafe"})
+
+-- linkoptions({})
+
+------------
+-- Output --
+------------
+
+kind("SharedLib")
+
+targetname("MusiC.Extensions.Handlers.WAVHandlers")
+--targetprefix("")
+--targetextension="dll"
+targetdir(base_bin_dir)
+objdir(base_bin_dir.."/obj")

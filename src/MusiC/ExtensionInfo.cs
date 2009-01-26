@@ -63,7 +63,7 @@ namespace MusiC
 	/// </summary>
 	class ExtensionInfo : MusiCObject
 	{
-		# Attributes
+		#region Attributes
 		/// <summary>
 		/// The type of the represented class.
 		/// </summary>

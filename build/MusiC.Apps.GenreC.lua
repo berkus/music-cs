@@ -1,29 +1,54 @@
--- MusiC.Apps.GenreC
+--------------------------------
+-- Project: MusiC.Apps.GenreC --
+--------------------------------
 
-package = newpackage()
-package.name="MusiC.Apps.GenreC"
-package.path=project.path
+project("MusiC.Apps.GenreC")
+location(base_prj_dir)
 
--- Input
-package.language="c#"
-package.files={
-	matchrecursive(base_src_dir.."/Apps/GenreC/*.cs")
-}
-package.links={
-	"System",
+-----------
+-- Input --
+-----------
+
+language("c#")
+
+files({
+	base_src_dir.."/Apps/GenreC/**.cs",
+	base_src_dir.."/Apps/GenreC/config.xml"
+})
+
+includedirs({
+})
+
+links({
 	"MusiC"
-}
--- Code Generation
-package.defines={"TRACE"}
---package.buildflags={"unsafe"}
+})
 
--- Output
-package.kind="exe"
-package.target="MusiC.Apps.GenreC"
-package.targetprefix=""
-package.targetextension="dll"
-package.bindir=base_bin_dir
-package.objdir=base_bin_dir.."/obj"
+libdirs({
+	base_bin_dir
+})
 
--- Debug:MusiC
-package.config["Debug"].defines={"DEBUG"}
+---------------------
+-- Code Generation --
+---------------------
+
+defines({"TRACE"})
+
+configuration({"Debug"})
+	defines({"DEBUG"})
+configuration({})
+
+flags({"Unsafe"})
+
+-- linkoptions({})
+
+------------
+-- Output --
+------------
+
+kind("ConsoleApp")
+
+targetname("MusiC.Apps.GenreC")
+--targetprefix("")
+--targetextension="dll"
+targetdir(base_bin_dir)
+objdir(base_bin_dir.."/obj")
