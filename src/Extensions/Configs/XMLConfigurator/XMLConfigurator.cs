@@ -39,14 +39,21 @@ namespace MusiC.Configs
 	/// You can add any non-specified tag to the file and the parser will ignore it. Just try to avoid tags which begins
 	/// by 'MusiC-*' because those may be used later. 
 	/// </remarks>
+	/// <see cref="MusiC.Configurator"/>
 	/// @todo Algorithm should have a name to refer errors.
 	/// @todo Find MusiC node and use it instead of document.
 	/// @todo Update parser to run each node instead of GetElements.
 	public class XMLConfigurator : Configurator
 	{
-		/// store class alias. Tag <=> classname.
+		/// store class alias. Tag(key) <=> classname(value).
 		Dictionary<String, String> _tagCache = new Dictionary<String, String>();
 		
+		/// <summary>
+		/// 
+		/// </summary>
+		/// <param name="cfgPath">
+		/// XML file with library configuration.
+		/// </param>
 		public override void Load(String cfgPath)
 		{
 			XmlDocument cfgFile = new XmlDocument();
@@ -142,7 +149,6 @@ namespace MusiC.Configs
 			foreach(XmlNode classifyNode in cfgFile.GetElementsByTagName("MusiC-Classify"))
 			{
 				/// @todo Add support to allow/deny algorithms to use this folder
-				
 				String dir = XmlSafeAttribute(classifyNode,"dir");
 				
 				if(!AddDir(dir))

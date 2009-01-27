@@ -39,6 +39,7 @@ namespace MusiC
 		Message,
 		Debug,
 	}
+	
 	/// <summary>
 	/// Base class to ALL other classes.
 	/// 

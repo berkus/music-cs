@@ -74,6 +74,17 @@ namespace MusiC
 			_class = Type.GetType(paramClass, false, false);
 		}
 		
+		/// <summary>
+		/// Creates a new instance of a class
+		/// 
+		/// @anchor constructor_param_order
+		/// 
+		/// @warning
+		/// The parameters added by the Configurator must be in the same order of the target-type constructor declaration.
+		/// This function uses the System.Type.GetConstructor(Type[]) method to select the constructor that
+		/// should be invoked.
+		///  
+		/// </summary>
 		override public void Instantiate()
 		{
 			if( _value != null || _isInitiated)
@@ -100,7 +111,10 @@ namespace MusiC
 				}
 			}
 			
+			// Find the constructor matching the types contained by the list. Order IS relevant.
 			ConstructorInfo defaultCtor = _class.GetConstructor(GetTypes());
+			
+			// Invoke the constructor.
 			defaultCtor.Invoke(GetParamsValue());
 		}
 	}

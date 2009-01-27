@@ -19,6 +19,7 @@ includedirs({
 })
 
 links({
+	"System.Xml",
 	"MusiC"
 })
 

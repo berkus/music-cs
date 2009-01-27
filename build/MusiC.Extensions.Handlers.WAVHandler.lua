@@ -12,7 +12,7 @@ location(base_prj_dir)
 language("c#")
 
 files({
-	base_src_dir.."/Extensions/Handlers/WAVHandlers/**.cs"
+	base_src_dir.."/Extensions/Handlers/WAVHandler/**.cs"
 })
 
 includedirs({

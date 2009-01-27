@@ -31,8 +31,18 @@ using MusiC.Extensions;
 namespace MusiC
 {
 	/// <summary>
+	/// This class describe which actions the library must accomplish. 
+	/// 
+	/// Algorithm Blocks:
+	/// Windows - Only one
+	/// Features - One or more
+	/// Classifiers - It is not necessary.
 	/// 
 	/// </summary>
+	/// 
+	/// <see cref="MusiC.Window"/>
+	/// <see cref="MusiC.Feature"/>
+	/// <see cref="MusiC.Classifier"/>	
 	class Algorithm : MusiCObject, IAlgorithm
 	{
 		Pipeline _pipe = new Pipeline();

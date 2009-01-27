@@ -33,6 +33,15 @@ using MusiC.Extensions;
 
 namespace MusiC
 {
+	/// <summary>
+	/// Base Configurator class.
+	/// 
+	/// Configurator Tasks:
+	/// Assemble the algorithms
+	/// Sets input paths and labels
+	/// 
+	/// </summary>
+	/// <see cref="MusiC.Algorithms"/>
 	abstract public class Configurator : Extension
 	{
 		LinkedList<IAlgorithm> _algList = new LinkedList<IAlgorithm>();

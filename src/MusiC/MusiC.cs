@@ -182,22 +182,42 @@ namespace MusiC
 /// @version 0.9.1
 /// @date 21.01.09
 ///
-/// Please refer to the @ref application_notes
-/// for relevant notes about the system.
-///
-/// @page Roadmap
-/// @todo Use some xml structure verifier like DTD or Scheme
+/// Please refer to the @ref application_notes for relevant notes about the system.
 ///
 /// @page application_notes Notes
 ///
-/// @section About parameters to imported classes
-/// Requisites to instatiable types are: \n
-/// @li Type must have default constructor
-/// @li void Parse(String) method must be available
+/// @section internal_algorithm Internal Algorithm
+/// 
+/// A few notes about the internals.
+/// 
+/// File Handlers:
+/// 
+/// Windows expect data in raw format so file handlers are responsible for any decompression eventually needed.
+/// 
+/// Windows also need the file to be broken in small size fix chunks so the handler must handle this. Of course it is possible to pass all
+/// available data to the window but the internal data representation would be 3 times (file data, window data, the product filedata * windowdata)
+/// the size of the file.
+/// 
+/// Windows:
+/// 
+/// First thing to be noted is that window data is MULTIPLIED by the file data. I intend to give the user the possibility to overload the "interaction"
+/// function enabling those who want to use the library to filter something.
 ///
-/// @subsection Expected Types
+/// @section imported_classes_parameters Extensions Parameters
+/// 
+/// Requisites to extensions parameters:
+/// @li void Parse(String) - This method must be available IF a non-default value is needed.
+/// 
+/// This is true for System.Int32 (int), System.Single (float) and System.Double (double) and possibly for other base types.
+/// 
+/// This also means that you may pass a class as a parameter, if it implements the method, or if the default value is always used. 
+/// 
+/// Check this(@ref constructor_param_order "About the order of the parameter declaration") note about the order the parameters are declared. 
+///
+/// @subsection obs_about_types Expected Types
 /// In C# the keywords int, float and double are wrappers for standard classes.
-/// The parameters must have those underlying type which can be found running the following code
+/// When declaring an extension the parameters MUST be declared as one of the underlying types which can be found
+/// running the following code:
 ///
 /// @verbatim
 /// using System;
@@ -206,9 +226,11 @@ namespace MusiC
 /// {
 ///		static void Main()
 ///		{
-///				Console.WriteLine("int:"+typeof(int).ToString());
-///				Console.WriteLine("float:"+typeof(float).ToString());
-///				Console.WriteLine("double:"+typeof(double).ToString());
+///             // This list can also include: bool, string, char, short, long and possibly others.
+///				Console.WriteLine("int:"+typeof(int).ToString()); // System.Int32
+///				Console.WriteLine("float:"+typeof(float).ToString()); // System.Single
+///				Console.WriteLine("double:"+typeof(double).ToString()); // System.Double
 ///		}
 ///	}
 /// @endverbatim
+///
