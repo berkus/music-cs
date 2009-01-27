@@ -4,7 +4,7 @@ using System.Collections.Specialized;
 
 class app
 {
-    public static void Main()
+    public static void Main(string[] args)
     {
         if (File.Exists("printSrc.tex"))
             File.Delete("printSrc.tex");
@@ -24,18 +24,26 @@ class app
         
 		f.WriteLine("\\lstset{language=[Sharp]C}");
 		f.WriteLine("\\section{C Sharp}");
-        exportToLatex(".", ".cs", f);
+		
+		foreach(string s in args)
+			exportToLatex(s, ".cs", f);
 
 		f.WriteLine("\\lstset{language=[ANSI]C}");
 		f.WriteLine("\\section{C++ Headers}");
-		exportToLatex(".", ".h", f);		
+		
+		foreach(string s in args)
+			exportToLatex(s, ".h", f);		
 		f.WriteLine("\\lstset{language=[ANSI]C++}");
 		f.WriteLine("\\section{C++ Source}");
-		exportToLatex(".", ".cpp", f);
+		
+		foreach(string s in args)
+			exportToLatex(s, ".cpp", f);
 		
 		f.WriteLine("\\lstset{language=XML}");	
 		f.WriteLine("\\section{XML Configuration Script}");
-		exportToLatex(".", ".xml", f);
+		
+		foreach(string s in args)
+			exportToLatex(s, ".xml", f);
 		
 		f.WriteLine("\\lstset{language=Lua}");
 		f.WriteLine("\\section{Premake Build Scripts}");
