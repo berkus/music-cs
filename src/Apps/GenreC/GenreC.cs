@@ -1,6 +1,6 @@
 /*
  * The MIT License
- * Copyright (c) 2008 Marcos José Sant'Anna Magalhães
+ * Copyright (c) 2008-2009 Marcos José Sant'Anna Magalhães
  * 
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -19,7 +19,6 @@
  * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
- * 
  */
 
 using System;
@@ -31,7 +30,7 @@ namespace MusiC.Apps
 	/// 
 	/// This application just uses the library to run an specific music genre classification algorithm.
 	/// </summary>
-	/// <see cref="MusiC.Extensions.Classifiers.Barbedo"
+	/// <see cref="MusiC.Extensions.Classifiers.Barbedo"></see>
 	class GenreC
 	{
 		static void Main(String[] args)
