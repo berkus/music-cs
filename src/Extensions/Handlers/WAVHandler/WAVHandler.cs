@@ -45,16 +45,25 @@ namespace MusiC.Extensions.Handlers
 			return true;
 		}
 		
+		/// <summary>
+		/// Attaches the handler to an existing file.
+		/// </summary>
+		/// <param name="file"></param>
 		override public void Attach(string file)
 		{
 			base.Attach(file);
 			Load();
 		}
 		
+		/// <summary>
+		/// Dettaches the handler from a file.
+		/// </summary>
 		override public void Detach()
 		{
 			rd.Close();
 			rd = null;
+			
+			base.Detach();
 		}
 		
 		override public int GetStreamSize()

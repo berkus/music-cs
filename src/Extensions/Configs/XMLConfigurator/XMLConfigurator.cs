@@ -77,12 +77,12 @@ namespace MusiC.Configs
 		/// <returns>The attribute value</returns>
 		String XmlSafeAttribute(XmlNode n, String attName, bool isOptional)
 		{
-			if(n==null)
+			if(n == null)
 				throw new MCException("XmlNode submited is null");
 			
 			XmlAttribute att = n.Attributes[attName];
 
-			if (att == null)
+			if(att == null)
 			{
 				if (!isOptional)
 					throw new MissingAttributeException(attName);
@@ -106,7 +106,7 @@ namespace MusiC.Configs
 		
 		void BuildTagCache(XmlDocument cfgFile)
 		{
-			foreach (XmlNode n in cfgFile.GetElementsByTagName("MusiC-Alias"))
+			foreach(XmlNode n in cfgFile.GetElementsByTagName("MusiC-Alias"))
 			{				
 				_tagCache.Add(XmlSafeAttribute(n, "name"), XmlSafeAttribute(n, "class"));
 			}
@@ -119,7 +119,7 @@ namespace MusiC.Configs
 				String baseDir = XmlSafeAttribute(train, "dir", true);
 				
 				XmlNodeList nList = train.ChildNodes;
-				foreach (XmlNode xmlLabelNode in nList)
+				foreach(XmlNode xmlLabelNode in nList)
 				{
 					if(xmlLabelNode.Name == "Label")
 					{
@@ -128,7 +128,7 @@ namespace MusiC.Configs
 						
 						/// @todo Add support to multiple input dirs
 						l.InputDir=XmlSafeAttribute(xmlLabelNode,"input", true);
-						if (l.InputDir==null)
+						if(l.InputDir==null)
 						{
 							/// @todo Check baseDir availability
 							l.InputDir = System.IO.Path.Combine(baseDir, l.Label);

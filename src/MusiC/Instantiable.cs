@@ -1,6 +1,6 @@
 /*
  * The MIT License
- * Copyright (c) 2008-2009 Marcos José Sant'Anna Magalhães
+ * Copyright (c) 2008-2009 Marcos Josï¿½ Sant'Anna Magalhï¿½es
  * 
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -26,16 +26,16 @@ using System.Reflection;
 
 namespace MusiC
 {
-	class Instantiable : ParamList
+	internal class Instantiable : ParamList
 	{
-		String _name;
-		String _classname;
-		Type _class;
+		private string _name;
+		private string _classname;
+		private string _strValue;
 		
-		String _strValue;
-		Object _value;
+		private Type _class;
+		private object _value;
 		
-		Boolean _isInitiated = false;
+		private bool  _isInitiated = false;
 		
 		public Type TypeObj
 		{
@@ -43,25 +43,25 @@ namespace MusiC
 			set { _class = value; _classname = value.FullName; }
 		}
 		
-		public String Name
+		public string Name
 		{
 			get { return _name; }
 			set {_name = value; }
 		}
 		
-		public String Class
+		public string Class
 		{
 			get { return _classname; }
 			set { _class = Type.GetType(value, false, false); _classname = value; }
 		}
 		
-		public String StrValue
+		public string StrValue
 		{
 			get { return _strValue; }
 			set { _strValue=value; }
 		}
 		
-		public Object Value
+		public object Value
 		{
 			get { return _value; }
 		}
@@ -84,7 +84,8 @@ namespace MusiC
 		/// should be invoked.
 		///  
 		/// </summary>
-		override public void Instantiate()
+		override
+		public void Instantiate()
 		{
 			if( _value != null || _isInitiated)
 				return;

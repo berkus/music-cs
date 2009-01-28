@@ -1,6 +1,6 @@
 /*
  * The MIT License
- * Copyright (c) 2008-2009 Marcos José Sant'Anna Magalhães
+ * Copyright (c) 2008-2009 Marcos Josï¿½ Sant'Anna Magalhï¿½es
  * 
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -46,26 +46,34 @@ namespace MusiC
 	/// </summary>
 	public class MusiCObject
 	{
-		static int _level=0;
-		static int _globalReportLevel=(int)ReportLevel.Debug;
-		static String _indent = String.Empty;
+		static
+		private int _level=0;
 		
-		 static readonly private log4net.ILog _log;
+		static
+		private int _globalReportLevel=(int)ReportLevel.Debug;
 		
-		int _localReportLevel=(int)ReportLevel.NotSet;
+		static
+		private String _indent = String.Empty;
 		
-		static MusiCObject()
+		static readonly
+		private log4net.ILog _log;
+		
+		private int _localReportLevel=(int)ReportLevel.NotSet;
+		
+		static
+		MusiCObject()
 		{
 			log4net.Config.XmlConfigurator.Configure(new System.IO.FileInfo("music.log.xml"));
 			_log = log4net.LogManager.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
 		}
 		
-		override public String ToString()
+		override
+		public String ToString()
 		{
 			return base.ToString();
 		}
 		
-#region Not-In-Use
+		#region Not-In-Use
 		private void ToScreen(FieldInfo f)
 		{
 			Object o = f.GetValue(this);
@@ -91,7 +99,7 @@ namespace MusiC
 			
 			Message(tObject.ToString() + " [" + f.Name + "]: " + o.GetType().ToString() + " [" +	o.ToString() + "]");
 		}
-#endregion
+		#endregion
 		
 		private void Report(String msg, String msgLvl)
 		{
@@ -244,7 +252,8 @@ namespace MusiC
 			_log.Info("");
 		}
 	
-		static public void UnhandledException(Object sender, UnhandledExceptionEventArgs args)
+		static
+		public void UnhandledException(Object sender, UnhandledExceptionEventArgs args)
 		{
 			MCException ex = args.ExceptionObject as MCException;
 			

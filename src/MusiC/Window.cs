@@ -1,6 +1,6 @@
 /*
  * The MIT License
- * Copyright (c) 2008-2009 Marcos José Sant'Anna Magalhães
+ * Copyright (c) 2008-2009 Marcos Josï¿½ Sant'Anna Magalhï¿½es
  * 
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -38,66 +38,64 @@ namespace MusiC
 	/// Base class of Windows extensions implementation.
 	/// </summary>
 	/// @todo Allow different types.
-	abstract public class BaseWindow : Extension, IWindow
+	abstract
+	public class BaseWindow : Extension, IWindow
 	{
-		Int32 _nWnd = -1;
+		private int _nWnd = -1;
+		private int _size;
+		private int _overlap;
 		
-		Int32 _size;
-		Int32 _overlap;
-		Int32 _step;
-		
-		IHandler _hnd;
-		
-		String _name;
+		private IHandler _hnd;
 	
-		public String Name
-		{
-			get { return _name; }
-		}
-	
-		public Int32 WindowCount
+		public int WindowCount
 		{
 			get { return _nWnd; }
 		}
 	
-		public Int32 WindowSize
+		public int WindowSize
 		{
 			get { return _size; }
 		}
+
+		public int WindowOverlap
+		{
+			get { return _overlap; }
+		}
 		
-		protected IHandler HandlerInterface
+		public IHandler HandlerInterface
 		{
 			get { return _hnd; }
 		}
 	
-		protected BaseWindow(String name, Int32 size, Int32 overlap)
+		protected BaseWindow(int size, int overlap)
 		{
-			_name = name;
 			_size = size;
 			_overlap = overlap;
-			
-			_step = size - overlap;
 		}
 		
-		virtual public void Attach(IHandler file)
+		virtual
+		public void Attach(IHandler file)
 		{
 			_hnd = file;
-			_nWnd = (Int32) Math.Floor( (double) (_hnd.GetStreamSize() / _size) );
+			_nWnd = (int) Math.Floor( (double) (_hnd.GetStreamSize() / _size) );
 		}
 		
-		virtual public void Detach()
+		virtual
+		public void Detach()
 		{
 			_hnd = null;
 			_nWnd = -1;
 		}
 		
-		abstract public Single Factory(Int32 windowPos);
+		abstract
+		public Single Factory(int windowPos);
 	}
 	
 	namespace Unmanaged
 	{
 		[CLSCompliant(false)]
-		abstract unsafe public class Window : BaseWindow
+		abstract unsafe
+		public class Window : BaseWindow
 		{
 			/// Window Values
 			Single * _wndData = null;
@@ -113,12 +111,13 @@ namespace MusiC
 				get { return HandlerInterface as Unmanaged.Handler; }
 			}
 			
-			protected Window(String name, Int32 size, Int32 overlap) : base(name, size, overlap)
+			protected Window(int size, int overlap) : base(size, overlap)
 			{
 				_wndData = NativeMethods.Pointer.fgetmem(size);
                 _dataStream = NativeMethods.Pointer.fgetmem(size);
 
-				Initialize();
+				for (int i = 0; i < WindowSize; i++)
+					_wndData[i] = Factory(i);
 			}
 			
 			/// <summary>
@@ -147,12 +146,6 @@ namespace MusiC
 					*(result++) = *(fileData++) * *(wndData++);
 			}
 			
-			private void Initialize()
-			{
-				for (Int32 i = 0; i < WindowSize; i++)
-					_wndData[i] = Factory(i);
-			}
-			
 			~Window()
 			{
 				if(_wndData != null)
@@ -162,9 +155,10 @@ namespace MusiC
                     NativeMethods.Pointer.free(_dataStream);
 			}
 			
-			unsafe public Single * GetWindow(Int32 windowPos)
+			unsafe
+			public Single * GetWindow(int windowPos)
 			{
-				_rawStream = FileHandler.Read(windowPos, WindowSize);
+				_rawStream = FileHandler.Read(windowPos * (WindowSize - WindowOverlap), WindowSize);
 
                 if (_rawStream == null)
                     return _rawStream;
@@ -173,7 +167,7 @@ namespace MusiC
                 Single * ptrDataStream = _dataStream;
 				Single * ptrWnd = _wndData;
 				
-				Calculate(ptrWnd, ptrRawStream, _dataStream);
+				Calculate(ptrWnd, ptrRawStream, ptrDataStream);
 				
 				return _dataStream;
 			}
@@ -182,32 +176,27 @@ namespace MusiC
 	
 	namespace Managed
 	{
-		abstract public class Window : BaseWindow
+		abstract
+		public class Window : BaseWindow
 		{
 			/// Window Coeficients
 			Single[] _wndData;
 		
 			/// Windowed Data
-			Single[] _dataStream;
+			//Single[] _dataStream;
 			
-			protected Window(String name, Int32 size, Int32 overlap) : base(name, size, overlap)
+			protected Window(int size, int overlap) : base(size, overlap)
 			{
 				_wndData = new Single[size];
 				
-				Int16 i = 0;
-				for(; i < size; i++)
+				for (int i = 0; i < WindowSize; i++)
 					_wndData[i] = Factory(i);
 			}
 			
-			void Initialize()
+			public Single[] GetWindow(int windowPos)
 			{
-				for (Int32 i = 0; i < WindowSize; i++)
-					_wndData[i] = Factory(i);
-			}
-			
-			public Single[] GetWindow(Int32 windowPos)
-			{
-				return _dataStream;
+				//return _dataStream;
+				return null;
 			}
 		}
 	}

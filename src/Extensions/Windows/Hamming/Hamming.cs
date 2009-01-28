@@ -40,7 +40,7 @@ namespace MusiC.Extensions.Windows
 	
 	public class HammingU : Unmanaged.Window
 	{
-		public HammingU(int size, int overlap) : base("Hamming - Unmanaged", size, overlap)
+		public HammingU(int size, int overlap) : base(size, overlap)
 		{
 		}
 		
@@ -52,7 +52,7 @@ namespace MusiC.Extensions.Windows
 	
 	public class HammingM : Managed.Window
 	{
-		public HammingM(int size, int overlap) : base("Hamming - Managed", size, overlap)
+		public HammingM(int size, int overlap) : base(size, overlap)
 		{
 		}
 		

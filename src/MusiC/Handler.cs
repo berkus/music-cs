@@ -1,6 +1,6 @@
 /*
  * The MIT License
- * Copyright (c) 2008-2009 Marcos José Sant'Anna Magalhães
+ * Copyright (c) 2008-2009 Marcos Josï¿½ Sant'Anna Magalhï¿½es
  * 
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -33,36 +33,60 @@ namespace MusiC
 		void Attach(String file);
 		void Detach();
 		
-		Int32 GetStreamSize();
+		int GetStreamSize();
 	}
-	
-	abstract public class BaseHandler : Extension, IHandler
+
+	/// @todo Make sure base Attach and Detach are executed.
+	abstract
+	public class BaseHandler : Extension, IHandler
 	{
-		private String _file;
+		private string _file;
 		
-		public String CurrentFile
+		public string CurrentFile
 		{
 			get { return _file; }
 		}
 		
-		virtual public bool CanHandle(string file)
+		virtual
+		public bool CanHandle(string file)
 		{
 			return false;
 		}
 		
-		virtual public void Attach(string file)
+		virtual
+		public void Attach(string file)
 		{
-			_file = file;
+			if(System.IO.File.Exists(file))
+				_file = file;
+			else
+				Detach();
+		}
+
+		public DBHandler GetDBHandler()
+		{
+			DBHandler hnd = null;
+
+			if(_file != null)
+				hnd = new DBHandler(_file);
+
+			return hnd;
 		}
 		
-		abstract public void Detach();
-		abstract public Int32 GetStreamSize();
+		virtual
+		public void Detach()
+		{
+			_file = null;
+		}
+
+		abstract
+		public int GetStreamSize();
 	}
 	
 	namespace Managed
 	{
 		//abstract public class Handler<T> : Extension, IHandler where T : struct
-		abstract public class Handler : BaseHandler
+		abstract
+		public class Handler : BaseHandler
 		{
 		}
 	}
@@ -70,9 +94,11 @@ namespace MusiC
 	namespace Unmanaged
 	{
 		[CLSCompliant(false)]
-		abstract public class Handler : BaseHandler
+		abstract
+		public class Handler : BaseHandler
 		{
-			abstract unsafe public Single * Read(Int32 windowPos, Int32 windowSize);
+			abstract unsafe
+			public Single * Read(long windowPos, int windowSize);
 		}
 	}
 }

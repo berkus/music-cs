@@ -1,6 +1,6 @@
 /*
  * The MIT License
- * Copyright (c) 2008-2009 Marcos José Sant'Anna Magalhães
+ * Copyright (c) 2008-2009 Marcos Josï¿½ Sant'Anna Magalhï¿½es
  * 
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -33,26 +33,35 @@ namespace MusiC
 	{
 	}
 	
+	public class BaseClassifier : Extension, IClassifier
+	{
+	}
+	
 	namespace Managed
 	{
-		abstract public class Classifier : Extension, IClassifier
+		abstract
+		public class Classifier : BaseClassifier
 		{
-			virtual public void Execute()
+			virtual
+			public void Execute()
 			{
 				throw new NotImplementedException();
 			}
 			
-			virtual public void Classify()
+			virtual
+			public void Classify()
 			{
 				throw new NotImplementedException();
 			}
 			
-			virtual public void TryLoadingParameters()
+			virtual
+			public void TryLoadingParameters()
 			{
 				throw new NotImplementedException();
 			}
 			
-			virtual public void Dispose()
+			virtual
+			public void Dispose()
 			{
 				throw new NotImplementedException();
 			}
@@ -61,15 +70,18 @@ namespace MusiC
 	
 	namespace Unmanaged
 	{
-        [CLSCompliant(false)]
-		abstract public class Classifier : Extension, IClassifier
+		[CLSCompliant(false)]
+		abstract
+		public class Classifier : BaseClassifier
 		{
-            virtual unsafe public Data.Unmanaged.DataCollection * Filter(Data.Unmanaged.DataCollection * dataIn)
-            {
-            	return null;
-            }
+			virtual unsafe
+			public Data.Unmanaged.DataCollection * Filter(Data.Unmanaged.DataCollection * dataIn)
+			{
+				return null;
+			}
 
-            abstract unsafe public void Train(Data.Unmanaged.DataCollection* dtCol);
+			abstract unsafe
+			public void Train(Data.Unmanaged.DataCollection* dtCol);
 		}
 	}
 }

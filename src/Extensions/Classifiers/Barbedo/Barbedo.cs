@@ -31,25 +31,28 @@ namespace MusiC.Extensions.Classifiers
 {
 	public class Barbedo : Unmanaged.Classifier
 	{
-		public Barbedo()// : base("Barbedo")
+		public Barbedo()
 		{
 		}
 
-    override unsafe public void Train(DataCollection* dtCol)
+		override unsafe 
+		public void Train(DataCollection* dtCol)
 		{
 			uTrain(ref (*dtCol));
 		}
 
-    override unsafe public Data.Unmanaged.DataCollection * Filter(DataCollection* dataIn)
+		override unsafe 
+		public Data.Unmanaged.DataCollection * Filter(DataCollection* dataIn)
 		{
 			return uFilter(ref *dataIn);
 		}
 		
-		
 		[DllImport("./MusiC.Extensions.Classifiers.uBarbedo.dll", EntryPoint="Barbedo_Train")]
-		static extern public void uTrain(ref DataCollection dtCol);
+		static extern 
+		public void uTrain(ref DataCollection dtCol);
 		
 		[DllImport("./MusiC.Extensions.Classifiers.uBarbedo.dll", EntryPoint="Barbedo_Filter")]
-		static extern unsafe public DataCollection * uFilter(ref DataCollection dtCol);
+		static extern unsafe 
+		public DataCollection * uFilter(ref DataCollection dtCol);
     }
 }

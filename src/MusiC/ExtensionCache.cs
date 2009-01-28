@@ -1,6 +1,6 @@
 /*
  * The MIT License
- * Copyright (c) 2008-2009 Marcos José Sant'Anna Magalhães
+ * Copyright (c) 2008-2009 Marcos Josï¿½ Sant'Anna Magalhï¿½es
  * 
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -28,15 +28,20 @@ using System.Reflection;
 
 namespace MusiC.Extensions
 {
-	class ExtensionCache : MusiCObject
+	internal class ExtensionCache : MusiCObject
 	{
 		// Attributes
 		private Configurator _objConfig;
 		
 		#region Static Attributes
-		static readonly private Dictionary<String, ExtensionInfo> _extensionList = new Dictionary<String, ExtensionInfo>();
-		static readonly private LinkedList<ExtensionInfo> _configList = new LinkedList<ExtensionInfo>();
-		static readonly private LinkedList<IHandler> _handlerList = new LinkedList<IHandler>();
+		static readonly
+		private Dictionary<String, ExtensionInfo> _extensionList = new Dictionary<String, ExtensionInfo>();
+
+		static readonly
+		private LinkedList<ExtensionInfo> _configList = new LinkedList<ExtensionInfo>();
+
+		static readonly
+		private LinkedList<IHandler> _handlerList = new LinkedList<IHandler>();
 		#endregion
 		
 		#region Extension Handling

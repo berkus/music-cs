@@ -1,6 +1,6 @@
 /*
  * The MIT License
- * Copyright (c) 2008-2009 Marcos José Sant'Anna Magalhães
+ * Copyright (c) 2008-2009 Marcos Josï¿½ Sant'Anna Magalhï¿½es
  * 
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -30,36 +30,23 @@ namespace MusiC
 	/// @brief Basic feature type.
 	/// @details To implement a new feature you must extended this class.
 	/// @todo Implement IDispose interface
-	abstract public class BaseFeature : Extension
+	abstract
+	public class BaseFeature : Extension
 	{
-		String _name;
-		
-		public String Name
-		{
-			get { return _name; }
-		}
-	
-		protected BaseFeature(String name)
-		{
-			_name = name;
-			Console.WriteLine(name);
-		}
 	} 
 
 	namespace Managed
 	{
 		abstract public class Feature : BaseFeature
 		{
-			protected Feature(String name) : base(name)
-			{
-			}
-			
-			virtual protected Single[] OuterExtract(Managed.Window window)
+			virtual
+			protected Single[] OuterExtract(Managed.Window window)
 			{
 				return Extract(window);
 			}
 			
-			virtual public Single[] Extract(Managed.Window window)
+			virtual
+			public Single[] Extract(Managed.Window window)
 			{
 				return null;
 			}
@@ -69,14 +56,11 @@ namespace MusiC
 	namespace Unmanaged
 	{
 		[CLSCompliant(false)]
-		abstract unsafe public class Feature : BaseFeature
+		abstract unsafe
+		public class Feature : BaseFeature
 		{
 			float * _buf;
 			int _sz;
-		
-			protected Feature(String name) : base(name)
-			{
-			}
 			
 			protected Single * GetBuffer(int sz)
 			{
@@ -95,7 +79,8 @@ namespace MusiC
 			}
 			
 			/// All frame data must be consecutive
-			abstract public Single Extract(Single * wndData, Int32 wndSize);
+			abstract
+			public Single Extract(Single * wndData, Int32 wndSize);
 		}
 	}
 }

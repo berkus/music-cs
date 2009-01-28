@@ -1,6 +1,6 @@
 /*
  * The MIT License
- * Copyright (c) 2008-2009 Marcos José Sant'Anna Magalhães
+ * Copyright (c) 2008-2009 Marcos Josï¿½ Sant'Anna Magalhï¿½es
  * 
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -42,13 +42,13 @@ namespace MusiC
 	public class MusiC : MusiCObject
 	{
 		#region Attributes
-		UnhandledExceptionEventHandler _UnhandledExceptionHandler;
+		private UnhandledExceptionEventHandler _UnhandledExceptionHandler;
 		
-		String _configFile;
-		String _extensionsDir;
+		private String _configFile;
+		private String _extensionsDir;
 		
-		ExtensionCache _cache = new ExtensionCache();
-		Configurator _cfg;
+		private ExtensionCache _cache = new ExtensionCache();
+		private Configurator _cfg;
 		#endregion
 		
 		#region Properties
@@ -61,7 +61,9 @@ namespace MusiC
 		public String ExtensionsDir
 		{
 			get {return _extensionsDir;}
-			set {
+
+			set
+			{
 				if(!Directory.Exists(value))
 				{
 					if(_extensionsDir == null)
@@ -127,7 +129,7 @@ namespace MusiC
 		{
 			try
 			{
-				_cfg = _cache.GetConfigurator();				
+				_cfg = _cache.GetConfigurator();
 				_cfg.Load(ConfigFile);
 				
 				Message(_configFile + " ... [LOADED]");
@@ -177,7 +179,7 @@ namespace MusiC
 /// @mainpage
 /// System Basic Information:
 ///
-/// @author Marcos José Sant'Anna Magalhães
+/// @author Marcos Josï¿½ Sant'Anna Magalhï¿½es
 /// @version 0.9.1
 /// @date 21.01.09
 ///

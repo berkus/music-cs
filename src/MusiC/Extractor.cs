@@ -1,6 +1,6 @@
 /*
  * The MIT License
- * Copyright (c) 2008-2009 Marcos José Sant'Anna Magalhães
+ * Copyright (c) 2008-2009 Marcos Josï¿½ Sant'Anna Magalhï¿½es
  * 
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -37,7 +37,8 @@ namespace MusiC
 	{
 		public class Extractor
 		{
-			static public Data.Managed.MCDataCollection Extract(Window wnd, Feature f)
+			static
+			public Data.Managed.MCDataCollection Extract(Window wnd, Feature f)
 			{
 				return null;
 			}
@@ -49,10 +50,14 @@ namespace MusiC
 		[CLSCompliant(false)]
 		public class Extractor
 		{
-			static unsafe public void Extract(Window wnd, IEnumerable<Feature> featList, Data.Unmanaged.FileData * dataStg)
+			static unsafe 
+			public void Extract(Window wnd, IEnumerable<Feature> featList, Data.Unmanaged.FileData * dataStg)
 			{
 				int fIdx;
                 float * windowBuffer;
+				DBHandler db = (wnd.HandlerInterface as BaseHandler).GetDBHandler();
+				
+				//db.GetFeature
 
 				for(int i = 0; i < wnd.WindowCount; i++)
 				{
@@ -63,7 +68,10 @@ namespace MusiC
 
                         if (windowBuffer != null)
                         {
-                        	Data.Unmanaged.FrameData* frame = Data.Unmanaged.DataHandler.BuildFrameData(dataStg);
+							/// @todo Shield this method against any changes in the data structure.
+                        	Data.Unmanaged.FrameData* frame = 
+								Data.Unmanaged.DataHandler.BuildFrameData(dataStg);
+							
                             *(frame->pData + fIdx) = f.Extract(windowBuffer, wnd.WindowSize);
                         }
                     }
