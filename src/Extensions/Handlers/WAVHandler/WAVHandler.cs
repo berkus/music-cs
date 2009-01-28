@@ -20,7 +20,6 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
- */
 
 using System;
 using System.IO;
@@ -41,24 +40,24 @@ namespace MusiC.Extensions.Handlers
             NativeMethods.Pointer.free(_data);
         }
 
-		public override bool CanHandle(string file)
+		override public bool CanHandle(string file)
 		{
 			return true;
 		}
 		
-		public override void Attach(string file)
+		override public void Attach(string file)
 		{
 			base.Attach(file);
 			Load();
 		}
 		
-		public override void Detach()
+		override public void Detach()
 		{
 			rd.Close();
 			rd = null;
 		}
 		
-		public override int GetStreamSize()
+		override public int GetStreamSize()
 		{
 			return _streamSz;
 		}
@@ -116,14 +115,16 @@ namespace MusiC.Extensions.Handlers
 			Console.WriteLine("Has {0} channels.", _channels);
 			
 			//int samplesPerChannel = m_info.SamplesPerChannel = Convert.ToInt32(dataSz / (m_info.Channels * bytesInUse));
-			Int32 samplesPerChannel = Convert.ToInt32(_streamSz / blockSize);
+			//Int32 samplesPerChannel = Convert.ToInt32(_streamSz / blockSize);
 
             _offset = rd.BaseStream.Position;
 		}
 		
-		override unsafe public System.Single* Read(int windowPos, int windowSize)
+		override unsafe public System.Single* Read(long firstSample, int windowSize)
 		{
-            rd.BaseStream.Seek(_offset + (windowPos * windowSize * _bytesInUse * _channels), SeekOrigin.Begin);
+			long firstByte = _offset + (firstSample * _bytesInUse * _channels);
+			
+            rd.BaseStream.Seek( firstByte, SeekOrigin.Begin);
             Byte[] raw_data = rd.ReadBytes(windowSize * _bytesInUse * _channels);
 
             if (_dataSz < windowSize)
