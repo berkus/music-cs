@@ -1,6 +1,6 @@
 /*
  * The MIT License
- * Copyright (c) 2008-2009 Marcos José Sant'Anna Magalhães
+ * Copyright (c) 2008-2009 Marcos Josï¿½ Sant'Anna Magalhï¿½es
  * 
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -59,23 +59,39 @@ using System.Security.Permissions;
 namespace MusiC.Extensions.Features
 {
 	[CLSCompliant(false)]
-	unsafe public class SpecRollOffU : Unmanaged.Feature
+	unsafe
+	public class SpecRollOffU : Unmanaged.Feature
 	{	
-		float * _temp;
+		private float * _temp;
 		
-		override unsafe public Single Extract(Single * wndData, int wndSize)
+		//::::::::::::::::::::::::::::::::::::::://
+		
+		/// <summary>
+		/// 
+		/// </summary>
+		/// <param name="wndData">
+		/// A <see cref="Single"/>
+		/// </param>
+		/// <param name="wndSize">
+		/// A <see cref="System.Int32"/>
+		/// </param>
+		/// <returns>
+		/// A <see cref="Single"/>
+		/// </returns>
+		override unsafe
+		public Single Extract(Single * wndData, int wndSize)
 		{
 			double sum = 0, cum = 0;
 			int sro = 0;
 			
 			_temp = GetBuffer(wndSize);
 			NativeMethods.Math.FFTMagnitude(wndData, _temp, wndSize);
-
+			
 			for (int i = 0; i < wndSize; i++)
 				sum += *(_temp) * *(_temp++);
-	
+			
 			cum = sum;
-	
+			
 			for (sro = wndSize - 1; sro > 0; sro--)
 			{
 				cum -= *(_temp) * *(_temp--);
@@ -87,6 +103,8 @@ namespace MusiC.Extensions.Features
 			return sro;
 		}
 	}
+	
+	//---------------------------------------//
 	
 	public class SpecRollOffM : Managed.Feature
 	{	

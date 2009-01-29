@@ -27,49 +27,152 @@ using System.Runtime.InteropServices;
 
 namespace MusiC
 {
+	/// <summary>
+	/// 
+	/// </summary>
 	public class DBHandler : MusiCObject
 	{
+		/// <summary>
+		/// 
+		/// </summary>
+		/// <param name="file">
+		/// A <see cref="System.String"/>
+		/// </param>
 		public DBHandler(string file)
 		{
 			uInitialize(GetDBName(file));
 		}
-
+		
+		//::::::::::::::::::::::::::::::::::::::://
+		
 		~DBHandler()
 		{
 			uTerminate();
 		}
 		
+		//::::::::::::::::::::::::::::::::::::::://
+		
+		/// <summary>
+		/// 
+		/// </summary>
+		/// <param name="file">
+		/// A <see cref="System.String"/>
+		/// </param>
+		/// <returns>
+		/// A <see cref="System.String"/>
+		/// </returns>
 		public string GetDBName(string file)
 		{
 			return file + ".db";
 		}
-
+		
+		//::::::::::::::::::::::::::::::::::::::://
+		
+		/// <summary>
+		/// 
+		/// </summary>
+		/// <param name="wndName">
+		/// A <see cref="System.String"/>
+		/// </param>
+		/// <param name="featName">
+		/// A <see cref="System.String"/>
+		/// </param>
+		/// <param name="data">
+		/// A <see cref="System.Single"/>
+		/// </param>
+		/// <returns>
+		/// A <see cref="System.Int32"/>
+		/// </returns>
 		[CLSCompliant(false)]
 		unsafe
 		public int GetFeature(string wndName, string featName, float * data)
 		{
 			return uGetFeature(wndName, featName, data);
 		}
-
+		
+		//::::::::::::::::::::::::::::::::::::::://
+		
+		/// <summary>
+		/// 
+		/// </summary>
+		/// <param name="wndName">
+		/// A <see cref="System.String"/>
+		/// </param>
+		/// <param name="featName">
+		/// A <see cref="System.String"/>
+		/// </param>
+		/// <param name="data">
+		/// A <see cref="System.Single"/>
+		/// </param>
+		/// <param name="size">
+		/// A <see cref="System.Int32"/>
+		/// </param>
 		[CLSCompliant(false)]
 		unsafe
 		public void AddFeature(string wndName, string featName, float * data, int size)
 		{
 			uAddFeature(wndName, featName, data, size);
 		}
-
+		
+		//::::::::::::::::::::::::::::::::::::::://
+		
+		/// <summary>
+		/// 
+		/// </summary>
+		/// <param name="dbName">
+		/// A <see cref="System.String"/>
+		/// </param>
 		[DllImport("MusiC.Native.dll", EntryPoint="Initialize", CharSet=CharSet.Ansi)]
 		extern static unsafe
 		private void uInitialize(string dbName);
-
+		
+		//::::::::::::::::::::::::::::::::::::::://
+		
+		/// <summary>
+		/// 
+		/// </summary>
 		[DllImport("MusiC.Native.dll", EntryPoint="Terminate")]
 		extern static unsafe
 		private void uTerminate();
-
+		
+		//::::::::::::::::::::::::::::::::::::::://
+		
+		/// <summary>
+		/// 
+		/// </summary>
+		/// <param name="wndName">
+		/// A <see cref="System.String"/>
+		/// </param>
+		/// <param name="featName">
+		/// A <see cref="System.String"/>
+		/// </param>
+		/// <param name="dt">
+		/// A <see cref="System.Single"/>
+		/// </param>
+		/// <returns>
+		/// A <see cref="System.Int32"/>
+		/// </returns>
 		[DllImport("MusiC.Native.dll", EntryPoint="GetFeature", CharSet=CharSet.Ansi)]
 		extern static unsafe
 		private int uGetFeature(string wndName, string featName, float * dt);
-
+		
+		//::::::::::::::::::::::::::::::::::::::://
+		
+		/// <summary>
+		/// 
+		/// </summary>
+		/// <param name="wndName">
+		/// A <see cref="System.String"/>
+		/// </param>
+		/// <param name="featName">
+		/// A <see cref="System.String"/>
+		/// </param>
+		/// <param name="data">
+		/// A <see cref="System.Single"/>
+		/// </param>
+		/// <param name="size">
+		/// A <see cref="System.Int32"/>
+		/// </param>
 		[DllImport("MusiC.Native.dll", EntryPoint="AddFeature", CharSet=CharSet.Ansi)]
 		extern static unsafe
 		private void uAddFeature(string wndName, string featName, float * data, int size);

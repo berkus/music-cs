@@ -34,6 +34,8 @@ namespace MusiC
 		void Detach();
 	}
 	
+	//---------------------------------------//
+	
 	/// <summary>
 	/// Base class of Windows extensions implementation.
 	/// </summary>
@@ -46,33 +48,72 @@ namespace MusiC
 		private int _overlap;
 		
 		private IHandler _hnd;
-	
+		
+		//::::::::::::::::::::::::::::::::::::::://
+		
+		/// <value>
+		/// 
+		/// </value>
 		public int WindowCount
 		{
 			get { return _nWnd; }
 		}
-	
+		
+		//::::::::::::::::::::::::::::::::::::::://
+		
+		/// <value>
+		/// 
+		/// </value>
 		public int WindowSize
 		{
 			get { return _size; }
 		}
-
+		
+		//::::::::::::::::::::::::::::::::::::::://
+		
+		/// <value>
+		/// 
+		/// </value>
 		public int WindowOverlap
 		{
 			get { return _overlap; }
 		}
 		
+		//::::::::::::::::::::::::::::::::::::::://
+		
+		/// <value>
+		/// 
+		/// </value>
 		public IHandler HandlerInterface
 		{
 			get { return _hnd; }
 		}
-	
+		
+		//::::::::::::::::::::::::::::::::::::::://
+		
+		/// <summary>
+		/// 
+		/// </summary>
+		/// <param name="size">
+		/// A <see cref="System.Int32"/>
+		/// </param>
+		/// <param name="overlap">
+		/// A <see cref="System.Int32"/>
+		/// </param>
 		protected BaseWindow(int size, int overlap)
 		{
 			_size = size;
 			_overlap = overlap;
 		}
 		
+		//::::::::::::::::::::::::::::::::::::::://
+		
+		/// <summary>
+		/// 
+		/// </summary>
+		/// <param name="file">
+		/// A <see cref="IHandler"/>
+		/// </param>
 		virtual
 		public void Attach(IHandler file)
 		{
@@ -80,6 +121,11 @@ namespace MusiC
 			_nWnd = (int) Math.Floor( (double) (_hnd.GetStreamSize() / _size) );
 		}
 		
+		//::::::::::::::::::::::::::::::::::::::://
+		
+		/// <summary>
+		/// 
+		/// </summary>
 		virtual
 		public void Detach()
 		{
@@ -87,9 +133,38 @@ namespace MusiC
 			_nWnd = -1;
 		}
 		
+		//::::::::::::::::::::::::::::::::::::::://
+		
+		/// <summary>
+		/// 
+		/// </summary>
+		/// <returns>
+		/// A <see cref="System.String"/>
+		/// </returns>
+		/// <remarks>Any aditional parameter the window takes should be added here. This string is used
+		/// to know if the stored window-feature combination is the same as the one we want to extract.</remarks>
+		virtual
+		public string GetID()
+		{
+			return this.GetType().FullName + ":" + _size + ":" + _overlap;
+		}
+		
+		//::::::::::::::::::::::::::::::::::::::://
+		
+		/// <summary>
+		/// 
+		/// </summary>
+		/// <param name="windowPos">
+		/// A <see cref="System.Int32"/>
+		/// </param>
+		/// <returns>
+		/// A <see cref="System.Single"/>
+		/// </returns>
 		abstract
-		public Single Factory(int windowPos);
+		public float Factory(int windowPos);
 	}
+	
+	//---------------------------------------//
 	
 	namespace Unmanaged
 	{
@@ -98,19 +173,32 @@ namespace MusiC
 		public class Window : BaseWindow
 		{
 			/// Window Values
-			Single * _wndData = null;
+			private float * _wndData = null;
 		
 			/// File Handler Buffer
-			Single * _rawStream = null;
+			private float * _rawStream = null;
 
             /// Windowed Data
-            Single* _dataStream = null;
+            private float * _dataStream = null;
+			
+			//::::::::::::::::::::::::::::::::::::::://
 			
 			protected Handler FileHandler
 			{
 				get { return HandlerInterface as Unmanaged.Handler; }
 			}
 			
+			//::::::::::::::::::::::::::::::::::::::://
+			
+			/// <summary>
+			/// 
+			/// </summary>
+			/// <param name="size">
+			/// A <see cref="System.Int32"/>
+			/// </param>
+			/// <param name="overlap">
+			/// A <see cref="System.Int32"/>
+			/// </param>
 			protected Window(int size, int overlap) : base(size, overlap)
 			{
 				_wndData = NativeMethods.Pointer.fgetmem(size);
@@ -119,6 +207,19 @@ namespace MusiC
 				for (int i = 0; i < WindowSize; i++)
 					_wndData[i] = Factory(i);
 			}
+			
+			//::::::::::::::::::::::::::::::::::::::://
+			
+			~Window()
+			{
+				if(_wndData != null)
+					NativeMethods.Pointer.free(_wndData);
+
+                if (_dataStream != null)
+                    NativeMethods.Pointer.free(_dataStream);
+			}
+			
+			//::::::::::::::::::::::::::::::::::::::://
 			
 			/// <summary>
 			/// Calculates interaction between window data and file data.
@@ -140,32 +241,35 @@ namespace MusiC
 			/// <param name="result">
 			/// A float-pointer to hold the result.
 			/// </param>
-			virtual protected void Calculate(Single * wndData, Single * fileData, Single * result)
+			virtual 
+			protected void Calculate(float * wndData, float * fileData, float * result)
 			{
 				for(int i = 0; i < WindowSize; i++)
 					*(result++) = *(fileData++) * *(wndData++);
 			}
 			
-			~Window()
-			{
-				if(_wndData != null)
-					NativeMethods.Pointer.free(_wndData);
-
-                if (_dataStream != null)
-                    NativeMethods.Pointer.free(_dataStream);
-			}
+			//::::::::::::::::::::::::::::::::::::::://
 			
+			/// <summary>
+			/// 
+			/// </summary>
+			/// <param name="windowPos">
+			/// A <see cref="System.Int32"/>
+			/// </param>
+			/// <returns>
+			/// A <see cref="float"/>
+			/// </returns>
 			unsafe
-			public Single * GetWindow(int windowPos)
+			public float * GetWindow(int windowPos)
 			{
 				_rawStream = FileHandler.Read(windowPos * (WindowSize - WindowOverlap), WindowSize);
 
                 if (_rawStream == null)
                     return _rawStream;
 
-				Single * ptrRawStream = _rawStream;
-                Single * ptrDataStream = _dataStream;
-				Single * ptrWnd = _wndData;
+				float * ptrRawStream = _rawStream;
+                float * ptrDataStream = _dataStream;
+				float * ptrWnd = _wndData;
 				
 				Calculate(ptrWnd, ptrRawStream, ptrDataStream);
 				
@@ -174,26 +278,50 @@ namespace MusiC
 		}
 	}
 	
+	//---------------------------------------//
+	
 	namespace Managed
 	{
 		abstract
 		public class Window : BaseWindow
 		{
 			/// Window Coeficients
-			Single[] _wndData;
+			private float[] _wndData;
 		
 			/// Windowed Data
-			//Single[] _dataStream;
+			//private float[] _dataStream;
 			
+			//::::::::::::::::::::::::::::::::::::::://
+			
+			/// <summary>
+			/// 
+			/// </summary>
+			/// <param name="size">
+			/// A <see cref="System.Int32"/>
+			/// </param>
+			/// <param name="overlap">
+			/// A <see cref="System.Int32"/>
+			/// </param>
 			protected Window(int size, int overlap) : base(size, overlap)
 			{
-				_wndData = new Single[size];
+				_wndData = new float[size];
 				
 				for (int i = 0; i < WindowSize; i++)
 					_wndData[i] = Factory(i);
 			}
 			
-			public Single[] GetWindow(int windowPos)
+			//::::::::::::::::::::::::::::::::::::::://
+			
+			/// <summary>
+			/// 
+			/// </summary>
+			/// <param name="windowPos">
+			/// A <see cref="System.Int32"/>
+			/// </param>
+			/// <returns>
+			/// A <see cref="float"/>
+			/// </returns>
+			public float[] GetWindow(int windowPos)
 			{
 				//return _dataStream;
 				return null;

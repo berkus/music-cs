@@ -27,13 +27,15 @@ using MusiC;
 
 namespace MusiC
 {
-	/// @brief Basic feature type.
-	/// @details To implement a new feature you must extended this class.
-	/// @todo Implement IDispose interface
+	/// <summary>
+	/// 
+	/// </summary>
 	abstract
 	public class BaseFeature : Extension
 	{
-	} 
+	}
+	
+	//---------------------------------------//
 
 	namespace Managed
 	{
@@ -45,6 +47,8 @@ namespace MusiC
 				return Extract(window);
 			}
 			
+			//::::::::::::::::::::::::::::::::::::::://
+			
 			virtual
 			public Single[] Extract(Managed.Window window)
 			{
@@ -53,15 +57,28 @@ namespace MusiC
 		}
 	}
 	
+	//---------------------------------------//
+	
 	namespace Unmanaged
 	{
 		[CLSCompliant(false)]
 		abstract unsafe
 		public class Feature : BaseFeature
 		{
-			float * _buf;
-			int _sz;
+			private float * _buf;
+			private int _sz;
 			
+			//::::::::::::::::::::::::::::::::::::::://
+			
+			/// <summary>
+			/// 
+			/// </summary>
+			/// <param name="sz">
+			/// A <see cref="System.Int32"/>
+			/// </param>
+			/// <returns>
+			/// A <see cref="Single"/>
+			/// </returns>
 			protected Single * GetBuffer(int sz)
 			{
 				if(sz <= _sz)
@@ -78,7 +95,37 @@ namespace MusiC
 				return _buf;
 			}
 			
-			/// All frame data must be consecutive
+			//::::::::::::::::::::::::::::::::::::::://
+				
+			/// <summary>
+			/// 
+			/// </summary>
+			/// <returns>
+			/// A <see cref="System.String"/>
+			/// </returns>
+			/// <remarks>Any aditional parameter the feature takes should be added here. This string is used
+			/// to know if the stored feature is the same as the one we want to extract.</remarks>
+			virtual
+			public string GetID()
+			{
+				return this.GetType().FullName;
+			}
+			
+			//::::::::::::::::::::::::::::::::::::::://
+			
+			/// <summary>
+			/// 
+			/// </summary>
+			/// <param name="wndData">
+			/// A <see cref="Single"/>
+			/// </param>
+			/// <param name="wndSize">
+			/// A <see cref="Int32"/>
+			/// </param>
+			/// <returns>
+			/// A <see cref="Single"/>
+			/// </returns>
+			/// <remarks>All frame data must be consecutive.</remarks>
 			abstract
 			public Single Extract(Single * wndData, Int32 wndSize);
 		}

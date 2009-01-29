@@ -46,6 +46,8 @@ namespace MusiC
 		Error
 	}
 	
+	//::::::::::::::::::::::::::::::::::::::://
+	
 	/// <summary>
 	/// Identifies to which Pipeline an extension should go.
 	/// </summary>
@@ -57,6 +59,8 @@ namespace MusiC
 		Error
 	}
 	
+	//::::::::::::::::::::::::::::::::::::::://
+	
 	/// <summary>
 	/// Holds information about available extensions.
 	/// </summary>
@@ -66,18 +70,20 @@ namespace MusiC
 		/// <summary>
 		/// The type of the represented class.
 		/// </summary>
-		Type _class=null;
+		private Type _class=null;
 		
 		/// <summary>
 		/// The kind of the represented extension.
 		/// </summary>
-		ExtensionKind _kind = ExtensionKind.NotSet;
+		private ExtensionKind _kind = ExtensionKind.NotSet;
 		
 		/// <summary>
 		/// 
 		/// </summary>
-		ExtensionManagement _managed = ExtensionManagement.NotSet;
+		private ExtensionManagement _managed = ExtensionManagement.NotSet;
 		#endregion
+		
+		//::::::::::::::::::::::::::::::::::::::://
 		
 		#region Properties
 		public Type Class
@@ -105,6 +111,8 @@ namespace MusiC
 		}
 		#endregion
 		
+		//::::::::::::::::::::::::::::::::::::::://
+		
 		#region Identification Routines
 		/// <summary>
 		/// Identify the category of an extension.
@@ -112,7 +120,8 @@ namespace MusiC
 		/// <returns>
 		/// The kind of the extension.
 		/// </returns>
-		static public ExtensionKind Identify(Type t)
+		static 
+		public ExtensionKind Identify(Type t)
 		{
 			// This one should be the most frequent call.
 			if(typeof(BaseFeature).IsAssignableFrom(t))
@@ -133,7 +142,19 @@ namespace MusiC
 			return ExtensionKind.Error;
 		}
 		
-		static public ExtensionManagement IdentifyManagement(Type t)
+		//::::::::::::::::::::::::::::::::::::::://
+		
+		/// <summary>
+		/// 
+		/// </summary>
+		/// <param name="t">
+		/// A <see cref="Type"/>
+		/// </param>
+		/// <returns>
+		/// A <see cref="ExtensionManagement"/>
+		/// </returns>
+		static
+		public ExtensionManagement IdentifyManagement(Type t)
 		{
 			// Managed
 			if(
@@ -156,7 +177,10 @@ namespace MusiC
 					
 			return ExtensionManagement.Error;
 		}
+		
 		#endregion
+		
+		//::::::::::::::::::::::::::::::::::::::://
 		
 		#region Instantiate
 		/// <summary>
@@ -192,6 +216,7 @@ namespace MusiC
 			
 			return e;
 		}
+		
 		#endregion
 	}
 }

@@ -29,15 +29,19 @@ namespace MusiC.Data.Unmanaged
 {
 	[CLSCompliant(false)]
 	[StructLayout(LayoutKind.Sequential,Pack = 1)]
-	unsafe public struct FrameData
+	unsafe 
+	public struct FrameData
 	{
 		public float * pData;
 		public FrameData * pNextFrame;
-	}	
+	}
+	
+	//---------------------------------------//
 	
 	[CLSCompliant(false)]
 	[StructLayout(LayoutKind.Sequential,Pack = 1)]
-	unsafe public struct FileData
+	unsafe 
+	public struct FileData
 	{
 		public long nFrames;
 		
@@ -48,11 +52,14 @@ namespace MusiC.Data.Unmanaged
 		public FrameData * pFiltered;
 		
 		public ClassData * pClass;
-	}	
+	}
+	
+	//---------------------------------------//
 	
 	[CLSCompliant(false)]
 	[StructLayout(LayoutKind.Sequential,Pack = 1)]
-	unsafe public struct ClassData
+	unsafe 
+	public struct ClassData
 	{
 		public long nFiles;
 		public long nFrames;
@@ -64,9 +71,12 @@ namespace MusiC.Data.Unmanaged
 		public DataCollection * pCollection;
 	}
 	
+	//---------------------------------------//
+	
 	[CLSCompliant(false)]
 	[StructLayout(LayoutKind.Sequential,Pack = 1)]
-	unsafe public struct DataCollection
+	unsafe 
+	public struct DataCollection
 	{
 		public int nClasses;
 		public int nFeatures;
@@ -74,10 +84,26 @@ namespace MusiC.Data.Unmanaged
 		public ClassData * pFirstClass;
 	}
 	
+	//---------------------------------------//
+	
+	/// <summary>
+	/// 
+	/// </summary>
 	[CLSCompliant(false)]
-	unsafe public class DataHandler
+	unsafe 
+	public class DataHandler
 	{
-		public static DataCollection * BuildCollection(int nFeatures)
+		/// <summary>
+		/// 
+		/// </summary>
+		/// <param name="nFeatures">
+		/// A <see cref="System.Int32"/>
+		/// </param>
+		/// <returns>
+		/// A <see cref="DataCollection"/>
+		/// </returns>
+		static
+		public DataCollection * BuildCollection(int nFeatures)
 		{
 			DataCollection * data = (DataCollection *) Marshal.AllocHGlobal(sizeof(DataCollection)).ToPointer();
 
@@ -89,7 +115,19 @@ namespace MusiC.Data.Unmanaged
 			return data;
 		}
 		
-		public static ClassData * BuildClassData(DataCollection * dtCol)
+		//::::::::::::::::::::::::::::::::::::::://
+		
+		/// <summary>
+		/// 
+		/// </summary>
+		/// <param name="dtCol">
+		/// A <see cref="DataCollection"/>
+		/// </param>
+		/// <returns>
+		/// A <see cref="ClassData"/>
+		/// </returns>
+		static
+		public ClassData * BuildClassData(DataCollection * dtCol)
 		{
 			ClassData * newClass = (ClassData *) Marshal.AllocHGlobal(sizeof(ClassData)).ToPointer();
 			
@@ -117,7 +155,19 @@ namespace MusiC.Data.Unmanaged
 			return newClass;
 		}
 		
-		public static FileData * BuildFileData(ClassData * currentClass)
+		//::::::::::::::::::::::::::::::::::::::://
+		
+		/// <summary>
+		/// 
+		/// </summary>
+		/// <param name="currentClass">
+		/// A <see cref="ClassData"/>
+		/// </param>
+		/// <returns>
+		/// A <see cref="FileData"/>
+		/// </returns>
+		static
+		public FileData * BuildFileData(ClassData * currentClass)
 		{
 			FileData * newFile = (FileData *) Marshal.AllocHGlobal(sizeof(FileData)).ToPointer();
 			
@@ -136,7 +186,19 @@ namespace MusiC.Data.Unmanaged
 			return newFile;
 		}
 		
-		public static FrameData * BuildFrameData(FileData * currentFile)
+		//::::::::::::::::::::::::::::::::::::::://
+		
+		/// <summary>
+		/// 
+		/// </summary>
+		/// <param name="currentFile">
+		/// A <see cref="FileData"/>
+		/// </param>
+		/// <returns>
+		/// A <see cref="FrameData"/>
+		/// </returns>
+		static
+		public FrameData * BuildFrameData(FileData * currentFile)
 		{
 			FrameData * newFrame = (FrameData *) Marshal.AllocHGlobal(sizeof(FrameData)).ToPointer();
 			
@@ -165,39 +227,48 @@ namespace MusiC.Data.Unmanaged
 	}
 }
 
+//---------------------------------------//
+
 namespace MusiC.Data.Managed
 {
-	public class MCFeatVector
+	public class FrameData
 	{
 		public double [] pData;
 		public long nVectors = 0;
 		// Unmanaged side only - historical
 		public long next = 0;
-	}	
+	}
 	
-	public class MCClassData
+	//---------------------------------------//
+	
+	public class ClassData
 	{
 		public long nVectorListAlloc = 0;
 		public long nVectorList = 0;
 		public long nVectors = 0;
 		
-		public LinkedList<MCFeatVector> pVectorList = new LinkedList<MCFeatVector>();
-		public MCDataCollection pCollection;
+		public LinkedList<FrameData> pVectorList = new LinkedList<FrameData>();
+		public DataCollection pCollection;
 	}
 	
-	public class MCDataCollection
+	//---------------------------------------//
+	
+	public class DataCollection
 	{
-		public MCClassData[] pClassData;
+		public ClassData[] pClassData;
 		public long nClasses;
 		public long nFeatures;
 	}
 	
-	public class MCDataHandler
+	//---------------------------------------//
+	
+	public class DataHandler
 	{
-		public static MCDataCollection BuildCollection(int nClasses, int nFeatures)
+		static
+		public DataCollection BuildCollection(int nClasses, int nFeatures)
 		{
-			MCDataCollection data = new MCDataCollection();
-			data.pClassData = new MCClassData[nClasses];
+			DataCollection data = new DataCollection();
+			data.pClassData = new ClassData[nClasses];
 			
 			for(int i = 0; i < nClasses; i++)
 			{
@@ -210,7 +281,8 @@ namespace MusiC.Data.Managed
 			return data;
 		}
 		
-		public static void BuildVectorList(MCClassData wClass, Int32 nLists)
+		static
+		public void BuildVectorList(ClassData wClass, Int32 nLists)
 		{
 			//wClass.pVectorList = ;
 			wClass.nVectorListAlloc = nLists;
@@ -223,12 +295,12 @@ namespace MusiC.Data.Managed
 		/// <param name="wClass"></param>
 		/// <param name="data"></param>
 		/// <param name="nWindows"></param>
-		public static void AddVectorList(MCClassData wClass, Double[] data, Int64 nWindows)
+		public static void AddVectorList(ClassData wClass, Double[] data, Int64 nWindows)
 		{
 			if(wClass == null )
 				Console.WriteLine("MCClassData is NULL");
 			
-			MCFeatVector vec = new MCFeatVector();
+			FrameData vec = new FrameData();
 			vec.pData = data;
 			vec.nVectors = nWindows;
 				

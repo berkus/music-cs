@@ -25,7 +25,11 @@ using System;
 
 namespace MusiC
 {
-	abstract public class Extension : MusiCObject
+	/// <summary>
+	/// 
+	/// </summary>
+	abstract 
+	public class Extension : MusiCObject
 	{
 	}
 }

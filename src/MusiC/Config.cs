@@ -43,56 +43,113 @@ namespace MusiC
 	/// <see cref="MusiC.Algorithms"/>
 	abstract public class Configurator : Extension
 	{
-		LinkedList<IAlgorithm> _algList = new LinkedList<IAlgorithm>();
-		LinkedList<ILabel> _trainList = new LinkedList<ILabel>();
-		LinkedList<String> _classifyList = new LinkedList<String>();
+		private LinkedList<IAlgorithm> _algList = new LinkedList<IAlgorithm>();
+		private LinkedList<ILabel> _trainList = new LinkedList<ILabel>();
+		private LinkedList<String> _classifyList = new LinkedList<String>();
 		
-		static readonly protected Intantiator New = new Intantiator();
+		static readonly 
+		protected Intantiator New = new Intantiator();
 		
+		//::::::::::::::::::::::::::::::::::::::://
+		
+		/// <value>
+		/// 
+		/// </value>
 		protected class Intantiator
 		{
+			/// <value>
+			/// 
+			/// </value>
 			public IAlgorithm Algorithm()
 			{
 				return new Algorithm();
 			}
 			
+			/// <value>
+			/// 
+			/// </value>
 			public ILabel Label()
 			{
 				return new TrainLabel();
 			}
 			
+			/// <value>
+			/// 
+			/// </value>
 			public IParamList ParamList()
 			{
 				return new ParamList();
 			}
 		}
 		
+		//::::::::::::::::::::::::::::::::::::::://
+		
+		/// <value>
+		/// 
+		/// </value>
 		public LinkedList<IAlgorithm> AlgorithmList
 		{
 			get { return _algList; }
 		}
 		
+		//::::::::::::::::::::::::::::::::::::::://
+		
+		/// <value>
+		/// 
+		/// </value>
 		public LinkedList<ILabel> LabelList
 		{
 			get { return _trainList; }
 		}
 		
+		//::::::::::::::::::::::::::::::::::::::://
+		
+		/// <summary>
+		/// 
+		/// </summary>
 		protected Configurator()
 		{
 			Message(this.GetType().FullName + " ... [LOADED]");
 		}
 		
+		//::::::::::::::::::::::::::::::::::::::://
+		
+		/// <summary>
+		/// 
+		/// </summary>
+		/// <param name="algorithm">
+		/// A <see cref="IAlgorithm"/>
+		/// </param>
 		protected void AddAlgorithm(IAlgorithm algorithm)
 		{
 			_algList.AddLast(algorithm);
 		}
 		
+		//::::::::::::::::::::::::::::::::::::::://
+		
+		/// <summary>
+		/// 
+		/// </summary>
+		/// <param name="label">
+		/// A <see cref="ILabel"/>
+		/// </param>
 		protected void AddTrainLabel(ILabel label)
 		{
 			if(label.Validate())
 				_trainList.AddLast(label);
 		}
 		
+		//::::::::::::::::::::::::::::::::::::::://
+		
+		/// <summary>
+		/// 
+		/// </summary>
+		/// <param name="dir">
+		/// A <see cref="String"/>
+		/// </param>
+		/// <returns>
+		/// A <see cref="System.Boolean"/>
+		/// </returns>
 		protected bool AddDir(String dir)
 		{
 			bool returnValue;
@@ -103,6 +160,15 @@ namespace MusiC
 			return returnValue;
 		}
 		
-		abstract public void Load(String file);
+		//::::::::::::::::::::::::::::::::::::::://
+		
+		/// <summary>
+		/// 
+		/// </summary>
+		/// <param name="file">
+		/// A <see cref="String"/>
+		/// </param>
+		abstract 
+		public void Load(String file);
 	}
 }

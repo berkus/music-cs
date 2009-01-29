@@ -1,6 +1,6 @@
 /*
  * The MIT License
- * Copyright (c) 2008-2009 Marcos José Sant'Anna Magalhães
+ * Copyright (c) 2008-2009 Marcos Josï¿½ Sant'Anna Magalhï¿½es
  * 
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -22,8 +22,6 @@
  */
  
 using System;
-using System.Collections.Generic;
-using System.Text;
 
 using MusiC;
 
@@ -31,24 +29,32 @@ namespace MusiC.Extensions.Windows
 {
 	class Hamming
 	{
-		static public Single Factory(Int32 n, Int32 wndSize)
+		static
+		public Single Factory(Int32 n, Int32 wndSize)
 		{
 			//return 0.53836 - 0.46164 * (Math.Cos(2 * Math.PI * n / (wndSize - 1)));
-			return (Single) (0.54f - 0.46f * (Math.Cos(2.0f * Math.PI * n / (wndSize - 1))));
+			return (float) (0.54f - 0.46f * (Math.Cos(2.0f * Math.PI * n / (wndSize - 1))));
 		}
 	}
+	
+	//----------------------------------------//
 	
 	public class HammingU : Unmanaged.Window
 	{
 		public HammingU(int size, int overlap) : base(size, overlap)
 		{
 		}
+
+		//::::::::::::::::::::::::::::::::::::::://
 		
-		override public Single Factory(int n)
+		override
+		public Single Factory(int n)
 		{
 			return Hamming.Factory(n, WindowSize);
 		}
 	}
+	
+	//----------------------------------------//
 	
 	public class HammingM : Managed.Window
 	{
@@ -56,10 +62,12 @@ namespace MusiC.Extensions.Windows
 		{
 		}
 		
-		override public Single Factory(int n)
+		//::::::::::::::::::::::::::::::::::::::://
+		
+		override
+		public Single Factory(int n)
 		{
 			return Hamming.Factory(n, WindowSize);
 		}
 	}
 }
-

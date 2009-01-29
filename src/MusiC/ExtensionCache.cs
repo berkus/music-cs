@@ -28,6 +28,9 @@ using System.Reflection;
 
 namespace MusiC.Extensions
 {
+	/// <summary>
+	/// 
+	/// </summary>
 	internal class ExtensionCache : MusiCObject
 	{
 		// Attributes
@@ -44,7 +47,16 @@ namespace MusiC.Extensions
 		private LinkedList<IHandler> _handlerList = new LinkedList<IHandler>();
 		#endregion
 		
+		//::::::::::::::::::::::::::::::::::::::://
+		
 		#region Extension Handling
+		
+		/// <summary>
+		/// 
+		/// </summary>
+		/// <param name="extensionsDir">
+		/// A <see cref="String"/>
+		/// </param>
 		public void Load(String extensionsDir)
 		{
 			foreach(String ext in Directory.GetFiles(extensionsDir, "*.dll"))
@@ -70,6 +82,8 @@ namespace MusiC.Extensions
 				}
 			}
 		}
+		
+		//::::::::::::::::::::::::::::::::::::::://
 		
 		public void Add(Type extensionType)
 		{
@@ -120,9 +134,22 @@ namespace MusiC.Extensions
 			
 			Message(extensionType.ToString() + " ... [ADDED]");
 		}
+		
 		#endregion
 		
+		//::::::::::::::::::::::::::::::::::::::://
+		
 		#region FileHandlers Handling
+		
+		/// <summary>
+		/// 
+		/// </summary>
+		/// <param name="file">
+		/// A <see cref="String"/>
+		/// </param>
+		/// <returns>
+		/// A <see cref="Managed.Handler"/>
+		/// </returns>
 		public Managed.Handler GetManagedHandler(String file)
 		{
 			foreach(IHandler h in _handlerList)
@@ -136,6 +163,17 @@ namespace MusiC.Extensions
 			return null;
 		}
 		
+		//::::::::::::::::::::::::::::::::::::::://
+		
+		/// <summary>
+		/// 
+		/// </summary>
+		/// <param name="file">
+		/// A <see cref="String"/>
+		/// </param>
+		/// <returns>
+		/// A <see cref="Unmanaged.Handler"/>
+		/// </returns>
 		public Unmanaged.Handler GetUnmanagedHandler(String file)
 		{
 			foreach(IHandler h in _handlerList)
@@ -148,9 +186,13 @@ namespace MusiC.Extensions
 			
 			return null;
 		}
+		
 		#endregion
 		
+		//::::::::::::::::::::::::::::::::::::::://
+		
 		#region Configurator Handling
+		
 		/// <summary>
 		/// 
 		/// </summary>
@@ -169,13 +211,34 @@ namespace MusiC.Extensions
 			return _objConfig;
 		}
 		
+		//::::::::::::::::::::::::::::::::::::::://
+		
+		/// <summary>
+		/// 
+		/// </summary>
+		/// <param name="configObj">
+		/// A <see cref="Configurator"/>
+		/// </param>
 		public void SetConfigurator(Configurator configObj)
 		{
 			_objConfig = configObj;
 		}
+		
 		#endregion
 		
+		//::::::::::::::::::::::::::::::::::::::://
+		
 		#region Info Handling
+		
+		/// <summary>
+		/// 
+		/// </summary>
+		/// <param name="className">
+		/// A <see cref="String"/>
+		/// </param>
+		/// <returns>
+		/// A <see cref="ExtensionInfo"/>
+		/// </returns>
 		static public ExtensionInfo GetInfo(String className)
 		{
 			ExtensionInfo info;
@@ -185,18 +248,37 @@ namespace MusiC.Extensions
 			
 			return info;
 		}
+		
 		#endregion
 		
+		//::::::::::::::::::::::::::::::::::::::://
+		
 		#region Checkers
+		
+		/// <summary>
+		/// 
+		/// </summary>
+		/// <returns>
+		/// A <see cref="System.Boolean"/>
+		/// </returns>
 		public bool HasConfig()
 		{
 			return (_configList.Count > 0);
 		}
 		
+		//::::::::::::::::::::::::::::::::::::::://
+		
+		/// <summary>
+		/// 
+		/// </summary>
+		/// <returns>
+		/// A <see cref="System.Boolean"/>
+		/// </returns>
 		public bool HasFileHandler()
 		{
 			return (_handlerList.Count > 0);
 		}
+		
 		#endregion
 	}
 }

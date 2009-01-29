@@ -29,28 +29,63 @@ using MusiC.Data.Unmanaged;
 
 namespace MusiC.Extensions.Classifiers
 {
+	/// <summary>
+	/// 
+	/// </summary>
 	public class Barbedo : Unmanaged.Classifier
 	{
-		public Barbedo()
-		{
-		}
-
+		/// <summary>
+		/// 
+		/// </summary>
+		/// <param name="dtCol">
+		/// A <see cref="DataCollection"/>
+		/// </param>
 		override unsafe 
 		public void Train(DataCollection* dtCol)
 		{
 			uTrain(ref (*dtCol));
 		}
-
+		
+		//::::::::::::::::::::::::::::::::::::::://
+		
+		/// <summary>
+		/// 
+		/// </summary>
+		/// <param name="dataIn">
+		/// A <see cref="DataCollection"/>
+		/// </param>
+		/// <returns>
+		/// A <see cref="Data.Unmanaged.DataCollection"/>
+		/// </returns>
 		override unsafe 
 		public Data.Unmanaged.DataCollection * Filter(DataCollection* dataIn)
 		{
 			return uFilter(ref *dataIn);
 		}
 		
+		//::::::::::::::::::::::::::::::::::::::://
+		
+		/// <summary>
+		/// 
+		/// </summary>
+		/// <param name="dtCol">
+		/// A <see cref="DataCollection"/>
+		/// </param>
 		[DllImport("./MusiC.Extensions.Classifiers.uBarbedo.dll", EntryPoint="Barbedo_Train")]
 		static extern 
 		public void uTrain(ref DataCollection dtCol);
 		
+		//::::::::::::::::::::::::::::::::::::::://
+		
+		/// <summary>
+		/// 
+		/// </summary>
+		/// <param name="dtCol">
+		/// A <see cref="DataCollection"/>
+		/// </param>
+		/// <returns>
+		/// A <see cref="DataCollection"/>
+		/// </returns>
 		[DllImport("./MusiC.Extensions.Classifiers.uBarbedo.dll", EntryPoint="Barbedo_Filter")]
 		static extern unsafe 
 		public DataCollection * uFilter(ref DataCollection dtCol);

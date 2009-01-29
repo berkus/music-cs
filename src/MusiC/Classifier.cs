@@ -29,37 +29,68 @@ using MusiC.Data;
 
 namespace MusiC
 {
+	/// <summary>
+	/// 
+	/// </summary>
 	public interface IClassifier
 	{
 	}
 	
+	//---------------------------------------//
+	
+	/// <summary>
+	/// 
+	/// </summary>
 	public class BaseClassifier : Extension, IClassifier
 	{
 	}
 	
+	//---------------------------------------//
+	
 	namespace Managed
 	{
+		/// <summary>
+		/// 
+		/// </summary>
 		abstract
 		public class Classifier : BaseClassifier
 		{
+			/// <summary>
+			/// 
+			/// </summary>
 			virtual
 			public void Execute()
 			{
 				throw new NotImplementedException();
 			}
 			
+			//::::::::::::::::::::::::::::::::::::::://
+			
+			/// <summary>
+			/// 
+			/// </summary>
 			virtual
 			public void Classify()
 			{
 				throw new NotImplementedException();
 			}
 			
+			//::::::::::::::::::::::::::::::::::::::://
+			
+			/// <summary>
+			/// 
+			/// </summary>
 			virtual
 			public void TryLoadingParameters()
 			{
 				throw new NotImplementedException();
 			}
 			
+			//::::::::::::::::::::::::::::::::::::::://
+			
+			/// <summary>
+			/// 
+			/// </summary>
 			virtual
 			public void Dispose()
 			{
@@ -68,18 +99,40 @@ namespace MusiC
 		}
 	}
 	
+	//---------------------------------------//
+	
 	namespace Unmanaged
 	{
+		/// <summary>
+		/// 
+		/// </summary>
 		[CLSCompliant(false)]
 		abstract
 		public class Classifier : BaseClassifier
 		{
+			/// <summary>
+			/// 
+			/// </summary>
+			/// <param name="dataIn">
+			/// A <see cref="Data.Unmanaged.DataCollection"/>
+			/// </param>
+			/// <returns>
+			/// A <see cref="Data.Unmanaged.DataCollection"/>
+			/// </returns>
 			virtual unsafe
 			public Data.Unmanaged.DataCollection * Filter(Data.Unmanaged.DataCollection * dataIn)
 			{
 				return null;
 			}
-
+			
+			//::::::::::::::::::::::::::::::::::::::://
+			
+			/// <summary>
+			/// 
+			/// </summary>
+			/// <param name="dtCol">
+			/// A <see cref="Data.Unmanaged.DataCollection"/>
+			/// </param>
 			abstract unsafe
 			public void Train(Data.Unmanaged.DataCollection* dtCol);
 		}

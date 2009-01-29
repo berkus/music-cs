@@ -70,13 +70,13 @@ namespace MusiC
 
 			fstream db;
 
-			char * m_sectionLabel;
-			char * m_dataLabel;
-			int m_sectionLabelSz, m_dataLabelSz, m_dataSectionSz;
+			char * _sectionLabel;
+			char * _dataLabel;
+			int _sectionLabelSz, _dataLabelSz, _dataSectionSz;
 
 		public:
 
-            //-------------------------------------------------------------------------\\
+            //::::::::::::::::::::::::::::::::::::::://
 
 			DBHandler()
 			{
@@ -89,7 +89,7 @@ namespace MusiC
 				/// @todo Check/Delete Allocated Data
 			}
 
-			//-------------------------------------------------------------------------\\
+			//::::::::::::::::::::::::::::::::::::::://
 
 			void OpenDB(const char * dbName)
 			{
@@ -97,7 +97,7 @@ namespace MusiC
 
 				CloseDB();
 
-				m_dataSectionSz = 0;
+				_dataSectionSz = 0;
 				db.open(dbName, ios_base::in | ios_base::out | ios_base::app | ios_base::binary);
 
 				LOG("Opening:" << dbName);
@@ -105,7 +105,7 @@ namespace MusiC
                 LOG_OUT();
 			}
 
-			//-------------------------------------------------------------------------\\
+			//::::::::::::::::::::::::::::::::::::::://
 
 			void CloseDB()
 			{
@@ -119,7 +119,7 @@ namespace MusiC
                 LOG_OUT();
 			}
 
-			//-------------------------------------------------------------------------\\
+			//::::::::::::::::::::::::::::::::::::::://
 
 			bool HasData(char * sectionLabel, char * dtLabel)
 			{
@@ -143,7 +143,7 @@ namespace MusiC
 				return false;
 			}
 
-			//-------------------------------------------------------------------------\\
+			//::::::::::::::::::::::::::::::::::::::://
 
 			///@brief Returns the data stored in the .db file.
 			///@details trusts that hasData has already positioned get-pointer
@@ -153,8 +153,8 @@ namespace MusiC
 
 				long offset = db.tellg();
 
-				dt = new double[m_dataSectionSz/sizeof(double)];
-				db.read((char *)dt, m_dataSectionSz);
+				dt = new double[_dataSectionSz/sizeof(double)];
+				db.read((char *)dt, _dataSectionSz);
 				//LOG("Bytes Read:" << db.gcount());
 				int count = db.gcount();
 				db.seekg(offset, ios_base::beg);
@@ -163,7 +163,7 @@ namespace MusiC
 				return count;
 			}
 
-			//-------------------------------------------------------------------------\\
+			//::::::::::::::::::::::::::::::::::::::://
 
 			void AddData(const char * sectionLabel, const char * dataLabel, double * data, int dataSectionSz)
 			{
@@ -188,7 +188,7 @@ namespace MusiC
 				return flag;
 			}
 
-			//-------------------------------------------------------------------------\\
+			//::::::::::::::::::::::::::::::::::::::://
 
 			bool IsEndOfFile()
 			{
@@ -200,7 +200,7 @@ namespace MusiC
 				return flag;
 			}
 
-			//-------------------------------------------------------------------------\\
+			//::::::::::::::::::::::::::::::::::::::://
 
 			bool LoadNext()
 			{
@@ -229,55 +229,55 @@ namespace MusiC
 				return true;
 			}
 
-			//-------------------------------------------------------------------------\\
+			//::::::::::::::::::::::::::::::::::::::://
 
 			void PrintHeader()
 			{
                 LOG_IN();
-				LOG("Section Label: " << m_sectionLabel << " - size: " << m_sectionLabelSz);
-				LOG("Data Label: " << m_dataLabel << " - size: " << m_dataLabelSz);
-				LOG("Data Size:" << m_dataSectionSz);
+				LOG("Section Label: " << _sectionLabel << " - size: " << _sectionLabelSz);
+				LOG("Data Label: " << _dataLabel << " - size: " << _dataLabelSz);
+				LOG("Data Size:" << _dataSectionSz);
                 LOG_OUT();
 			}
 
-			//-------------------------------------------------------------------------\\
+			//::::::::::::::::::::::::::::::::::::::://
 
 			void JumpDataSection()
 			{
                 LOG_IN();
-				LOG("Current:" << db.tellg() << " - Skipping:" << m_dataSectionSz);
-				db.seekg(m_dataSectionSz, ios_base::cur);
+				LOG("Current:" << db.tellg() << " - Skipping:" << _dataSectionSz);
+				db.seekg(_dataSectionSz, ios_base::cur);
                 LOG_OUT();
 			}
 
-			//-------------------------------------------------------------------------\\
+			//::::::::::::::::::::::::::::::::::::::://
 
 			void ReadHeader()
 			{
                 LOG_IN();
 
-				db.read((char *)&m_sectionLabelSz, sizeof(int));LOG("Bytes Read:" << db.gcount());
-				db.read((char *)&m_dataLabelSz, sizeof(int));LOG("Bytes Read:" << db.gcount());
-				db.read((char *)&m_dataSectionSz, sizeof(int));LOG("Bytes Read:" << db.gcount());
+				db.read((char *)&_sectionLabelSz, sizeof(int));LOG("Bytes Read:" << db.gcount());
+				db.read((char *)&_dataLabelSz, sizeof(int));LOG("Bytes Read:" << db.gcount());
+				db.read((char *)&_dataSectionSz, sizeof(int));LOG("Bytes Read:" << db.gcount());
 
-				if(m_sectionLabel)
+				if(_sectionLabel)
 				{
-					delete m_sectionLabel;
+					delete _sectionLabel;
 				}
-				m_sectionLabel = new char [m_sectionLabelSz];
+				_sectionLabel = new char [_sectionLabelSz];
 
-				if(m_dataLabel)
+				if(_dataLabel)
 				{
-					delete m_dataLabel;
+					delete _dataLabel;
 				}
-				m_dataLabel = new char [m_dataLabelSz];
+				_dataLabel = new char [_dataLabelSz];
 
-				db.read(m_sectionLabel, m_sectionLabelSz + 1); LOG("Bytes Read:" << db.gcount());
-				db.read(m_dataLabel, m_dataLabelSz + 1); LOG("Bytes Read:" << db.gcount());
+				db.read(_sectionLabel, _sectionLabelSz + 1); LOG("Bytes Read:" << db.gcount());
+				db.read(_dataLabel, _dataLabelSz + 1); LOG("Bytes Read:" << db.gcount());
                 LOG_OUT();
 			}
 
-			//-------------------------------------------------------------------------\\
+			//::::::::::::::::::::::::::::::::::::::://
 
 			void WriteHeader(const char * sectionLabel, const char * dataLabel, int dataSectionSz)
 			{
@@ -300,7 +300,7 @@ namespace MusiC
                 LOG_OUT();
 			}
 
-			//-------------------------------------------------------------------------\\
+			//::::::::::::::::::::::::::::::::::::::://
 
 			void WriteData(double * data, int dataSectionSz)
 			{
@@ -313,35 +313,35 @@ namespace MusiC
                 LOG_OUT();
 			}
 
-			//-------------------------------------------------------------------------\\
+			//::::::::::::::::::::::::::::::::::::::://
 
 			char * GetSection()
 			{
-				return m_sectionLabel;
+				return _sectionLabel;
 			}
 
-			//-------------------------------------------------------------------------\\
+			//::::::::::::::::::::::::::::::::::::::://
 
 			char * GetDataLabel()
 			{
-				return m_dataLabel;
+				return _dataLabel;
 			}
 
-			//-------------------------------------------------------------------------\\
+			//::::::::::::::::::::::::::::::::::::::://
 
 			void Reset()
 			{
                 LOG_IN();
 				LOG("Current:" << db.tellp());
 
-				m_dataSectionSz = 0;
+				_dataSectionSz = 0;
 				db.seekg(0, ios_base::beg);
 
 				LOG("After Seek:" << db.tellp());
                 LOG_OUT();
 			}
 
-			//-------------------------------------------------------------------------\\
+			//::::::::::::::::::::::::::::::::::::::://
 
 			void Set()
 			{
@@ -362,7 +362,7 @@ extern "C"
 {
 	MusiC::Native::DBHandler hnd;
 
-	//-------------------------------------------------------------------------\\
+	//::::::::::::::::::::::::::::::::::::::://
 
 	void Initialize(const char * db)
 	{
@@ -373,7 +373,7 @@ extern "C"
         LOG_OUT();
 	}
 
-	//-------------------------------------------------------------------------\\
+	//::::::::::::::::::::::::::::::::::::::://
 
 	void AddFeature(const char * sectionLabel, const char * dataLabel, double * data, int dataSz)
 	{
@@ -384,7 +384,7 @@ extern "C"
         LOG_OUT();
 	}
 
-	//-------------------------------------------------------------------------\\
+	//::::::::::::::::::::::::::::::::::::::://
 
 	int GetFeature(char * wndName, char * featName, double *data)
 	{
@@ -399,7 +399,7 @@ extern "C"
 		return 0;
 	}
 
-	//-------------------------------------------------------------------------\\
+	//::::::::::::::::::::::::::::::::::::::://
 
 	void Terminate()
 	{
@@ -411,7 +411,7 @@ extern "C"
 	}
 }
 
-//-------------------------------------------------------------------------\\
+//::::::::::::::::::::::::::::::::::::::://
 
 /*
 int main2()

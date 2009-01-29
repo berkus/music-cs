@@ -47,7 +47,7 @@ namespace MusiC
 	internal class Algorithm : MusiCObject, IAlgorithm
 	{
 		private Pipeline _pipe = new Pipeline();
-
+		
 		/// <summary>
 		/// Add an extension to the algorithm.
 		///
@@ -61,15 +61,17 @@ namespace MusiC
 		public bool Add(string extensionClass, IParamList args)
 		{
 			ExtensionInfo info = ExtensionCache.GetInfo(extensionClass);
-
-			if (info == null) throw new Exceptions.MissingExtensionException(extensionClass + " wasn't found."); 
-
-			if (info.Kind == ExtensionKind.Error) {
+			
+			if (info == null) throw new Exceptions.MissingExtensionException(extensionClass + " wasn't found.");
+			
+			if (info.Kind == ExtensionKind.Error)
+			{
 				Error(extensionClass + ": Can't recognize this Extension. This may happen when an extension inherits directly from MusiC.Extension");
 				return false;
 			}
-
-			if (info.Manager == ExtensionManagement.Error) {
+			
+			if (info.Manager == ExtensionManagement.Error)
+			{
 				Error(extensionClass + ": Can't recognize if this is a Managed or Unmanaged implementation. Classifiers/Features/Windows must inherit from their subclasses.");
 				return false;
 			}
@@ -78,38 +80,71 @@ namespace MusiC
 			
 			if(pList == null)
 				return false;
-
+			
 			Extension ext = info.Instantiate(pList);
 			return _pipe.Add(ext, info);
 		}
-
+		
+		//::::::::::::::::::::::::::::::::::::::://
+		
+		/// <summary>
+		/// 
+		/// </summary>
+		/// <param name="cache">
+		/// A <see cref="ExtensionCache"/>
+		/// </param>
 		public void Execute(ExtensionCache cache)
 		{
 			ExtensionManagement status = _pipe.Check();
-
+			
 			if (status == ExtensionManagement.NotSet || status == ExtensionManagement.Error)
 			{
 				Error("An error has ocurred. Status = " + status.ToString());
 				Say();
 			}
-
+			
 			_pipe.Execute(cache);
 		}
-
+		
+		//::::::::::::::::::::::::::::::::::::::://
+		
+		/// <summary>
+		/// 
+		/// </summary>
 		public void Say()
 		{
 			_pipe.Say();
 		}
 	}
-
+	
+	//---------------------------------------//
+	
 	#region Classes
+	
+	/// <summary>
+	/// 
+	/// </summary>
 	internal class Pipeline : MusiCObject
 	{
 		private mPipeline _mPipe = new mPipeline();
 		private uPipeline _uPipe = new uPipeline();
-
+		
 		private ExtensionManagement _status = ExtensionManagement.NotSet;
-
+		
+		//::::::::::::::::::::::::::::::::::::::://
+		
+		/// <summary>
+		/// 
+		/// </summary>
+		/// <param name="ext">
+		/// A <see cref="Extension"/>
+		/// </param>
+		/// <param name="info">
+		/// A <see cref="ExtensionInfo"/>
+		/// </param>
+		/// <returns>
+		/// A <see cref="System.Boolean"/>
+		/// </returns>
 		public bool Add(Extension ext, ExtensionInfo info)
 		{
 			switch (info.Manager)
@@ -120,83 +155,98 @@ namespace MusiC
 						case ExtensionKind.Window:
 							_mPipe.AddWindow(ext as Managed.Window);
 							break;
-
+						
 						case ExtensionKind.Classifier:
 							_mPipe.AddClassifier(ext as Managed.Classifier);
 							break;
-
+						
 						case ExtensionKind.Feature:
 							_mPipe.AddFeature(ext as Managed.Feature);
 							break;
+						
 						default:
-
 							return false;
-
 					}
 					break;
-
+				
 				case ExtensionManagement.Unmanaged:
 					switch (info.Kind)
 					{
 						case ExtensionKind.Window:
 							_uPipe.AddWindow(ext as Unmanaged.Window);
 							break;
-
+						
 						case ExtensionKind.Classifier:
 							_uPipe.AddClassifier(ext as Unmanaged.Classifier);
 							break;
-
+						
 						case ExtensionKind.Feature:
 							_uPipe.AddFeature(ext as Unmanaged.Feature);
 							break;
-
+						
 						default:
 							return false;
 					}
-
+					
 					break;
-
+				
 				default:
 					return false;
 			}
-
+			
 			return true;
 		}
-
+		
+		//::::::::::::::::::::::::::::::::::::::://
+		
+		/// <summary>
+		/// 
+		/// </summary>
+		/// <returns>
+		/// A <see cref="ExtensionManagement"/>
+		/// </returns>
 		public ExtensionManagement Check()
 		{
 			bool mStatus = _mPipe.Check();
 			bool uStatus = _uPipe.Check();
-
+			
 			if (uStatus && mStatus)
 			{
 				_status = ExtensionManagement.Error;
 				return ExtensionManagement.Error;
 			}
-
+			
 			if (!(uStatus || mStatus))
 			{
 				_status = ExtensionManagement.Error;
 				return ExtensionManagement.NotSet;
 			}
-
+			
 			if (uStatus)
 			{
 				_status = ExtensionManagement.Unmanaged;
 				return ExtensionManagement.Unmanaged;
 			}
-
+			
 			if (mStatus)
 			{
 				_status = ExtensionManagement.Managed;
 				return ExtensionManagement.Managed;
 			}
-
+			
 			// this shouldn't be reached.
 			// conforming to compiler: not all code paths return a value (CS0161)
 			return ExtensionManagement.NotSet;
 		}
-
+		
+		//::::::::::::::::::::::::::::::::::::::://
+		
+		/// <summary>
+		/// 
+		/// </summary>
+		/// <param name="cache">
+		/// A <see cref="ExtensionCache"/>
+		/// </param>
 		public void Execute(ExtensionCache cache)
 		{
 			if (_status == ExtensionManagement.Managed)
@@ -204,108 +254,195 @@ namespace MusiC
 				_mPipe.Execute(cache);
 				return;
 			}
-
+			
 			if (_status == ExtensionManagement.Unmanaged)
 			{
 				_uPipe.Execute(cache);
 				return;
 			}
-
+			
 			Error("No pipeline can be executed.");
 			Say();
 		}
-
+		
+		//::::::::::::::::::::::::::::::::::::::://
+		
+		/// <summary>
+		/// 
+		/// </summary>
 		public void Say()
 		{
 			BeginReportSection("Managed Pipeline");
 			_mPipe.Say();
 			EndReportSection(false);
-
+			
 			BeginReportSection("Unmanaged Pipeline");
 			_uPipe.Say();
 			EndReportSection(true);
 		}
 	}
-
-
+	
+	//---------------------------------------//
+	
+	/// <summary>
+	/// 
+	/// </summary>
 	internal class mPipeline : MusiCObject
 	{
 		private Managed.Window _window;
 		private Managed.Classifier _classifier;
 		private LinkedList<Managed.Feature> _featureList = new LinkedList<Managed.Feature>();
-
+		
+		//::::::::::::::::::::::::::::::::::::::://
+		
+		/// <summary>
+		/// 
+		/// </summary>
+		/// <param name="classifier">
+		/// A <see cref="Managed.Classifier"/>
+		/// </param>
 		public void AddClassifier(Managed.Classifier classifier)
 		{
 			_classifier = classifier;
 		}
-
+		
+		//::::::::::::::::::::::::::::::::::::::://
+		
 		public void AddWindow(Managed.Window window)
 		{
 			_window = window;
 		}
-
+		
+		//::::::::::::::::::::::::::::::::::::::://
+		
+		/// <summary>
+		/// 
+		/// </summary>
+		/// <param name="feature">
+		/// A <see cref="Managed.Feature"/>
+		/// </param>
 		public void AddFeature(Managed.Feature feature)
 		{
 			_featureList.AddLast(feature);
 		}
-
+		
+		//::::::::::::::::::::::::::::::::::::::://
+		
+		/// <summary>
+		/// 
+		/// </summary>
+		/// <returns>
+		/// A <see cref="System.Boolean"/>
+		/// </returns>
 		public bool Check()
 		{
 			if (_window == null) return false;
-
+			
 			if (_featureList.Count == 0) return false;
-
+			
 			return true;
 		}
-
+		
+		//::::::::::::::::::::::::::::::::::::::://
+		
+		/// <summary>
+		/// 
+		/// </summary>
+		/// <param name="cache">
+		/// A <see cref="ExtensionCache"/>
+		/// </param>
 		public void Execute(ExtensionCache cache)
 		{
 		}
-
+		
+		//::::::::::::::::::::::::::::::::::::::://
+		
+		/// <summary>
+		/// 
+		/// </summary>
 		public void Say()
 		{
 			Message("Window: " + ((_window != null) ? _window.GetType().FullName : "((NULL))"));
 			Message("Classifier: " + ((_classifier != null) ? _classifier.GetType().FullName : "((NULL))"));
-
+			
 			BeginReportSection("Feature List");
-
+			
 			foreach (Managed.Feature f in _featureList)
 				Message((f != null) ? f.GetType().FullName : "((NULL))");
-
+			
 			EndReportSection(true);
 		}
 	}
-
+	
+	//---------------------------------------//
+	
+	/// <summary>
+	/// 
+	/// </summary>
 	internal class uPipeline : MusiCObject
 	{
 		private Unmanaged.Window _window;
 		private Unmanaged.Classifier _classifier;
 		private LinkedList<Unmanaged.Feature> _featureList = new LinkedList<Unmanaged.Feature>();
-
+		
+		//::::::::::::::::::::::::::::::::::::::://
+		
+		/// <summary>
+		/// 
+		/// </summary>
+		/// <param name="classifier">
+		/// A <see cref="Unmanaged.Classifier"/>
+		/// </param>
 		public void AddClassifier(Unmanaged.Classifier classifier)
 		{
 			_classifier = classifier;
 		}
-
+		
+		//::::::::::::::::::::::::::::::::::::::://
+		
+		/// <summary>
+		/// 
+		/// </summary>
+		/// <param name="window">
+		/// A <see cref="Unmanaged.Window"/>
+		/// </param>
 		public void AddWindow(Unmanaged.Window window)
 		{
 			_window = window;
 		}
-
+		
+		//::::::::::::::::::::::::::::::::::::::://
+		
+		/// <summary>
+		/// 
+		/// </summary>
+		/// <param name="feature">
+		/// A <see cref="Unmanaged.Feature"/>
+		/// </param>
 		public void AddFeature(Unmanaged.Feature feature)
 		{
 			_featureList.AddLast(feature);
 		}
-
+		
+		//::::::::::::::::::::::::::::::::::::::://
+		
+		/// <summary>
+		/// 
+		/// </summary>
+		/// <returns>
+		/// A <see cref="System.Boolean"/>
+		/// </returns>
 		public bool Check()
 		{
 			if (_window == null) return false;
-
+			
 			if (_featureList.Count == 0) return false;
-
+			
 			return true;
 		}
-
+		
+		//::::::::::::::::::::::::::::::::::::::://
+		
 		/// <summary>
 		///
 		/// </summary>
@@ -316,59 +453,69 @@ namespace MusiC
 		{
 			IEnumerable<ILabel> tLabel = cache.GetConfigurator().LabelList;
 			Data.Unmanaged.DataCollection* dtCol = Data.Unmanaged.DataHandler.BuildCollection(_featureList.Count);
-
+			
 			foreach (TrainLabel label in tLabel)
 			{
 				Data.Unmanaged.ClassData* currentClass = Data.Unmanaged.DataHandler.BuildClassData(dtCol);
-
+				
 				Message("Processing " + label.InputDir);
-
+				
 				foreach (string file in Directory.GetFiles(label.InputDir, "*.wav"))
 				{
 					Message("Opening " + file);
-
+					
 					Data.Unmanaged.FileData* currentFile = Data.Unmanaged.DataHandler.BuildFileData(currentClass);
 					Unmanaged.Handler h = cache.GetUnmanagedHandler(file);
-
+					
 					if (h == null)
 					{
 						Warning(file + ": No handler supports this file");
 						continue;
 					}
-
+					
 					h.Attach(file);
 					_window.Attach(h);
-
+					
 					Unmanaged.Extractor.Extract(_window, _featureList, currentFile);
-
+					
 					h.Detach();
 				}
 			}
-
+			
 			Message("Extraction Done.");
-
+			
 			Summarize(dtCol);
-
+			
 			if (_classifier != null) {
 				Message("Beginning Classification");
 				Data.Unmanaged.DataCollection* filteredData = _classifier.Filter(dtCol);
-
-				if (filteredData == null) _classifier.Train(dtCol);
-				else _classifier.Train(filteredData);
+				
+				if (filteredData == null) 
+					_classifier.Train(dtCol);
+				else 
+					_classifier.Train(filteredData);
 			}
-
+			
 			Message("All Tasks Done");
 		}
-
+		
+		//::::::::::::::::::::::::::::::::::::::://
+		
+		/// <summary>
+		/// 
+		/// </summary>
+		/// <param name="dtCol">
+		/// A <see cref="Data.Unmanaged.DataCollection"/>
+		/// </param>
 		unsafe
 		public void Summarize(Data.Unmanaged.DataCollection* dtCol)
 		{
 			BeginReportSection("Extraction Report");
 			Message("Classes Found: " + dtCol->nClasses);
 			Message("Features Found: " + dtCol->nFeatures);
-
+			
 			Data.Unmanaged.ClassData* c = dtCol->pFirstClass;
-
+			
 			int i = 1;
 			while (c != null)
 			{
@@ -376,21 +523,25 @@ namespace MusiC
 				c = c->pNextClass;
 				i++;
 			}
-
+			
 			EndReportSection(true);
 		}
-
+		
+		//::::::::::::::::::::::::::::::::::::::://
+		
+		/// <summary>
+		/// 
+		/// </summary>
 		public void Say()
 		{
 			Message("Window: " + ((_window != null) ? _window.GetType().FullName : "((NULL))"));
-
 			Message("Classifier: " + ((_classifier != null) ? _classifier.GetType().FullName : "((NULL))"));
-
+			
 			BeginReportSection("Feature List");
-
+			
 			foreach (Unmanaged.Feature f in _featureList)
 				Message((f != null) ? f.GetType().FullName : "((NULL))");
-
+			
 			EndReportSection(true);
 		}
 	}

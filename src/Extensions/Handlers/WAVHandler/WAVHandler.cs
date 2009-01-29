@@ -1,6 +1,6 @@
 /*
  * The MIT License
- * Copyright (c) 2008-2009 Marcos José Sant'Anna Magalhães
+ * Copyright (c) 2008-2009 Marcos Josï¿½ Sant'Anna Magalhï¿½es
  * 
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -26,39 +26,63 @@ using System.IO;
 
 namespace MusiC.Extensions.Handlers
 {
-	unsafe public class WavHandler : Unmanaged.Handler
+	/// <summary>
+	/// 
+	/// </summary>
+	unsafe
+	public class WavHandler : Unmanaged.Handler
 	{	
-		Single * _data = null;
+		private float * _data = null;
+		
 		// total audio data, loaded audio data, bytes per sample, channels
-		Int32 _streamSz, _dataSz, _bytesInUse, _channels;
-        Int64 _offset;
-
-		BinaryReader rd;
-
-        ~WavHandler()
-        {
-            NativeMethods.Pointer.free(_data);
-        }
-
-		override public bool CanHandle(string file)
+		private int _streamSz, _dataSz, _bytesInUse, _channels;
+		private long _offset;
+		private BinaryReader rd;
+		
+		//::::::::::::::::::::::::::::::::::::::://
+		
+		~WavHandler()
+		{
+			NativeMethods.Pointer.free(_data);
+		}
+		
+		//::::::::::::::::::::::::::::::::::::::://
+		
+		/// <summary>
+		/// 
+		/// </summary>
+		/// <param name="file">
+		/// A <see cref="System.String"/>
+		/// </param>
+		/// <returns>
+		/// A <see cref="System.Boolean"/>
+		/// </returns>
+		override
+		public bool CanHandle(string file)
 		{
 			return true;
 		}
+		
+		//::::::::::::::::::::::::::::::::::::::://
 		
 		/// <summary>
 		/// Attaches the handler to an existing file.
 		/// </summary>
 		/// <param name="file"></param>
-		override public void Attach(string file)
+		override
+		public void Attach(string file)
 		{
 			base.Attach(file);
 			Load();
 		}
 		
+		//::::::::::::::::::::::::::::::::::::::://
+		
 		/// <summary>
 		/// Dettaches the handler from a file.
 		/// </summary>
-		override public void Detach()
+		override
+		public void Detach()
 		{
 			rd.Close();
 			rd = null;
@@ -66,26 +90,123 @@ namespace MusiC.Extensions.Handlers
 			base.Detach();
 		}
 		
-		override public int GetStreamSize()
+		//::::::::::::::::::::::::::::::::::::::://
+		
+		/// <summary>
+		/// 
+		/// </summary>
+		/// <returns>
+		/// A <see cref="System.Int32"/>
+		/// </returns>
+		override
+		public int GetStreamSize()
 		{
 			return _streamSz;
 		}
 		
+		//::::::::::::::::::::::::::::::::::::::://
+		
+		/// <summary>
+		/// 
+		/// </summary>
+		/// <param name="firstSample">
+		/// A <see cref="System.Int64"/>
+		/// </param>
+		/// <param name="windowSize">
+		/// A <see cref="System.Int32"/>
+		/// </param>
+		/// <returns>
+		/// A <see cref="System.Single"/>
+		/// </returns>
+		override unsafe
+		public System.Single* Read(long firstSample, int windowSize)
+		{
+			long firstByte = _offset + (firstSample * _bytesInUse * _channels);
+			
+			rd.BaseStream.Seek( firstByte, SeekOrigin.Begin);
+			Byte[] raw_data = rd.ReadBytes(windowSize * _bytesInUse * _channels);
+			
+			if (_dataSz < windowSize)
+			{
+				if(_data != null)
+					NativeMethods.Pointer.free(_data);
+				
+				_data = NativeMethods.Pointer.fgetmem(windowSize);
+				_dataSz = windowSize;
+			}
+			
+			if (raw_data.Length < windowSize)
+				return null;
+			
+			short i = 0;
+			long count = 0;
+			short c;
+			
+			unsafe
+			{
+				float* pData = _data;
+				long temp;
+				
+				fixed (Byte* pB = raw_data)
+				{
+					Byte* bitPt = pB; //can't assign to pB
+					byte* m = (byte*)&temp;
+					
+					for (; count < windowSize; count++)
+					{
+						*(pData) = 0;
+						
+						for (c = 0; c < _channels; c++)
+						{
+							// if it is a negative sample set temp to -1
+							// to make the value correct.
+							// if MSB > 128 ---> [[LSB]...[MSB]], ..., [[LSB]...[MSB]]
+							//              bitPt ^
+							temp = (*(bitPt + _bytesInUse -1) > 128) ? -1 : 0;
+							
+							// temp = current sample
+							for (i = 0; i < _bytesInUse; i++)
+								*(m + i) = *(bitPt + i);
+							
+							// next sample
+							bitPt += _bytesInUse;
+							
+							// Increases the number of divisions but avoid overflow problems
+							// Makes data mono
+							// long / int = int .... need to cast to float.
+							*pData += (float) temp / _channels;
+						}
+						
+						pData++;
+					}
+				}
+			}
+			
+			raw_data = null;
+			
+			return _data;
+		}
+		
+		//::::::::::::::::::::::::::::::::::::::://
+		
+		/// <summary>
+		/// 
+		/// </summary>
 		protected void Load()
 		{
 			rd = new BinaryReader(new FileStream(CurrentFile, FileMode.Open));
-	
+			
 			// RIFF
 			rd.ReadChars(4);
 			rd.ReadInt32();
-	
+			
 			// WAVE
 			rd.ReadChars(4);
-	
+			
 			// 'fmt	'
 			rd.ReadChars(4);
 			rd.ReadInt32();
-	
+			
 			//m_info.Compression = rd.ReadInt16();
 			rd.ReadInt16();
 			
@@ -103,9 +224,9 @@ namespace MusiC.Extensions.Handlers
 			
 			//m_info.Depth = rd.ReadInt16();
 			int sampleSize = rd.ReadInt16();
-	
+			
 			///	@todo Handle compressed wave
-	
+			
 			// DATA
 			rd.ReadChars(4);
 			
@@ -114,8 +235,8 @@ namespace MusiC.Extensions.Handlers
 			Console.WriteLine("Has {0} bytes in total.", _streamSz);
 			
 			// m_info.Samples = dataSz / m_info.BlockSize;
-	
 			//int bytesInUse = m_info.DepthInBytes = Convert.ToInt16(m_info.Depth / 8);
+			
 			_bytesInUse = sampleSize / 8;
 			Console.WriteLine("Each sample has {0} bits.", sampleSize);
 			Console.WriteLine("Each sample has {0} bytes.", _bytesInUse);
@@ -125,76 +246,8 @@ namespace MusiC.Extensions.Handlers
 			
 			//int samplesPerChannel = m_info.SamplesPerChannel = Convert.ToInt32(dataSz / (m_info.Channels * bytesInUse));
 			//Int32 samplesPerChannel = Convert.ToInt32(_streamSz / blockSize);
-
-            _offset = rd.BaseStream.Position;
-		}
-		
-		override unsafe public System.Single* Read(long firstSample, int windowSize)
-		{
-			long firstByte = _offset + (firstSample * _bytesInUse * _channels);
 			
-            rd.BaseStream.Seek( firstByte, SeekOrigin.Begin);
-            Byte[] raw_data = rd.ReadBytes(windowSize * _bytesInUse * _channels);
-
-            if (_dataSz < windowSize)
-			{
-				if(_data != null)
-					NativeMethods.Pointer.free(_data);
-
-                _data = NativeMethods.Pointer.fgetmem(windowSize);
-                _dataSz = windowSize;
-			}
-
-            if (raw_data.Length < windowSize)
-				return null;
-			
-			short i = 0;
-			long count = 0;
-			short c;
-
-            unsafe
-            {
-                float* pData = _data;
-                Int64 temp;
-
-                fixed (Byte* pB = raw_data)
-                {
-                    Byte* bitPt = pB; //can't assign to pB
-                    byte* m = (byte*)&temp;
-
-                    for (; count < windowSize; count++)
-                    {
-                        *(pData) = 0;
-
-                        for (c = 0; c < _channels; c++)
-                        {        
-                            // if it is a negative sample set temp to -1
-                            // to make the value correct.
-                            // if MSB > 128 ---> [[LSB]...[MSB]], ..., [[LSB]...[MSB]]
-                            //              bitPt ^
-                            temp = (*(bitPt + _bytesInUse -1) > 128) ? -1 : 0;
-
-                            // temp = current sample
-                            for (i = 0; i < _bytesInUse; i++)
-                                *(m + i) = *(bitPt + i);
-                            
-                            // next sample
-                            bitPt += _bytesInUse;
-                            
-                            // Increases the number of divisions but avoid overflow problems
-                            // Makes data mono
-                            // long / int = int .... need to cast to float.
-                            *pData += (float) temp / _channels;
-                        }
-
-                        pData++;
-                    }
-                }
-            }
-
-            raw_data = null;
-			
-			return _data;
+			_offset = rd.BaseStream.Position;
 		}
 	}
 }

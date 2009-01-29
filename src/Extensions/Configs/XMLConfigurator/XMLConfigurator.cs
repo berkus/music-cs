@@ -1,6 +1,6 @@
 /*
  * The MIT License
- * Copyright (c) 2008-2009 Marcos José Sant'Anna Magalhães
+ * Copyright (c) 2008-2009 Marcos Josï¿½ Sant'Anna Magalhï¿½es
  * 
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -45,7 +45,9 @@ namespace MusiC.Configs
 	public class XMLConfigurator : Configurator
 	{
 		/// store class alias. Tag(key) <=> classname(value).
-		Dictionary<String, String> _tagCache = new Dictionary<String, String>();
+		private Dictionary<String, String> _tagCache = new Dictionary<String, String>();
+		
+		//::::::::::::::::::::::::::::::::::::::://
 		
 		/// <summary>
 		/// 
@@ -53,7 +55,8 @@ namespace MusiC.Configs
 		/// <param name="cfgPath">
 		/// XML file with library configuration.
 		/// </param>
-		public override void Load(String cfgPath)
+		override
+		public void Load(String cfgPath)
 		{
 			XmlDocument cfgFile = new XmlDocument();
 			cfgFile.Load(cfgPath);
@@ -65,6 +68,9 @@ namespace MusiC.Configs
 			BuildAlgorithmList(cfgFile);
 		}
 		
+		//::::::::::::::::::::::::::::::::::::::://
+		
+		#region XMLAttribute Handling
 		/// <summary> Get attributes from a xml node. </summary>
 		/// <description> 
 		/// Safely retrieves an attribute named attName from the node n which may be forced
@@ -75,7 +81,7 @@ namespace MusiC.Configs
 		/// <param name="attName">The System.Attribute name</param>
 		/// <param name="isOptional">Is it optional ?</param>
 		/// <returns>The attribute value</returns>
-		String XmlSafeAttribute(XmlNode n, String attName, bool isOptional)
+		private String XmlSafeAttribute(XmlNode n, String attName, bool isOptional)
 		{
 			if(n == null)
 				throw new MCException("XmlNode submited is null");
@@ -91,6 +97,8 @@ namespace MusiC.Configs
 			
 			return att.Value;
 		}
+
+		//::::::::::::::::::::::::::::::::::::::://
 		
 		/// <summary>
 		/// Get attributes from a xml node. 
@@ -99,11 +107,21 @@ namespace MusiC.Configs
 		/// <param name="attName">The System.Attribute name</param>
 		/// <returns>The attribute value</returns>
 		/// @details This form sets the isOptional to false.
-		String XmlSafeAttribute(XmlNode n, String attName)
+		private String XmlSafeAttribute(XmlNode n, String attName)
 		{
 			return XmlSafeAttribute(n, attName, false);
 		}
+		#endregion
 		
+		//::::::::::::::::::::::::::::::::::::::://
+
+		#region Parsing Methods
+		/// <summary>
+		/// 
+		/// </summary>
+		/// <param name="cfgFile">
+		/// A <see cref="XmlDocument"/>
+		/// </param>
 		void BuildTagCache(XmlDocument cfgFile)
 		{
 			foreach(XmlNode n in cfgFile.GetElementsByTagName("MusiC-Alias"))
@@ -111,8 +129,16 @@ namespace MusiC.Configs
 				_tagCache.Add(XmlSafeAttribute(n, "name"), XmlSafeAttribute(n, "class"));
 			}
 		}
-		
-		void ParseData(XmlDocument cfgFile)
+
+		//::::::::::::::::::::::::::::::::::::::://
+
+		/// <summary>
+		/// 
+		/// </summary>
+		/// <param name="cfgFile">
+		/// A <see cref="XmlDocument"/>
+		/// </param>
+		private void ParseData(XmlDocument cfgFile)
 		{
 			foreach(XmlNode train in cfgFile.GetElementsByTagName("MusiC-Train"))
 			{
@@ -151,10 +177,19 @@ namespace MusiC.Configs
 				String dir = XmlSafeAttribute(classifyNode,"dir");
 				
 				if(!AddDir(dir))
-					Warning("A non-existent directory ("+ dir +") wasn't added to the processing queue.");
+					Warning("A non-existent directory ("+ dir +
+					        ") wasn't added to the processing queue.");
 			}
 		}
+
+		//::::::::::::::::::::::::::::::::::::::://
 		
+		/// <summary>
+		/// 
+		/// </summary>
+		/// <param name="cfgFile">
+		/// A <see cref="XmlDocument"/>
+		/// </param>
 		public void BuildAlgorithmList(XmlDocument cfgFile)
 		{
 			foreach (XmlNode n in cfgFile.GetElementsByTagName("MusiC-Algorithm"))
@@ -182,7 +217,10 @@ namespace MusiC.Configs
 						if(param.Name != "Param")
 							continue;
 						
-						paramList.AddParam(XmlSafeAttribute(param, "name"), XmlSafeAttribute(param, "class"), XmlSafeAttribute(param, "value", true));
+						paramList.AddParam(
+						                   XmlSafeAttribute(param, "name"),
+						                   XmlSafeAttribute(param, "class"),
+						                   XmlSafeAttribute(param, "value", true));
 					}
 					
 					try
@@ -200,5 +238,6 @@ namespace MusiC.Configs
 				AddAlgorithm(algorithm);
 			}
 		}
+		#endregion
 	}
 }
