@@ -40,7 +40,7 @@ flags({"Unicode", "NoImportLib"})
 kind("SharedLib")
 
 targetname("MusiC.Native")
---targetprefix("")
---targetextension="dll"
+targetprefix("")
+targetextension(".dll")
 targetdir(base_bin_dir)
 objdir(base_bin_dir.."/obj")
