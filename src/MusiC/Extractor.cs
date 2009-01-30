@@ -32,7 +32,7 @@ namespace MusiC
 	/// <summary>
 	/// 
 	/// </summary>
-	public class BaseExtractor : MusiCObject
+	internal class BaseExtractor : MusiCObject
 	{
 	}
 	
@@ -43,7 +43,7 @@ namespace MusiC
 		/// <summary>
 		/// 
 		/// </summary>
-		public class Extractor : BaseExtractor
+		internal class Extractor
 		{
 			static
 			public Data.Managed.DataCollection Extract(Window wnd, Feature f)
@@ -57,8 +57,11 @@ namespace MusiC
 	
 	namespace Unmanaged
 	{
+		/// <summary>
+		/// 
+		/// </summary>
 		unsafe
-		internal struct FeatureHelper
+		internal class FeatureHelper
 		{
 			public Feature feat;
 			public float * data;
@@ -70,9 +73,8 @@ namespace MusiC
 		/// <summary>
 		/// 
 		/// </summary>
-		internal class Extractor : BaseExtractor
+		internal class Extractor
 		{
-			
 			/// <summary>
 			/// 
 			/// </summary>
@@ -80,7 +82,7 @@ namespace MusiC
 			/// A <see cref="Window"/>
 			/// </param>
 			/// <param name="featList">
-			/// A <see cref="IEnumerable`1"/>
+			/// A <see cref="IEnumerable<Feature>"/>
 			/// </param>
 			/// <param name="dataStg">
 			/// A <see cref="Data.Unmanaged.FileData"/>
@@ -88,9 +90,13 @@ namespace MusiC
 			static unsafe 
 			public void Extract(Window wnd, IEnumerable<Feature> featList, Data.Unmanaged.FileData * dataStg)
 			{
+				Console.WriteLine("ok");
+				
 				int fIdx;
                 float * windowBuffer;
-				DBHandler db = (wnd.HandlerInterface as BaseHandler).GetDBHandler();
+				
+				BaseHandler bdb = wnd.HandlerInterface as BaseHandler;
+				DBHandler db = bdb.GetDBHandler();
 				
 				LinkedList<FeatureHelper> parsedList = new LinkedList<FeatureHelper>();
 				

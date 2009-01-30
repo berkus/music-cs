@@ -177,7 +177,7 @@ namespace MusiC
 		protected void Error(Exception ex)
 		{
 			Error("[ System Exception ]");
-			
+			Error("Exception Type: " + ex.GetType().FullName);
 			Error(ex.Message);
 			
 			StackFrame entry;

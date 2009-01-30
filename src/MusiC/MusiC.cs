@@ -44,8 +44,8 @@ namespace MusiC
 		#region Attributes
 		private UnhandledExceptionEventHandler _UnhandledExceptionHandler;
 		
-		private String _configFile;
-		private String _extensionsDir;
+		private String _configFile = "config.xml";
+		private String _extensionsDir = ".";
 		
 		private ExtensionCache _cache = new ExtensionCache();
 		private Configurator _cfg;
