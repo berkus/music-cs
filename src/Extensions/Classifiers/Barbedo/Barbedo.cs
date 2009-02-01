@@ -71,7 +71,7 @@ namespace MusiC.Extensions.Classifiers
 		/// <param name="dtCol">
 		/// A <see cref="DataCollection"/>
 		/// </param>
-		[DllImport("./MusiC.Extensions.Classifiers.uBarbedo.dll", EntryPoint="Barbedo_Train")]
+		[DllImport("MusiC.Extensions.Classifiers.uBarbedo.dll", EntryPoint="Barbedo_Train")]
 		static extern 
 		public void uTrain(ref DataCollection dtCol);
 		
@@ -86,7 +86,7 @@ namespace MusiC.Extensions.Classifiers
 		/// <returns>
 		/// A <see cref="DataCollection"/>
 		/// </returns>
-		[DllImport("./MusiC.Extensions.Classifiers.uBarbedo.dll", EntryPoint="Barbedo_Filter")]
+		[DllImport("MusiC.Extensions.Classifiers.uBarbedo.dll", EntryPoint="Barbedo_Filter")]
 		static extern unsafe 
 		public DataCollection * uFilter(ref DataCollection dtCol);
     }

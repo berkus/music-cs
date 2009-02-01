@@ -1,7 +1,7 @@
 function MakeUnmanagedProjects()
-	dofile("MusiC.Native.lua")
+	dofile("MusiC.Native.Base.lua")
+	dofile("MusiC.Native.Core.lua")
 	dofile("MusiC.Extensions.Classifiers.uBarbedo.lua")
-	--dofile("MusiC.Extensions.Handlers.uDBHandler.lua")
 end
 
 function MakeManagedProjects()
@@ -10,7 +10,6 @@ function MakeManagedProjects()
 	dofile("MusiC.Extensions.Classifiers.Barbedo.lua")
 	dofile("MusiC.Extensions.Configs.XMLConfigurator.lua")
 	dofile("MusiC.Extensions.Features.SpecRollOff.lua")
-	--dofile("MusiC.Extensions.Handlers.DBHandler.lua")
 	dofile("MusiC.Extensions.Handlers.WAVHandler.lua")
 	dofile("MusiC.Extensions.Windows.Hamming.lua")
 end

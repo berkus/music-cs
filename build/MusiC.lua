@@ -21,7 +21,9 @@ includedirs({
 
 links({
 	"System",
+	"System.Core",
 	"System.Xml",
+	"System.Xml.Linq",
 	"log4net"
 })
 

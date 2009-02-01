@@ -122,7 +122,7 @@ namespace MusiC
 		/// <param name="dbName">
 		/// A <see cref="System.String"/>
 		/// </param>
-		[DllImport("MusiC.Native.dll", EntryPoint="Initialize", CharSet=CharSet.Ansi)]
+		[DllImport("MusiC.Native.Core.dll", EntryPoint="Initialize", CharSet=CharSet.Ansi)]
 		extern static unsafe
 		private void uInitialize(string dbName);
 		
@@ -131,7 +131,7 @@ namespace MusiC
 		/// <summary>
 		/// 
 		/// </summary>
-		[DllImport("MusiC.Native.dll", EntryPoint="Terminate")]
+		[DllImport("MusiC.Native.Core.dll", EntryPoint="Terminate")]
 		extern static unsafe
 		private void uTerminate();
 		
@@ -152,7 +152,7 @@ namespace MusiC
 		/// <returns>
 		/// A <see cref="System.Int32"/>
 		/// </returns>
-		[DllImport("MusiC.Native.dll", EntryPoint="GetFeature", CharSet=CharSet.Ansi)]
+		[DllImport("MusiC.Native.Core.dll", EntryPoint="GetFeature", CharSet=CharSet.Ansi)]
 		extern static unsafe
 		private int uGetFeature(string wndName, string featName, float * dt);
 		
@@ -173,7 +173,7 @@ namespace MusiC
 		/// <param name="size">
 		/// A <see cref="System.Int32"/>
 		/// </param>
-		[DllImport("MusiC.Native.dll", EntryPoint="AddFeature", CharSet=CharSet.Ansi)]
+		[DllImport("MusiC.Native.Core.dll", EntryPoint="AddFeature", CharSet=CharSet.Ansi)]
 		extern static unsafe
 		private void uAddFeature(string wndName, string featName, float * data, int size);
 

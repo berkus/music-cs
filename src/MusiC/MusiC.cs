@@ -112,6 +112,7 @@ namespace MusiC
 				BeginReportSection("Starting Extension Loading");
 				
 				_cache.Load(ExtensionsDir);
+				_cache.Say();
 				
 				EndReportSection(true);
 			}

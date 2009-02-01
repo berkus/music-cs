@@ -39,7 +39,7 @@ namespace MusiC
 			{	
 			}
 			
-			[DllImport("MusiC.Native.dll", EntryPoint="fftr_mag")]
+			[DllImport("MusiC.Native.Core.dll", EntryPoint="fftr_mag")]
 			extern static unsafe
 			public Int32 FFTMagnitude(Single * sequence, Single * magnitude, Int32 size);
 		}

@@ -24,10 +24,12 @@ includedirs({
 links({
 	"gsl",
 	"gslcblas",
+	"MusiC.Native.Base"
 })
 
 libdirs({
 	base_deps_dir.."/"..os.get().."/lib",
+	base_bin_dir
 })
 
 ---------------------
@@ -45,7 +47,7 @@ flags({"Unicode", "NoImportLib"})
 kind("SharedLib")
 
 targetname("MusiC.Extensions.Classifiers.uBarbedo")
---targetprefix("")
---targetextension="dll"
+targetprefix("")
+targetextension(".dll")
 targetdir(base_bin_dir)
 objdir(base_bin_dir.."/obj")
