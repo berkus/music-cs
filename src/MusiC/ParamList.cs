@@ -26,24 +26,57 @@ using System.Collections.Generic;
 
 namespace MusiC
 {
+	/// <summary>
+	/// 
+	/// </summary>
 	class ParamList : MusiCObject, IParamList
 	{
-		bool _isParamInitiated = false;
+		private bool _isParamInitiated = false;
 
-		LinkedList<Instantiable> _paramList = new LinkedList<Instantiable>();
-
+		private LinkedList<Instantiable> _paramList = new LinkedList<Instantiable>();
+		
+		//::::::::::::::::::::::::::::::::::::::://
+		
+		/// <summary>
+		/// 
+		/// </summary>
+		/// <param name="paramName">
+		/// A <see cref="System.String"/>
+		/// </param>
+		/// <param name="paramClass">
+		/// A <see cref="System.String"/>
+		/// </param>
 		public virtual void AddParam(string paramName, string paramClass)
 		{
 			AddParam(paramName, paramClass, null);
 		}
-
+		
+		//::::::::::::::::::::::::::::::::::::::://
+		
+		/// <summary>
+		/// 
+		/// </summary>
+		/// <param name="paramName">
+		/// A <see cref="System.String"/>
+		/// </param>
+		/// <param name="paramClass">
+		/// A <see cref="System.String"/>
+		/// </param>
+		/// <param name="strValue">
+		/// A <see cref="System.String"/>
+		/// </param>
 		public virtual void AddParam(string paramName, string paramClass, string strValue)
 		{
 			Instantiable i = new Instantiable(paramName, paramClass);
 			i.StrValue = strValue;
 			_paramList.AddLast(i);
 		}
-
+		
+		//::::::::::::::::::::::::::::::::::::::://
+		
+		/// <summary>
+		/// 
+		/// </summary>
 		public virtual void Instantiate()
 		{
 			if (_paramList.Count != 0 && !_isParamInitiated) {
@@ -52,6 +85,17 @@ namespace MusiC
 			}
 		}
 
+		//::::::::::::::::::::::::::::::::::::::://
+		
+		/// <summary>
+		/// 
+		/// </summary>
+		/// <param name="name">
+		/// A <see cref="System.String"/>
+		/// </param>
+		/// <returns>
+		/// A <see cref="Instantiable"/>
+		/// </returns>
 		public Instantiable GetParamByName(string name)
 		{
 			foreach (Instantiable i in _paramList) {
@@ -62,7 +106,15 @@ namespace MusiC
 
 			///@todo error handling
 		}
-
+		
+		//::::::::::::::::::::::::::::::::::::::://
+		
+		/// <summary>
+		/// 
+		/// </summary>
+		/// <returns>
+		/// A <see cref="Type"/>
+		/// </returns>
 		public virtual Type[] GetTypes()
 		{
 			int paramCount = _paramList.Count;
@@ -76,7 +128,15 @@ namespace MusiC
 
 			return paramClassTypes;
 		}
-
+		
+		//::::::::::::::::::::::::::::::::::::::://
+		
+		/// <summary>
+		/// 
+		/// </summary>
+		/// <returns>
+		/// A <see cref="System.Object"/>
+		/// </returns>
 		public virtual object[] GetParamsValue()
 		{
 			if (_paramList.Count != 0 && !_isParamInitiated) {

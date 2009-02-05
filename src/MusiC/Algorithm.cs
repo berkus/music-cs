@@ -70,7 +70,7 @@ namespace MusiC
 				return false;
 			}
 			
-			if (info.Manager == ExtensionManagement.Error)
+			if (info.Model == MemoryModel.Error)
 			{
 				Error(extensionClass + ": Can't recognize if this is a Managed or Unmanaged implementation. Classifiers/Features/Windows must inherit from their subclasses.");
 				return false;
@@ -95,9 +95,9 @@ namespace MusiC
 		/// </param>
 		public void Execute(ExtensionCache cache)
 		{
-			ExtensionManagement status = _pipe.Check();
+			MemoryModel status = _pipe.Check();
 			
-			if (status == ExtensionManagement.NotSet || status == ExtensionManagement.Error)
+			if (status == MemoryModel.NotSet || status == MemoryModel.Error)
 			{
 				Error("An error has ocurred. Status = " + status.ToString());
 				Say();
@@ -129,7 +129,7 @@ namespace MusiC
 		private mPipeline _mPipe = new mPipeline();
 		private uPipeline _uPipe = new uPipeline();
 		
-		private ExtensionManagement _status = ExtensionManagement.NotSet;
+		private MemoryModel _status = MemoryModel.NotSet;
 		
 		//::::::::::::::::::::::::::::::::::::::://
 		
@@ -147,9 +147,9 @@ namespace MusiC
 		/// </returns>
 		public bool Add(Extension ext, ExtensionInfo info)
 		{
-			switch (info.Manager)
+			switch (info.Model)
 			{
-				case ExtensionManagement.Managed:
+				case MemoryModel.Managed:
 					switch (info.Kind)
 					{
 						case ExtensionKind.Window:
@@ -169,7 +169,7 @@ namespace MusiC
 					}
 					break;
 				
-				case ExtensionManagement.Unmanaged:
+				case MemoryModel.Unmanaged:
 					switch (info.Kind)
 					{
 						case ExtensionKind.Window:
@@ -205,38 +205,38 @@ namespace MusiC
 		/// <returns>
 		/// A <see cref="ExtensionManagement"/>
 		/// </returns>
-		public ExtensionManagement Check()
+		public MemoryModel Check()
 		{
 			bool mStatus = _mPipe.Check();
 			bool uStatus = _uPipe.Check();
 			
 			if (uStatus && mStatus)
 			{
-				_status = ExtensionManagement.Error;
-				return ExtensionManagement.Error;
+				_status = MemoryModel.Error;
+				return MemoryModel.Error;
 			}
 			
 			if (!(uStatus || mStatus))
 			{
-				_status = ExtensionManagement.Error;
-				return ExtensionManagement.NotSet;
+				_status = MemoryModel.Error;
+				return MemoryModel.NotSet;
 			}
 			
 			if (uStatus)
 			{
-				_status = ExtensionManagement.Unmanaged;
-				return ExtensionManagement.Unmanaged;
+				_status = MemoryModel.Unmanaged;
+				return MemoryModel.Unmanaged;
 			}
 			
 			if (mStatus)
 			{
-				_status = ExtensionManagement.Managed;
-				return ExtensionManagement.Managed;
+				_status = MemoryModel.Managed;
+				return MemoryModel.Managed;
 			}
 			
 			// this shouldn't be reached.
 			// conforming to compiler: not all code paths return a value (CS0161)
-			return ExtensionManagement.NotSet;
+			return MemoryModel.NotSet;
 		}
 		
 		//::::::::::::::::::::::::::::::::::::::://
@@ -249,13 +249,13 @@ namespace MusiC
 		/// </param>
 		public void Execute(ExtensionCache cache)
 		{
-			if (_status == ExtensionManagement.Managed)
+			if (_status == MemoryModel.Managed)
 			{
 				_mPipe.Execute(cache);
 				return;
 			}
 			
-			if (_status == ExtensionManagement.Unmanaged)
+			if (_status == MemoryModel.Unmanaged)
 			{
 				_uPipe.Execute(cache);
 				return;

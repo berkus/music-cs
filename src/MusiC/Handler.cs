@@ -1,6 +1,6 @@
 /*
  * The MIT License
- * Copyright (c) 2008-2009 Marcos Jos� Sant'Anna Magalh�es
+ * Copyright (c) 2008-2009 Marcos José Sant'Anna Magalhães
  * 
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -26,33 +26,43 @@ using System.IO;
 
 namespace MusiC
 {
-	public interface IHandler
-	{
-		bool CanHandle(String file);
-		
-		void Attach(String file);
-		void Detach();
-		
-		int GetStreamSize();
-	}
+	//---------------------------------------//
 
+	/// <summary>
+	/// 
+	/// </summary>
 	/// @todo Make sure base Attach and Detach are executed.
 	abstract
 	public class BaseHandler : Extension, IHandler
 	{
 		private string _file;
-		
+
+		//::::::::::::::::::::::::::::::::::::::://
+
+		//// <value>
+		/// 
+		/// </value>
 		public string CurrentFile
 		{
 			get { return _file; }
 		}
-		
+
+		//::::::::::::::::::::::::::::::::::::::://
+
+		/// <summary>
+		/// 
+		/// </summary>
 		virtual
 		public bool CanHandle(string file)
 		{
 			return false;
 		}
-		
+
+		//::::::::::::::::::::::::::::::::::::::://
+
+		/// <summary>
+		/// 
+		/// </summary>
 		virtual
 		public void Attach(string file)
 		{
@@ -62,6 +72,11 @@ namespace MusiC
 				Detach();
 		}
 
+		//::::::::::::::::::::::::::::::::::::::://
+
+		/// <summary>
+		/// 
+		/// </summary>
 		public DBHandler GetDBHandler()
 		{
 			DBHandler hnd = null;
@@ -71,7 +86,11 @@ namespace MusiC
 
 			return hnd;
 		}
-		
+		//::::::::::::::::::::::::::::::::::::::://
+
+		/// <summary>
+		/// 
+		/// </summary>
 		virtual
 		public void Detach()
 		{
@@ -82,17 +101,26 @@ namespace MusiC
 		public int GetStreamSize();
 	}
 	
+	//---------------------------------------//
+	
 	namespace Managed
 	{
-		//abstract public class Handler<T> : Extension, IHandler where T : struct
+		/// <summary>
+		/// 
+		/// </summary>
 		abstract
 		public class Handler : BaseHandler
 		{
 		}
 	}
+
+	//---------------------------------------//
 	
 	namespace Unmanaged
 	{
+		/// <summary>
+		/// 
+		/// </summary>
 		[CLSCompliant(false)]
 		abstract
 		public class Handler : BaseHandler

@@ -2,6 +2,8 @@ os=$(uname -s)
 
 if [ "$os" = "Darwin" ]; then
 	export DYLD_LIBRARY_PATH=./;$DYLD_LIBRARY_PATH
+else
+	export LD_LIBRARY_PATH=./:$LD_LIBRARY_PATH
 fi
-export
+
 mono --debug --verbose MusiC.Apps.GenreC.exe | grep "Method MusiC" > report.txt

@@ -1,6 +1,6 @@
 /*
  * The MIT License
- * Copyright (c) 2008-2009 Marcos José Sant'Anna Magalhães
+ * Copyright (c) 2008-2009 Marcos Jos� Sant'Anna Magalh�es
  * 
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -22,31 +22,37 @@
  */
 
 using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Text;
 
-using MusiC.Extensions;
-
-namespace MusiC
+namespace MusiC.Exceptions
 {
 	/// <summary>
 	/// 
 	/// </summary>
-	public interface IAlgorithm
+	public class MissingExtensionException : MCException
 	{
 		/// <summary>
 		/// 
 		/// </summary>
-		/// <param name="extensionClass">
+		/// <param name="msg">
 		/// A <see cref="System.String"/>
 		/// </param>
-		/// <param name="args">
-		/// A <see cref="IParamList"/>
+		public MissingExtensionException(String msg) : base(msg)
+		{
+		}
+		
+		//::::::::::::::::::::::::::::::::::::::://
+		
+		/// <summary>
+		/// 
+		/// </summary>
+		/// <param name="e">
+		/// A <see cref="Exception"/>
 		/// </param>
-		/// <returns>
-		/// A <see cref="System.Boolean"/>
-		/// </returns>
-		bool Add(string extensionClass, IParamList args);
+		/// <param name="msg">
+		/// A <see cref="System.String"/>
+		/// </param>
+		public MissingExtensionException(Exception e, String msg) : base(e, msg)
+		{
+		}
 	}
 }

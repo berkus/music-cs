@@ -26,23 +26,50 @@ using System.IO;
 
 namespace MusiC
 {
+	/// <summary>
+	/// 
+	/// </summary>
 	public interface ILabel
 	{
-		string Label {
+		//// <value>
+		/// 
+		/// </value>
+		string Label 
+		{
 			get;
 			set;
 		}
-	
-		string OutputDir {
+
+		//::::::::::::::::::::::::::::::::::::::://
+
+		//// <value>
+		/// 
+		/// </value>
+		string OutputDir 
+		{
 			get;
 			set;
 		}
-	
-		string InputDir {
+
+		//::::::::::::::::::::::::::::::::::::::://
+
+		//// <value>
+		/// 
+		/// </value>
+		string InputDir 
+		{
 			get;
 			set;
 		}
-	
+
+		//::::::::::::::::::::::::::::::::::::::://
+
+		/// <summary>
+		/// 
+		/// </summary>
+		/// <returns>
+		/// A <see cref="System.Boolean"/>
+		/// </returns>
 		bool Validate();
 	}
 }

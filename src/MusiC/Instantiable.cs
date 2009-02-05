@@ -26,7 +26,11 @@ using System.Reflection;
 
 namespace MusiC
 {
-	internal class Instantiable : ParamList
+	/// <summary>
+	/// 
+	/// </summary>
+	internal 
+	class Instantiable : ParamList
 	{
 		private string _name;
 		private string _classname;
@@ -36,42 +40,80 @@ namespace MusiC
 		private object _value;
 		
 		private bool  _isInitiated = false;
-		
+
+		//::::::::::::::::::::::::::::::::::::::://
+
+		//// <value>
+		/// 
+		/// </value>
 		public Type TypeObj
 		{
 			get { return _class; }
 			set { _class = value; _classname = value.FullName; }
 		}
+
+		//::::::::::::::::::::::::::::::::::::::://
 		
+		//// <value>
+		/// 
+		/// </value>
 		public string Name
 		{
 			get { return _name; }
 			set {_name = value; }
 		}
+
+		//::::::::::::::::::::::::::::::::::::::://
 		
+		//// <value>
+		/// 
+		/// </value>
 		public string Class
 		{
 			get { return _classname; }
 			set { _class = Type.GetType(value, false, false); _classname = value; }
 		}
-		
+
+		//::::::::::::::::::::::::::::::::::::::://
+
+		//// <value>
+		/// 
+		/// </value>
 		public string StrValue
 		{
 			get { return _strValue; }
 			set { _strValue=value; }
 		}
-		
+
+		//::::::::::::::::::::::::::::::::::::::://
+
+		//// <value>
+		/// 
+		/// </value>
 		public object Value
 		{
 			get { return _value; }
 		}
+
+		//::::::::::::::::::::::::::::::::::::::://
 		
+		/// <summary>
+		/// 
+		/// </summary>
+		/// <param name="paramName">
+		/// A <see cref="System.String"/>
+		/// </param>
+		/// <param name="paramClass">
+		/// A <see cref="System.String"/>
+		/// </param>
 		public Instantiable(String paramName, String paramClass)
 		{
 			_name=paramName;
 			_classname=paramClass;
 			_class = Type.GetType(paramClass, false, false);
 		}
+
+		//::::::::::::::::::::::::::::::::::::::://
 		
 		/// <summary>
 		/// Creates a new instance of a class

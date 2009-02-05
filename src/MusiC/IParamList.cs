@@ -26,9 +26,36 @@ using System.Collections.Generic;
 
 namespace MusiC
 {
+	/// <summary>
+	/// 
+	/// </summary>
 	public interface IParamList
 	{
+		/// <summary>
+		/// 
+		/// </summary>
+		/// <param name="paramName">
+		/// A <see cref="System.String"/>
+		/// </param>
+		/// <param name="paramClass">
+		/// A <see cref="System.String"/>
+		/// </param>
 		void AddParam(string paramName, string paramClass);
+
+		//::::::::::::::::::::::::::::::::::::::://
+
+		/// <summary>
+		/// 
+		/// </summary>
+		/// <param name="paramName">
+		/// A <see cref="System.String"/>
+		/// </param>
+		/// <param name="paramClass">
+		/// A <see cref="System.String"/>
+		/// </param>
+		/// <param name="strValue">
+		/// A <see cref="System.String"/>
+		/// </param>
 		void AddParam(string paramName, string paramClass, string strValue);
 	}
 }

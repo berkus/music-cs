@@ -46,20 +46,21 @@ namespace MusiC
 		Error
 	}
 	
-	//::::::::::::::::::::::::::::::::::::::://
+	//---------------------------------------//
 	
 	/// <summary>
 	/// Identifies to which Pipeline an extension should go.
 	/// </summary>
-	enum ExtensionManagement
+	enum MemoryModel
 	{
 		Managed,
 		Unmanaged,
+		Both,
 		NotSet,
 		Error
 	}
 	
-	//::::::::::::::::::::::::::::::::::::::://
+	//---------------------------------------//
 	
 	/// <summary>
 	/// Holds information about available extensions.
@@ -80,7 +81,7 @@ namespace MusiC
 		/// <summary>
 		/// 
 		/// </summary>
-		private ExtensionManagement _managed = ExtensionManagement.NotSet;
+		private MemoryModel _managed = MemoryModel.NotSet;
 		#endregion
 		
 		//::::::::::::::::::::::::::::::::::::::://
@@ -96,7 +97,7 @@ namespace MusiC
 			get { return _kind; }
 		}
 		
-		public ExtensionManagement Manager
+		public MemoryModel Model
 		{
 			get { return _managed; }
 		}
@@ -154,7 +155,7 @@ namespace MusiC
 		/// A <see cref="ExtensionManagement"/>
 		/// </returns>
 		static
-		public ExtensionManagement IdentifyManagement(Type t)
+		public MemoryModel IdentifyManagement(Type t)
 		{
 			// Managed
 			if(
@@ -164,7 +165,7 @@ namespace MusiC
 				typeof(Managed.Window).IsAssignableFrom(t) ||
 				typeof(Configurator).IsAssignableFrom(t)
 			)
-				return ExtensionManagement.Managed;
+				return MemoryModel.Managed;
 			
 			// Unmanaged
 			if(
@@ -173,9 +174,9 @@ namespace MusiC
 				typeof(Unmanaged.Handler).IsAssignableFrom(t) ||
 				typeof(Unmanaged.Window).IsAssignableFrom(t)
 			)
-				return ExtensionManagement.Unmanaged;
+				return MemoryModel.Unmanaged;
 					
-			return ExtensionManagement.Error;
+			return MemoryModel.Error;
 		}
 		
 		#endregion

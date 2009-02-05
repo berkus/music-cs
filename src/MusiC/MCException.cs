@@ -1,6 +1,6 @@
 /*
  * The MIT License
- * Copyright (c) 2008-2009 Marcos José Sant'Anna Magalhães
+ * Copyright (c) 2008-2009 Marcos Josï¿½ Sant'Anna Magalhï¿½es
  * 
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -22,38 +22,76 @@
  */
 
 using System;
+using System.Collections.Generic;
 
 namespace MusiC.Exceptions
 {
+	/// <summary>
+	/// 
+	/// </summary>
 	public class MCException : ApplicationException
 	{
+		//// <value>
+		/// 
+		/// </value>
 		class MCExceptionReporter : MusiCObject
 		{
+			/// <summary>
+			/// 
+			/// </summary>
+			/// <param name="e">
+			/// A <see cref="MCException"/>
+			/// </param>
 			public void ReportException(MCException e)
 			{
 				Error(e);
 			}
 		}
+
+		//::::::::::::::::::::::::::::::::::::::://
 		
-		int msgCounter = 0;
-		System.Collections.Generic.Queue<String> m_message = new System.Collections.Generic.Queue<String>();
-		MCExceptionReporter _reporter = new MCExceptionReporter();
+		private int msgCounter = 0;
+		private Queue<string> m_message = new Queue<string>();
+		private MCExceptionReporter _reporter = new MCExceptionReporter();
+
+		//::::::::::::::::::::::::::::::::::::::://
 		
 //		public MCExceptionReporter Reporter
 //		{
 //			get {return _reporter;}
 //		}
-		
+
+		//::::::::::::::::::::::::::::::::::::::://
+
+		/// <summary>
+		/// 
+		/// </summary>
 		public System.Collections.Generic.IEnumerable<String> MessageList {
 			get { return m_message; }
 		}
-		
+
+		//::::::::::::::::::::::::::::::::::::::://
+
+		/// <summary>
+		/// 
+		/// </summary>
 		public MCException(String message) : base(message)
 		{
 			//m_message.Enqueue("[MusiC]:");
 			m_message.Enqueue((++msgCounter).ToString() + ". " + message);
 		}
 		
+		//::::::::::::::::::::::::::::::::::::::://
+		
+		/// <summary>
+		/// 
+		/// </summary>
+		/// <param name="e">
+		/// A <see cref="System.Exception"/>
+		/// </param>
+		/// <param name="message">
+		/// A <see cref="System.String"/>
+		/// </param>
 		public MCException(System.Exception e, String message) : base(e.Message, e)
 		{	
 			m_message.Enqueue("[SYSTEM]:" + e.Message);
@@ -62,16 +100,37 @@ namespace MusiC.Exceptions
 			m_message.Enqueue((++msgCounter).ToString() + ". " + message);
 		}
 		
+		//::::::::::::::::::::::::::::::::::::::://
+		
+		/// <summary>
+		/// 
+		/// </summary>
+		/// <param name="message">
+		/// A <see cref="System.String"/>
+		/// </param>
 		public void AddMessage(string message)
 		{
 			m_message.Enqueue((++msgCounter).ToString() + ". " + message);
 		}
 		
+		//::::::::::::::::::::::::::::::::::::::://
+		
+		/// <summary>
+		/// 
+		/// </summary>
+		/// <returns>
+		/// A <see cref="System.String"/>
+		/// </returns>
 		public String GetMyName()
 		{
 			return null;
 		}
 		
+		//::::::::::::::::::::::::::::::::::::::://
+		
+		/// <summary>
+		/// 
+		/// </summary>
 		public void Report()
 		{
 			_reporter.ReportException(this);

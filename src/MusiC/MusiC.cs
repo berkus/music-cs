@@ -1,6 +1,6 @@
 /*
  * The MIT License
- * Copyright (c) 2008-2009 Marcos Jos� Sant'Anna Magalh�es
+ * Copyright (c) 2008-2009 Marcos José Sant'Anna Magalhães
  * 
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -50,6 +50,8 @@ namespace MusiC
 		private ExtensionCache _cache = new ExtensionCache();
 		private Configurator _cfg;
 		#endregion
+
+		//::::::::::::::::::::::::::::::::::::::://
 		
 		#region Properties
 		/// <summary>
@@ -60,7 +62,7 @@ namespace MusiC
 		/// </summary>
 		public String ExtensionsDir
 		{
-			get {return _extensionsDir;}
+			get { return _extensionsDir; }
 
 			set
 			{
@@ -74,6 +76,8 @@ namespace MusiC
 				_extensionsDir=value;
 			}
 		}
+
+		//::::::::::::::::::::::::::::::::::::::://
 		
 		/// <summary>
 		/// Library config file.
@@ -97,6 +101,8 @@ namespace MusiC
 			}
 		}
 		#endregion
+
+		//::::::::::::::::::::::::::::::::::::::://
 		
 		#region Library Startup/Finishing Functions
 		/// <summary>
@@ -126,6 +132,11 @@ namespace MusiC
 			}
 		}
 		
+		//::::::::::::::::::::::::::::::::::::::://
+		
+		/// <summary>
+		/// 
+		/// </summary>
 		public void Run()
 		{
 			try
@@ -150,6 +161,11 @@ namespace MusiC
 			}
 		}
 		
+		//::::::::::::::::::::::::::::::::::::::://
+		
+		/// <summary>
+		/// 
+		/// </summary>
 		public void Stop()
 		{
 			AppDomain.CurrentDomain.UnhandledException -= _UnhandledExceptionHandler;
@@ -157,20 +173,45 @@ namespace MusiC
 		
 		#endregion
 		
+		//::::::::::::::::::::::::::::::::::::::://
+		
 		#region Extensions Handling
+		
+		/// <summary>
+		/// 
+		/// </summary>
+		/// <param name="path">
+		/// A <see cref="System.String"/>
+		/// </param>
 		public void LoadFrom(String path)
 		{
 			_cache.Load(path);
 		}
 		
+		//::::::::::::::::::::::::::::::::::::::://
+		
+		/// <summary>
+		/// 
+		/// </summary>
+		/// <param name="classname">
+		/// A <see cref="System.String"/>
+		/// </param>
+		/// <returns>
+		/// A <see cref="System.Boolean"/>
+		/// </returns>
 		public bool IsExtensionLoaded(String classname)
 		{
 			return !(ExtensionCache.GetInfo(classname) == null);
 		}
+		
 		#endregion
+		
+		//::::::::::::::::::::::::::::::::::::::://
 		
 		#region Algorithm Handling
 		#endregion
+		
+		//::::::::::::::::::::::::::::::::::::::://
 		
 		#region Algorithm Execution
 		#endregion

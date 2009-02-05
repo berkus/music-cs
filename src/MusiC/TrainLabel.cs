@@ -26,54 +26,85 @@ using System.IO;
 
 namespace MusiC
 {
+	/// <summary>
+	/// 
+	/// </summary>
 	class TrainLabel : MusiCObject, ILabel
 	{
-		string _label;
-		string _inDir;
-		string _outDir;
-
+		private string _label;
+		private string _inDir;
+		private string _outDir;
+		
+		//::::::::::::::::::::::::::::::::::::::://
+		
+		//// <value>
+		/// 
+		/// </value>
 		public string Label {
 			get { return _label; }
 			set { _label = value; }
 		}
-
+		
+		//::::::::::::::::::::::::::::::::::::::://
+		
+		//// <value>
+		/// 
+		/// </value>
 		public string OutputDir {
 			get { return _outDir; }
 			set { _outDir = value; }
 		}
-
+		
+		//::::::::::::::::::::::::::::::::::::::://
+		
+		//// <value>
+		/// 
+		/// </value>
 		public string InputDir {
 			get { return _inDir; }
 			set { _inDir = value; }
 		}
-
-/* override public String ToString()
-		{
-			String obj=PrintHeader();
-			
-			obj= obj +
-			"[Label]:"+ _label + "\n" +
-			"[Input Dir]:"+_inDir + "\n"+
-			"[Output Dir]:"+_outDir + "\n";
-			
-			obj = obj + PrintFooter();
-			
-			return obj;
-		} */
-
+		
+		//::::::::::::::::::::::::::::::::::::::://
+		
+//		override
+//		public String ToString()
+//		{
+//			String obj=PrintHeader();
+//			
+//			obj= obj +
+//			"[Label]:"+ _label + "\n" +
+//			"[Input Dir]:"+_inDir + "\n"+
+//			"[Output Dir]:"+_outDir + "\n";
+//			
+//			obj = obj + PrintFooter();
+//			
+//			return obj;
+//		}
+		
+		//::::::::::::::::::::::::::::::::::::::://
+		
+		/// <summary>
+		/// 
+		/// </summary>
+		/// <returns>
+		/// A <see cref="System.Boolean"/>
+		/// </returns>
 		public bool Validate()
 		{
-			if (!Directory.Exists(_outDir)) {
+			if (!Directory.Exists(_outDir)) 
+			{
 				/// @todo change to a default place
-				Console.WriteLine("The specified output directory isn't available");
+				Message("Label:" + _label + " - Invalid directory - " + _outDir);
 				return false;
 			}
 
-			if (!Directory.Exists(_inDir)) {
-				Console.WriteLine("The specified input directory isn't available.");
+			if (!Directory.Exists(_inDir)) 
+			{
+				Message("Label:" + _label + " - Invalid directory - " + _inDir);
 				return false;
 			}
-
+			
 			Print();
 			return true;
 		}

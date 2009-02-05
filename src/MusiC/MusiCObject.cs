@@ -30,6 +30,9 @@ using MusiC.Exceptions;
 
 namespace MusiC
 {
+	/// <summary>
+	/// 
+	/// </summary>
 	public enum ReportLevel
 	{
 		NotSet,
@@ -38,6 +41,8 @@ namespace MusiC
 		Message,
 		Debug,
 	}
+	
+	//::::::::::::::::::::::::::::::::::::::://
 	
 	/// <summary>
 	/// Base class to ALL other classes.
@@ -60,12 +65,16 @@ namespace MusiC
 		
 		private int _localReportLevel=(int)ReportLevel.NotSet;
 		
+		//::::::::::::::::::::::::::::::::::::::://
+		
 		static
 		MusiCObject()
 		{
-			log4net.Config.XmlConfigurator.Configure(new System.IO.FileInfo("music.log.xml"));
+			log4net.Config.XmlConfigurator.Configure(new System.IO.FileInfo("MusiC.log.xml"));
 			_log = log4net.LogManager.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
 		}
+		
+		//::::::::::::::::::::::::::::::::::::::://
 		
 		override
 		public String ToString()
@@ -73,7 +82,16 @@ namespace MusiC
 			return base.ToString();
 		}
 		
+		//::::::::::::::::::::::::::::::::::::::://
+		
 		#region Not-In-Use
+		
+		/// <summary>
+		/// 
+		/// </summary>
+		/// <param name="f">
+		/// A <see cref="FieldInfo"/>
+		/// </param>
 		private void ToScreen(FieldInfo f)
 		{
 			Object o = f.GetValue(this);
@@ -99,8 +117,20 @@ namespace MusiC
 			
 			Message(tObject.ToString() + " [" + f.Name + "]: " + o.GetType().ToString() + " [" +	o.ToString() + "]");
 		}
+		
 		#endregion
 		
+		//::::::::::::::::::::::::::::::::::::::://
+		
+		/// <summary>
+		/// 
+		/// </summary>
+		/// <param name="msg">
+		/// A <see cref="System.String"/>
+		/// </param>
+		/// <param name="msgLvl">
+		/// A <see cref="System.String"/>
+		/// </param>
 		private void Report(String msg, String msgLvl)
 		{
 			String logLine = _indent + "[" + this.GetType().Name + "] [" + msgLvl + "]:" + msg;
@@ -125,6 +155,11 @@ namespace MusiC
 			}
 		}
 		
+		//::::::::::::::::::::::::::::::::::::::://
+		
+		/// <summary>
+		/// 
+		/// </summary>
 		public void Print()
 		{	
 			BeginReportSection("+------- {" + this.GetType().ToString() + "} --------");
@@ -144,6 +179,14 @@ namespace MusiC
 			EndReportSection(true);
 		}
 		
+		//::::::::::::::::::::::::::::::::::::::://
+		
+		/// <summary>
+		/// 
+		/// </summary>
+		/// <param name="msg">
+		/// A <see cref="System.String"/>
+		/// </param>
 		protected void Error(String msg)
 		{
 			int currentLvl = (_localReportLevel==(int)ReportLevel.NotSet) ? _globalReportLevel : _localReportLevel;
@@ -152,6 +195,14 @@ namespace MusiC
 				Report(msg, "ERROR");
 		}
 		
+		//::::::::::::::::::::::::::::::::::::::://
+		
+		/// <summary>
+		/// 
+		/// </summary>
+		/// <param name="ex">
+		/// A <see cref="MCException"/>
+		/// </param>
 		protected void Error(MCException ex)
 		{
 			Error("[ MCException ]");
@@ -174,6 +225,14 @@ namespace MusiC
 			}
 		}
 		
+		//::::::::::::::::::::::::::::::::::::::://
+		
+		/// <summary>
+		/// 
+		/// </summary>
+		/// <param name="ex">
+		/// A <see cref="Exception"/>
+		/// </param>
 		protected void Error(Exception ex)
 		{
 			Error("[ System Exception ]");
@@ -195,6 +254,14 @@ namespace MusiC
 			}
 		}
 		
+		//::::::::::::::::::::::::::::::::::::::://
+		
+		/// <summary>
+		/// 
+		/// </summary>
+		/// <param name="msg">
+		/// A <see cref="System.String"/>
+		/// </param>
 		protected void Warning(String msg)
 		{
 			int currentLvl = (_localReportLevel==(int)ReportLevel.NotSet) ? _globalReportLevel : _localReportLevel;
@@ -203,6 +270,14 @@ namespace MusiC
 				Report(msg, "WARNING");
 		}
 		
+		//::::::::::::::::::::::::::::::::::::::://
+		
+		/// <summary>
+		/// 
+		/// </summary>
+		/// <param name="msg">
+		/// A <see cref="System.String"/>
+		/// </param>
 		protected void Message(String msg)
 		{
 			int currentLvl = (_localReportLevel==(int)ReportLevel.NotSet) ? _globalReportLevel : _localReportLevel;
@@ -211,6 +286,14 @@ namespace MusiC
 				Report(msg, "MESSAGE");
 		}
 		
+		//::::::::::::::::::::::::::::::::::::::://
+		
+		/// <summary>
+		/// 
+		/// </summary>
+		/// <param name="msg">
+		/// A <see cref="System.String"/>
+		/// </param>
 		protected void Debug(String msg)
 		{
 			int currentLvl = (_localReportLevel==(int)ReportLevel.NotSet) ? _globalReportLevel : _localReportLevel;
@@ -219,6 +302,14 @@ namespace MusiC
 				Report(msg, "DEBUG");
 		}
 		
+		//::::::::::::::::::::::::::::::::::::::://
+		
+		/// <summary>
+		/// 
+		/// </summary>
+		/// <param name="sectionName">
+		/// A <see cref="System.String"/>
+		/// </param>
 		protected void BeginReportSection(String sectionName)
 		{
 			int currentLvl = (_localReportLevel==(int)ReportLevel.NotSet) ? _globalReportLevel : _localReportLevel;
@@ -232,6 +323,14 @@ namespace MusiC
 			}
 		}
 		
+		//::::::::::::::::::::::::::::::::::::::://
+		
+		/// <summary>
+		/// 
+		/// </summary>
+		/// <param name="addNewLine">
+		/// A <see cref="System.Boolean"/>
+		/// </param>
 		protected void EndReportSection(bool addNewLine)
 		{
 			int currentLvl = (_localReportLevel==(int)ReportLevel.NotSet) ? _globalReportLevel : _localReportLevel;
@@ -247,11 +346,27 @@ namespace MusiC
 				AddNewLine();
 		}
 		
+		//::::::::::::::::::::::::::::::::::::::://
+		
+		/// <summary>
+		/// 
+		/// </summary>
 		protected void AddNewLine()
 		{
 			_log.Info("");
 		}
-	
+		
+		//::::::::::::::::::::::::::::::::::::::://
+		
+		/// <summary>
+		/// 
+		/// </summary>
+		/// <param name="sender">
+		/// A <see cref="System.Object"/>
+		/// </param>
+		/// <param name="args">
+		/// A <see cref="UnhandledExceptionEventArgs"/>
+		/// </param>
 		static
 		public void UnhandledException(Object sender, UnhandledExceptionEventArgs args)
 		{

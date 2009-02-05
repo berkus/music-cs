@@ -26,31 +26,51 @@ using System.Runtime.InteropServices;
 
 namespace MusiC
 {
+	/// <summary>
+	/// 
+	/// </summary>
+	static
 	public class NativeMethods
-	{
-		NativeMethods()
-		{	
-		}
-		
+	{	
 		[CLSCompliant(false)]
+		static
 		public class Math
 		{
-			Math()
-			{	
-			}
-			
+			/// <summary>
+			/// 
+			/// </summary>
+			/// <param name="sequence">
+			/// A <see cref="System.Single"/>
+			/// </param>
+			/// <param name="magnitude">
+			/// A <see cref="System.Single"/>
+			/// </param>
+			/// <param name="size">
+			/// A <see cref="Int32"/>
+			/// </param>
+			/// <returns>
+			/// A <see cref="Int32"/>
+			/// </returns>
 			[DllImport("MusiC.Native.Core.dll", EntryPoint="fftr_mag")]
 			extern static unsafe
 			public Int32 FFTMagnitude(Single * sequence, Single * magnitude, Int32 size);
 		}
-	
+		
+		//---------------------------------------//
+		
 		[CLSCompliant(false)]
+		static
 		public class Pointer
 		{
-			Pointer()
-			{
-			}
-			
+			/// <summary>
+			/// 
+			/// </summary>
+			/// <param name="size">
+			/// A <see cref="Int32"/>
+			/// </param>
+			/// <returns>
+			/// A <see cref="System.Single"/>
+			/// </returns>
 			static unsafe
 			public Single * fgetmem(Int32 size)
 			{
@@ -58,6 +78,14 @@ namespace MusiC
 				return (Single *) ptr.ToPointer();
 			}
 			
+			//::::::::::::::::::::::::::::::::::::::://
+			
+			/// <summary>
+			/// 
+			/// </summary>
+			/// <param name="p">
+			/// A <see cref="System.Void"/>
+			/// </param>
 			static unsafe
 			public void free(void * p)
 			{

@@ -28,9 +28,22 @@ using MusiC.Data;
 
 namespace MusiC
 {
+	/// <summary>
+	/// 
+	/// </summary>
 	public interface IWindow
 	{
+		/// <summary>
+		/// 
+		/// </summary>
+		/// <param name="hnd">
+		/// A <see cref="IHandler"/>
+		/// </param>
 		void Attach(IHandler hnd);
+
+		/// <summary>
+		/// 
+		/// </summary>
 		void Detach();
 	}
 	

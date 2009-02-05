@@ -1,6 +1,6 @@
 /*
  * The MIT License
- * Copyright (c) 2008-2009 Marcos José Sant'Anna Magalhães
+ * Copyright (c) 2008-2009 Marcos Josï¿½ Sant'Anna Magalhï¿½es
  * 
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -25,13 +25,19 @@ using System;
 
 namespace MusiC.Exceptions
 {
-	public class MissingExtensionException : MCException
+	/// <summary>
+	/// 
+	/// </summary>
+	public class MissingAttributeException : MCException
 	{
-		public MissingExtensionException(String msg) : base(msg)
-		{
-		}
-		
-		public MissingExtensionException(Exception e, String msg) : base(e, msg)
+		/// <summary>
+		/// 
+		/// </summary>
+		/// <param name="nodeMissing">
+		/// A <see cref="System.String"/>
+		/// </param>
+		public MissingAttributeException(string nodeMissing) : base("Couldn't find the obligatory attribute "
+			+ nodeMissing + ". Please check case and spelling.")
 		{
 		}
 	}

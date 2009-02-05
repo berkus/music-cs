@@ -264,6 +264,18 @@ namespace MusiC.Data.Managed
 	
 	public class DataHandler
 	{
+		/// <summary>
+		/// 
+		/// </summary>
+		/// <param name="nClasses">
+		/// A <see cref="System.Int32"/>
+		/// </param>
+		/// <param name="nFeatures">
+		/// A <see cref="System.Int32"/>
+		/// </param>
+		/// <returns>
+		/// A <see cref="DataCollection"/>
+		/// </returns>
 		static
 		public DataCollection BuildCollection(int nClasses, int nFeatures)
 		{
@@ -280,13 +292,26 @@ namespace MusiC.Data.Managed
 			
 			return data;
 		}
-		
+
+		//::::::::::::::::::::::::::::::::::::::://
+
+		/// <summary>
+		/// 
+		/// </summary>
+		/// <param name="wClass">
+		/// A <see cref="ClassData"/>
+		/// </param>
+		/// <param name="nLists">
+		/// A <see cref="Int32"/>
+		/// </param>
 		static
 		public void BuildVectorList(ClassData wClass, Int32 nLists)
 		{
 			//wClass.pVectorList = ;
 			wClass.nVectorListAlloc = nLists;
 		}
+
+		//::::::::::::::::::::::::::::::::::::::://
 		
 		/// <summary>
 		/// 

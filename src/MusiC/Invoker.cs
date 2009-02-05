@@ -26,19 +26,54 @@ using System.Reflection;
 
 namespace MusiC
 {
+	/// <summary>
+	/// 
+	/// </summary>
+	internal static
 	class Invoker
 	{
-		public static Extension LoadType()
+		/// <summary>
+		/// 
+		/// </summary>
+		/// <returns>
+		/// A <see cref="Extension"/>
+		/// </returns>
+		static
+		public Extension LoadType()
 		{
 			return null;
 		}
 		
-		public static Extension LoadType(Instantiable i)
+		//::::::::::::::::::::::::::::::::::::::://
+		
+		/// <summary>
+		/// 
+		/// </summary>
+		/// <param name="i">
+		/// A <see cref="Instantiable"/>
+		/// </param>
+		/// <returns>
+		/// A <see cref="Extension"/>
+		/// </returns>
+		static
+		public Extension LoadType(Instantiable i)
 		{
 			return null;
 		}
 		
-		public static Configurator LoadConfig(Type tConfig)
+		//::::::::::::::::::::::::::::::::::::::://
+		
+		/// <summary>
+		/// 
+		/// </summary>
+		/// <param name="tConfig">
+		/// A <see cref="Type"/>
+		/// </param>
+		/// <returns>
+		/// A <see cref="Configurator"/>
+		/// </returns>
+		static
+		public Configurator LoadConfig(Type tConfig)
 		{
 			// TODO: Check if this type match expected config.
 			ConstructorInfo configCtor = tConfig.GetConstructor(new Type[0]);

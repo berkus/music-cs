@@ -48,6 +48,9 @@ namespace MusiC.Extensions
 
 		static readonly
 		private LinkedList<ExtensionInfo> _infoList = new LinkedList<ExtensionInfo>(); 
+
+		static readonly
+		private LinkedList<IHandler> _hndPool = new LinkedList<IHandler>();
 		
 		#endregion
 		
@@ -102,9 +105,13 @@ namespace MusiC.Extensions
 		private XElement BuildEntry(ExtensionInfo info)
 		{
 			XElement entry = new XElement("MusiC.Extension");
-			entry.Add(new XAttribute("Index", _infoList.Count() + 1));
-			entry.Add(new XElement("Class",info.Class.FullName));
-			entry.Add(new XElement("Kind", info.Kind.ToString()));
+			entry.Add( new XAttribute("Index", _infoList.Count() ));
+			entry.Add( new XElement("Class", info.Class.FullName) );
+			entry.Add( new XElement("Kind", info.Kind.ToString()) );
+			entry.Add( new XElement("Model", info.Model.ToString()) );
+
+			if( info.Kind == ExtensionKind.FileHandler )
+				entry.Add( new XElement("Handler_Index", _hndPool.Count()) );
 
 			return entry;
 		}
@@ -124,6 +131,9 @@ namespace MusiC.Extensions
 			
 			_root.Add(BuildEntry(info));
 			_infoList.AddLast(info);
+
+			if( info.Kind == ExtensionKind.FileHandler )
+				_hndPool.AddLast(info.Instantiate(null) as IHandler);
 			
 			Message(extensionType.ToString() + " ... [ADDED]");
 		}
@@ -169,15 +179,24 @@ namespace MusiC.Extensions
 		/// </returns>
 		public Unmanaged.Handler GetUnmanagedHandler(String file)
 		{
-//			foreach(IHandler h in _handlerList)
-//			{
-//				if(h.CanHandle(file) && ExtensionManagement.Unmanaged == ExtensionInfo.IdentifyManagement(h.GetType()))
-//				{
-//					return h as Unmanaged.Handler;
-//				}
-//			}
+			IHandler hnd = null;
+			// Get possible extensions
+			IEnumerable<IHandler> result =
+				from element in _root.Elements("MusiC.Extension")
+					where element.Descendants("Kind").ElementAt(0).Value == "FileHandler"
+					where (
+					       element.Descendants("Model").ElementAt(0).Value == "Unmanaged" ||
+					       element.Descendants("Model").ElementAt(0).Value == "Both"
+					       )
+					where (hnd = _hndPool.ElementAt(int.Parse( element.Elements("Handler_Index").ElementAt(0).Value ))).CanHandle(file)
+					select hnd;
 			
-			return null;
+			Message("GetUnmanagedHandler - Handlers Found: " + result.Count());
+			
+			if( result.Count() > 0 )
+				return result.ElementAt(0) as Unmanaged.Handler;
+			else
+				return null;
 		}
 		
 		#endregion
@@ -291,7 +310,7 @@ namespace MusiC.Extensions
 
 		public void Say()
 		{
-			Console.WriteLine(_doc);
+			Message(_doc.ToString());
 		}
 	}
 }

@@ -73,7 +73,7 @@ namespace MusiC
 		/// <summary>
 		/// 
 		/// </summary>
-		internal class Extractor
+		class Extractor
 		{
 			/// <summary>
 			/// 
@@ -90,8 +90,6 @@ namespace MusiC
 			static unsafe 
 			public void Extract(Window wnd, IEnumerable<Feature> featList, Data.Unmanaged.FileData * dataStg)
 			{
-				Console.WriteLine("ok");
-				
 				int fIdx;
                 float * windowBuffer;
 				
@@ -123,7 +121,7 @@ namespace MusiC
 				{
 					windowBuffer = wnd.GetWindow(i);
 					
-					if (windowBuffer != null)
+					if (windowBuffer == null)
                     {
 						continue;
 					}
@@ -144,8 +142,16 @@ namespace MusiC
 						{
 							// if it hasn't been extracted yet then extract it and prepare to store it.
 							/// @todo Shield this method against any changes in the data structure.
-							*(fh.data + i) = *(frame->pData + fIdx) = fh.feat.Extract(windowBuffer, wnd.WindowSize); 
+
+							// This code breaks mono compiler. It generates invalid IL instructions.
+							//*(fh.data + i) = *(frame->pData + fIdx) = fh.feat.Extract(windowBuffer, wnd.WindowSize);
+							
+							float val = fh.feat.Extract(windowBuffer, wnd.WindowSize);
+							*(frame->pData + fIdx) = val;
+							*(fh.data + i) = val;
 						}
+
+						fIdx++;
                     }
 				}
 				

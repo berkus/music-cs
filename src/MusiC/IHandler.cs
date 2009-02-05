@@ -22,31 +22,65 @@
  */
 
 using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Text;
-
-using MusiC.Extensions;
 
 namespace MusiC
 {
 	/// <summary>
 	/// 
 	/// </summary>
-	public interface IAlgorithm
+	public interface IHandler
+	{
+		bool CanHandle(string file);
+		
+		void Attach(String file);
+		void Detach();
+		
+		int GetStreamSize();
+	}
+
+	//---------------------------------------//
+
+	/// <summary>
+	/// For future use.
+	/// </summary>
+	public interface IManagedHandler : IHandler
 	{
 		/// <summary>
 		/// 
 		/// </summary>
-		/// <param name="extensionClass">
-		/// A <see cref="System.String"/>
+		/// <param name="windowPos">
+		/// A <see cref="System.Int64"/>
 		/// </param>
-		/// <param name="args">
-		/// A <see cref="IParamList"/>
+		/// <param name="windowSize">
+		/// A <see cref="System.Int32"/>
 		/// </param>
 		/// <returns>
-		/// A <see cref="System.Boolean"/>
+		/// A <see cref="System.Single"/>
 		/// </returns>
-		bool Add(string extensionClass, IParamList args);
+		Single[] Read(long windowPos, int windowSize);
+	}
+	
+	//---------------------------------------//
+
+	/// <summary>
+	/// For future use.
+	/// </summary>
+	[CLSCompliant(false)]
+	unsafe
+	public interface IUnmanagedHandler : IHandler
+	{
+		/// <summary>
+		/// 
+		/// </summary>
+		/// <param name="windowPos">
+		/// A <see cref="System.Int64"/>
+		/// </param>
+		/// <param name="windowSize">
+		/// A <see cref="System.Int32"/>
+		/// </param>
+		/// <returns>
+		/// A <see cref="System.Single"/>
+		/// </returns>
+		Single * Read(long windowPos, int windowSize);
 	}
 }

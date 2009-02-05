@@ -60,7 +60,8 @@ namespace MusiC.Extensions.Handlers
 		override
 		public bool CanHandle(string file)
 		{
-			return true;
+			///@todo This should check if the file is uncompressed
+			return Path.GetExtension(file).ToUpper() == ".WAV";
 		}
 		
 		//::::::::::::::::::::::::::::::::::::::://
