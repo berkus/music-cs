@@ -1,118 +1,85 @@
 #! /bin/bash
 
-compiler=""
-version=""
-
-function build()
+function menu_project()
 {
-	if ["$compiler" = "g"]; then ./premake --dotnet mono2 --target gnu; fi
-	if ["$compiler" = "m"]; then ./premake --dotnet mono2 --target monodev; fi
-	if ["$compiler" = "s"]; then ./premake --target sharpdev; fi
-	if ["$compiler" = "C"]; then ./premake --target cl-gcc; fi
-	
-	if ["$compiler" = "c"]; then
-		if ["$version" = "o"]; then ./premake --target cb-gcc; fi
-		if ["$version" = "g"]; then ./premake --target cb-gcc; fi
-	fi
-	
-	if ["$compiler" = "v"]; then
-		case "$version" in
-		"1")
-			./premake --target vs6
-		;;
-		"2")
-			./premake --target vs2002
-		;;
-		"3")
-			./premake --target vs2003
-		;;
-		"4")
-			./premake --target vs2005
-		;;
-		"5")
-			./premake --target vs2008
-		;;
-		esac
-	fi
-}
-
-function visualstudio()
-{
-	#clear
-	echo
-	echo "Choose VisualStudio version:"
-	echo "0: Go Back               2: Visual Studio 2002**        4: Visual Studio 2005"
-	echo "1: Visual Studio 6*      3: Visual Studio 2003          5: Visual Studio 2008"
-	echo
-	echo "  *(don't support managed code)     **(don't support .Net 2.0)"
-	echo
-	echo "   Enter a number:"
-	
-	read version
-	echo $version
-	
-	if [ $version -eq 0 ]; then return 1; fi
-	if [ $version -ge 1] && [$version -le 5 ]; then build; return $?; fi
-	
-	return 1
-}
-
-function codeblocks()
-{
-	#clear
-	echo
-	echo "Choose the Code::Blocks compiler:"
-	echo " 0: Go Back           2: Open Watcom*"
-	echo " 1: GCC (MinGW)"
-	echo
-	echo "  *(Not Supported yet)"
-	echo
-	echo "   Enter a number:"
-	
-	read version
-	
-	if [ $version -eq 0 ]; then return 1; fi
-	if [ $version -ge 1 && $version -le 2 ]; then build; return $?; fi
-	
-	return 1
-}
-
-function menu()
-{
-	#clear
-	echo
-	echo
-	echo
-	echo "                            MusiC"
-	echo
-	echo
+	clear
 	echo
 	echo " Choose one of the alternatives(NOTE they are case sensitive):"
 	echo
-	echo "v: Visual Studio         g: GNU Makefile       C: CodeLite"
-	echo "c: Code::Blocks          m: Monodevelop        s: Sharpdevelop"
+	echo "v: Visual Studio 2008       c: Code::Blocks      g: GNU Makefile"
+	echo "V: Visual Studio 2005*      C: CodeLite"
 	echo
-	echo "x: Exit"
+	echo
+	echo *Also Monodevelop and Sharpdevelop.
+	echo
+	echo
+	echo "x: Exit             [Any Other]: Back"
 	echo
 	echo " Enter a letter:"
 	
 	read compiler
 	
-	if [ "$compiler" = "v" ]; then visualstudio; return $?; fi
-	if [ "$compiler" = "c" ]; then codeblocks; return $?; fi
-	if [ "$compiler" = "g" ]; then build; exit $?; fi
-	if [ "$compiler" = "m" ]; then build; exit $?; fi
-	if [ "$compiler" = "s" ]; then build; exit $?; fi
-	if [ "$compiler" = "C" ]; then build; exit $?; fi
-	if [ "$compiler" = "x" ]; then return 0; fi
+	if [ "$compiler" = "v" ]; then build vs2008; return $?; fi
+	if [ "$compiler" = "V" ]; then build vs2005; return $?; fi
+	if [ "$compiler" = "c" ]; then build codeblocks gcc; return $?; fi
+	if [ "$compiler" = "C" ]; then build codelite gcc; return $?; fi
+	if [ "$compiler" = "g" ]; then build gmake; exit $?; fi
+	if [ "$compiler" = "b" ]; then return 0; fi
+	if [ "$compiler" = "x" ]; then clear; exit 0; fi
 	
 	return 1;
 }
 
-function start()
+function build()
 {
-	menu
-	if [ "$?" != "0" ]; then menu; fi
+  if [ "$2" = "" ]; then 
+    premake4 --file=premake.lua $1;
+  else
+    premake4 --cc=$2 --file=premake.lua $1
+  fi
+
+  echo
+  echo "Press [Enter] key to continue. . ."
+  read enterkey
 }
 
-start
+function build_doc()
+{
+  doxygen
+  cd ../srcDoc/latex
+  make pdf
+  cd ../../srcToTex
+  mono bin/Release/srcToTex.exe ../src
+  pdflatex printSrc
+  cd ../build
+  cp ../srcDoc/latex/refman.pdf ../srcToTex/printSrc.pdf .
+  
+  echo
+  echo "Press [Enter] key to continue. . ."
+  read enterkey
+}
+
+while :
+do
+  clear
+  echo 'Would you like to build :'
+  echo 
+  echo 'd) Documentation (Doxygen + Latex)'
+  echo 'p) Project'
+  echo 'x) Exit'
+  echo
+  echo
+  echo ' Your option:'
+
+  read opt
+  
+  case $opt in
+  d) build_doc;;
+  p) menu_project;;
+  x) clear; exit 0;;
+  *) clear;
+     echo "$opt is an invaild option.";
+     echo "Press [Enter] key to continue. . .";
+     read enterKey;;
+esac
+done

@@ -77,27 +77,12 @@ if %compiler%==g (
 )
 
 if %compiler%==v (
-	if %version%==1 (
-		premake --target vs6
-		goto pause-before-menu
-	)
-	if %version%==2 (
-		premake --target vs2002
-		goto pause-before-menu
-	)
-	if %version%==3 (
-		premake --target vs2003
-		premake --unmnaged --target vs2003
-		goto pause-before-menu
-	)
 	if %version%==4 (
-		premake --target vs2005
-		premake --unmanaged --target vs2005
+		premake --file=premake.lua vs2005
 		goto pause-before-menu
 	)
 	if %version%==5 (
-		premake --target vs2008
-		premake --unmanaged --target vs2008
+		premake --file=premake.lua vs2008
 		goto pause-before-menu
 	)
 )
