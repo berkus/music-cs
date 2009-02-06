@@ -1,6 +1,6 @@
 /*
  * The MIT License
- * Copyright (c) 2008-2009 Marcos JosÈ Sant'Anna Magalh„es
+ * Copyright (c) 2008 Marcos Jos√© Sant'Anna Magalh√£es
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -21,39 +21,20 @@
  * THE SOFTWARE.
  */
 
-#include "MemoryManager.h"
-
-using namespace std;
-
-void MusiC::Native::MemoryManager::Dealloc()
+namespace MusiC
 {
-    list<size_t>::iterator it;
+	internal class Reporter : MusiCObject
+	{
+		public void AddMessage(string str)
+		{
+			Message(str);
+		}
 
-    for(it = l.begin(); it != l.end(); it++)
-    {
-            free((void *) *it);
-    }
+		//::::::::::::::::::::::::::::::::::::::://
+		
+		public void AddError(string str)
+		{
+			Error(str);
+		}
+	}
 }
-
-void MusiC::Native::MemoryManager::Dealloc(void * p)
-{
-    if(!p)
-        return;
-
-    for(std::list<size_t>::iterator it = l.begin(); it != l.end(); it++)
-    {
-        if( (*it) == reinterpret_cast<size_t>(p) )
-        {
-            free(p);
-            l.erase(it);
-            break;
-        }
-    }
-}
-
-MusiC::Native::MemoryManager::~MemoryManager()
-{
-    Dealloc();
-}
-
-// END OF FILE

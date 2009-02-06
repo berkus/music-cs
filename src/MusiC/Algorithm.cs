@@ -458,16 +458,17 @@ namespace MusiC
 			{
 				Data.Unmanaged.ClassData* currentClass = Data.Unmanaged.DataHandler.BuildClassData(dtCol);
 				
-				Message("Processing " + label.InputDir);
+				//Message("Processing " + label.InputDir);
+				BeginReportSection("Processing " + label.InputDir);
 				
 				foreach (string file in Directory.GetFiles(label.InputDir, "*.wav"))
 				{
-					Message("Opening " + file);
+					BeginReportSection(file);
 					
 					Data.Unmanaged.FileData* currentFile = Data.Unmanaged.DataHandler.BuildFileData(currentClass);
 					Unmanaged.Handler h = cache.GetUnmanagedHandler(file);
 					
-					if (h == null)
+					if( h == null )
 					{
 						Warning(file + ": No handler supports this file");
 						continue;
@@ -479,7 +480,11 @@ namespace MusiC
 					Unmanaged.Extractor.Extract(_window, _featureList, currentFile);
 					
 					h.Detach();
+
+					EndReportSection(true);
 				}
+
+				EndReportSection(true);
 			}
 			
 			Message("Extraction Done.");

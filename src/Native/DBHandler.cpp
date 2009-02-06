@@ -33,23 +33,10 @@ int t = 0;
 
 //::::::::::::::::::::::::::::::::::::::://
 
-string tabulate(int t)
-{
-	ostringstream o;
-
-	for(int i = 0; i < t-1; i++)
-		o << "\t";
-
-	o << t << ")";
-
-	return o.str();
-}
-
-//::::::::::::::::::::::::::::::::::::::://
-
 MusiC::Native::DBHandler::DBHandler()
 {
 	/// @todo Add Logging initialization
+	log.open("Native_DBHandler.txt");
 }
 
 //::::::::::::::::::::::::::::::::::::::://
@@ -57,6 +44,7 @@ MusiC::Native::DBHandler::DBHandler()
 MusiC::Native::DBHandler::~DBHandler()
 {
 	CloseDB();
+	log.close();
 	/// @todo Check/Delete Allocated Data
 }
 
@@ -64,53 +52,51 @@ MusiC::Native::DBHandler::~DBHandler()
 
 void MusiC::Native::DBHandler::OpenDB(const char * dbName)
 {
-	LOG_IN();
-
 	CloseDB();
 
 	_dataSectionSz = 0;
-	db.open(dbName, ios_base::in | ios_base::out | ios_base::app | ios_base::binary);
 
-	LOG("Opening:" << dbName);
-	LOG("Status:" << db.is_open());
-	LOG_OUT();
+	log << "Opening: " << dbName << endl;
+	db.open(dbName, ios_base::in | ios_base::out | ios_base::app | ios_base::binary);
+    log << "Is Open: " << db.is_open() << endl;
 }
 
 //::::::::::::::::::::::::::::::::::::::://
 
 void MusiC::Native::DBHandler::CloseDB()
 {
-	LOG_IN();
-
-	if(IsDBOpen())
+	if(db.is_open())
 	{
+	    log << "Closing. . ." << endl;
 		db.close();
 	}
-
-	LOG_OUT();
+	else
+	{
+	    log << "Current DB is closed." << endl;
+	}
 }
 
 //::::::::::::::::::::::::::::::::::::::://
 
-bool MusiC::Native::DBHandler::HasData(char * sectionLabel, char * dtLabel)
+bool MusiC::Native::DBHandler::HasData(const char * sectionLabel, const char * dtLabel)
 {
-	LOG_IN();
-
 	Reset();
 
+    log << "Section: " << sectionLabel << "   Label: " << dtLabel << "   - Searching. . ." << endl;
 	while(LoadNext())
 	{
 		if(!strcmp(sectionLabel, GetSection()))
 		{
 			if(!strcmp(dtLabel, GetDataLabel()))
 			{
-				LOG_OUT();
+			    log << "FOUND" << endl;
 				return true;
 			}
 		}
 	}
 
-	LOG_OUT();
+	log << "NOT FOUND!" << endl;
+
 	return false;
 }
 
@@ -118,74 +104,45 @@ bool MusiC::Native::DBHandler::HasData(char * sectionLabel, char * dtLabel)
 
 ///@brief Returns the data stored in the .db file.
 ///@details trusts that hasData has already positioned get-pointer
-int MusiC::Native::DBHandler::ReadData(double * dt)
+int MusiC::Native::DBHandler::ReadData(float * dt)
 {
-	LOG_IN();
-
 	long offset = db.tellg();
 
-	dt = new double[_dataSectionSz/sizeof(double)];
+	//Hopes ReadData was allocated outside.
+	//dt = new float[_dataSectionSz/sizeof(float)];
+
 	db.read((char *)dt, _dataSectionSz);
+
 	//LOG("Bytes Read:" << db.gcount());
+
 	int count = db.gcount();
 	db.seekg(offset, ios_base::beg);
 
-	LOG_OUT();
 	return count;
 }
 
 //::::::::::::::::::::::::::::::::::::::://
 
-void MusiC::Native::DBHandler::AddData(const char * sectionLabel, const char * dataLabel, double * data, int dataSectionSz)
+void MusiC::Native::DBHandler::AddData(const char * sectionLabel, const char * dataLabel, float * data, int dataSectionSz)
 {
-	LOG_IN();
-
 	Set();//Positioning Put-Pointer
 	WriteHeader(sectionLabel, dataLabel, dataSectionSz);
 	WriteData(data, dataSectionSz);
-
-	LOG_OUT();
-}
-
-//::::::::::::::::::::::::::::::::::::::://
-
-bool MusiC::Native::DBHandler::IsDBOpen()
-{
-	LOG_IN();
-
-	bool flag = db.is_open(); LOG("OpenStatus:" << flag);
-
-	LOG_OUT();
-	return flag;
-}
-
-//::::::::::::::::::::::::::::::::::::::://
-
-bool MusiC::Native::DBHandler::IsEndOfFile()
-{
-	LOG_IN();
-
-	bool flag = (db.peek() == EOF);	LOG("End Of File:" << flag);
-
-	LOG_OUT();
-	return flag;
 }
 
 //::::::::::::::::::::::::::::::::::::::://
 
 bool MusiC::Native::DBHandler::LoadNext()
 {
-	LOG_IN();
-
 	if(!IsDBOpen())
 	{
-		LOG_OUT();
+	    log << "DB Closed!" << endl;
 		return false;
 	}
 
 	if(IsEndOfFile())
 	{
-		LOG_OUT();
+	    log << "No more data available!" << endl;
 		return false;
 	}
 
@@ -204,40 +161,39 @@ bool MusiC::Native::DBHandler::LoadNext()
 
 void MusiC::Native::DBHandler::PrintHeader()
 {
-	LOG_IN();
-	LOG("Section Label: " << _sectionLabel << " - size: " << _sectionLabelSz);
-	LOG("Data Label: " << _dataLabel << " - size: " << _dataLabelSz);
-	LOG("Data Size:" << _dataSectionSz);
-	LOG_OUT();
+	log << "Section Label: " << _sectionLabel << " - size: " << _sectionLabelSz << endl;
+	log << "Data Label: " << _dataLabel << " - size: " << _dataLabelSz << endl;
+	log << "Data Size:" << _dataSectionSz << endl;
 }
 
 //::::::::::::::::::::::::::::::::::::::://
 
 void MusiC::Native::DBHandler::JumpDataSection()
 {
-	LOG_IN();
-	LOG("Current:" << db.tellg() << " - Skipping:" << _dataSectionSz);
+	log << "Current:" << db.tellg() << " - Skipping:" << _dataSectionSz << endl;
 	db.seekg(_dataSectionSz, ios_base::cur);
-	LOG_OUT();
 }
 
 //::::::::::::::::::::::::::::::::::::::://
 
 void MusiC::Native::DBHandler::ReadHeader()
 {
-	LOG_IN();
-
 	db.read((char *)&_sectionLabelSz, sizeof(int));LOG("Bytes Read:" << db.gcount());
-	db.read((char *)&_dataLabelSz, sizeof(int));LOG("Bytes Read:" << db.gcount());
-	db.read((char *)&_dataSectionSz, sizeof(int));LOG("Bytes Read:" << db.gcount());
+	log << "Section Label Size: " << _sectionLabelSz;
 
-	if(_sectionLabel)
+	db.read((char *)&_dataLabelSz, sizeof(int));LOG("Bytes Read:" << db.gcount());
+	log << "   Data Label Size: " << _dataLabelSz;
+
+	db.read((char *)&_dataSectionSz, sizeof(int));LOG("Bytes Read:" << db.gcount());
+	log << "   Data Section Size: " << _dataSectionSz << endl;
+
+	if( _sectionLabel )
 	{
 		delete _sectionLabel;
 	}
 	_sectionLabel = new char [_sectionLabelSz];
 
-	if(_dataLabel)
+	if( _dataLabel )
 	{
 		delete _dataLabel;
 	}
@@ -245,15 +201,12 @@ void MusiC::Native::DBHandler::ReadHeader()
 
 	db.read(_sectionLabel, _sectionLabelSz + 1); LOG("Bytes Read:" << db.gcount());
 	db.read(_dataLabel, _dataLabelSz + 1); LOG("Bytes Read:" << db.gcount());
-	LOG_OUT();
 }
 
 //::::::::::::::::::::::::::::::::::::::://
 
 void MusiC::Native::DBHandler::WriteHeader(const char * sectionLabel, const char * dataLabel, int dataSectionSz)
 {
-	LOG_IN();
-
 	int sectionLabelSz = strlen(sectionLabel);
 	LOG("Section Label:`" << sectionLabel << "' - Size:" << sectionLabelSz);
 	db.write((char *) &sectionLabelSz, sizeof(int));LOG("Good:" << !db.fail());
@@ -267,21 +220,14 @@ void MusiC::Native::DBHandler::WriteHeader(const char * sectionLabel, const char
 
 	db.write(const_cast<char *>(sectionLabel), sectionLabelSz + 1);LOG("Good:" << !db.fail());
 	db.write(const_cast<char *>(dataLabel), dataLabelSz + 1);LOG("Good:" << !db.fail());
-
-	LOG_OUT();
 }
 
 //::::::::::::::::::::::::::::::::::::::://
 
-void MusiC::Native::DBHandler::WriteData(double * data, int dataSectionSz)
+void MusiC::Native::DBHandler::WriteData(float * data, int dataSectionSz)
 {
-	LOG_IN();
-
 	db.write((char *)data, dataSectionSz);
 	db.flush();
-
-	LOG("Good:" << !db.fail());
-	LOG_OUT();
 }
 
 //::::::::::::::::::::::::::::::::::::::://

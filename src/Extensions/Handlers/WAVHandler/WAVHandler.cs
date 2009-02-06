@@ -231,24 +231,22 @@ namespace MusiC.Extensions.Handlers
 			// DATA
 			rd.ReadChars(4);
 			
-			//dataSz = m_info.DataSize = rd.ReadInt32();
 			_streamSz = rd.ReadInt32();
-			Console.WriteLine("Has {0} bytes in total.", _streamSz);
 			
 			// m_info.Samples = dataSz / m_info.BlockSize;
 			//int bytesInUse = m_info.DepthInBytes = Convert.ToInt16(m_info.Depth / 8);
 			
 			_bytesInUse = sampleSize / 8;
-			Console.WriteLine("Each sample has {0} bits.", sampleSize);
-			Console.WriteLine("Each sample has {0} bytes.", _bytesInUse);
-			
 			_channels = blockSize / _bytesInUse;
-			Console.WriteLine("Has {0} channels.", _channels);
 			
-			//int samplesPerChannel = m_info.SamplesPerChannel = Convert.ToInt32(dataSz / (m_info.Channels * bytesInUse));
-			//Int32 samplesPerChannel = Convert.ToInt32(_streamSz / blockSize);
+			//int samplesPerChannel = Convert.ToInt32(dataSz / (m_info.Channels * bytesInUse));
+			int samplesPerChannel = Convert.ToInt32(_streamSz / blockSize);
 			
 			_offset = rd.BaseStream.Position;
+
+			//Message(CurrentFile);
+			Message(_channels + " channels with " + samplesPerChannel + " samples.");
+			Message( "Each sample has " + sampleSize + " bits making " + _streamSz + " bytes");
 		}
 	}
 }

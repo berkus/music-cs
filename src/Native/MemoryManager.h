@@ -27,11 +27,6 @@
 #include <list>
 #include <cstdlib>
 
-struct MemData
-{
-	double * ptr;
-};
-
 namespace MusiC
 {
 	namespace Native
@@ -39,17 +34,21 @@ namespace MusiC
 		class MemoryManager
 		{
 			private:
-				std::list<MemData> l;
+				std::list<size_t> l;
 
 				void Dealloc();
 
 			public:
 				void Dealloc (void * p);
+				void DeallocOwned(void * p);
 
 				template<class T>
 				T* Allocator (int sz)
 				{
-					return (T*) calloc (sz, sizeof (T) );
+				    T * ptr = (T*) calloc (sz, sizeof (T) );
+				    l.push_back(reinterpret_cast<size_t>(ptr));
+
+					return ptr;
 				}
 
 				~MemoryManager();

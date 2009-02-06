@@ -6,4 +6,4 @@ else
 	export LD_LIBRARY_PATH=./:$LD_LIBRARY_PATH
 fi
 
-mono --debug --verbose MusiC.Apps.GenreC.exe | grep "Method MusiC" > report.txt
+mono --debug MusiC.Apps.GenreC.exe

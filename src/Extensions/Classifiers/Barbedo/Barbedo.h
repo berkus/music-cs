@@ -26,6 +26,8 @@
 
 #include <iostream>
 #include <fstream>
+#include <sstream>
+
 #include <cmath>
 
 #include <gsl/gsl_combination.h>
@@ -51,16 +53,20 @@ namespace MusiC
             };
 
             //---------------------------------------//
-			
+
+        private:
+
 			// filterCandidates constants.
 			// 25C3 * 25C3 = 5,300,000. Doesn't take soooo long.
 			static const int MAX_CANDIDATES;
-			
+
 			// Filter Constants.
 			static const int CLUSTER_SIZE; // frames to make a second
 			static const int CLUSTER_COUNT; // how many seconds
 			static const int FRAME_COUNT;
-			
+
+			std::ofstream log;
+
 			//::::::::::::::::::::::::::::::::::::::://
 
         private:
@@ -70,6 +76,20 @@ namespace MusiC
             int combine (RefVecIndex * ref);
             float dist (float * src, float * ref, int size);
             float * seq_access (ClassData * cl, Int64 idx);
+
+            //::::::::::::::::::::::::::::::::::::::://
+
+        public:
+
+            Barbedo()
+            {
+                log.open("Barbedo_Filter.txt", std::ios_base::app);
+            }
+
+            ~Barbedo()
+            {
+                log.close();
+            }
 
             //::::::::::::::::::::::::::::::::::::::://
 

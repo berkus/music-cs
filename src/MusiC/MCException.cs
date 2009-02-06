@@ -34,7 +34,7 @@ namespace MusiC.Exceptions
 		//// <value>
 		/// 
 		/// </value>
-		class MCExceptionReporter : MusiCObject
+		class MCExceptionReporter : Reporter
 		{
 			/// <summary>
 			/// 
@@ -48,7 +48,7 @@ namespace MusiC.Exceptions
 			}
 		}
 
-		//::::::::::::::::::::::::::::::::::::::://
+		//---------------------------------------//
 		
 		private int msgCounter = 0;
 		private Queue<string> m_message = new Queue<string>();

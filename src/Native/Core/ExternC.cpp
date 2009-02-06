@@ -33,7 +33,7 @@ extern "C"
 	MusiC::Native::MemoryManager mgr;
 	MusiC::Native::Math math;
 	MusiC::Native::DBHandler hnd;
-	
+
 	//::::::::::::::::::::::::::::::::::::::://
 
 	int fftr_mag(float* x, float* mag, int m)
@@ -48,36 +48,25 @@ extern "C"
 
 	void Initialize(const char * db)
 	{
-        LOG_IN();
-
 		hnd.OpenDB(db);
-
-        LOG_OUT();
 	}
 
 	//::::::::::::::::::::::::::::::::::::::://
 
-	void AddFeature(const char * sectionLabel, const char * dataLabel, double * data, int dataSz)
+	void AddFeature(const char * sectionLabel, const char * dataLabel, float * data, int dataSz)
 	{
-        LOG_IN();
-
-		hnd.AddData(sectionLabel, dataLabel, data, dataSz * sizeof(double));
-
-        LOG_OUT();
+		hnd.AddData(sectionLabel, dataLabel, data, dataSz * sizeof(float));
 	}
 
 	//::::::::::::::::::::::::::::::::::::::://
 
-	int GetFeature(char * wndName, char * featName, double *data)
+	int GetFeature(const char * wndName, const char * featName, float * data)
 	{
-        LOG_IN();
-
 		if(hnd.HasData(wndName, featName))
 		{
 			return hnd.ReadData(data);
 		}
 
-        LOG_OUT();
 		return 0;
 	}
 
@@ -85,11 +74,7 @@ extern "C"
 
 	void Terminate()
 	{
-        LOG_IN();
-
 		hnd.CloseDB();
-
-        LOG_OUT();
 	}
 }
 

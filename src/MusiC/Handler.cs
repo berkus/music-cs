@@ -66,8 +66,10 @@ namespace MusiC
 		virtual
 		public void Attach(string file)
 		{
-			if(System.IO.File.Exists(file))
+			if( System.IO.File.Exists(file) )
+			{
 				_file = file;
+			}
 			else
 				Detach();
 		}
@@ -79,12 +81,7 @@ namespace MusiC
 		/// </summary>
 		public DBHandler GetDBHandler()
 		{
-			DBHandler hnd = null;
-
-			if(_file != null)
-				hnd = new DBHandler(_file);
-
-			return hnd;
+			return new DBHandler(_file);
 		}
 		//::::::::::::::::::::::::::::::::::::::://
 
