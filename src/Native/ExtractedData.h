@@ -48,8 +48,10 @@ namespace MusiC
 			Int64 nFrames;
 
 			FileData * pNextFile;
+			FileData * pPrevFile;
 
 			FrameData * pFirstFrame;
+			FrameData * pLastFrame;
 
 			FrameData * pFiltered;
 
@@ -66,6 +68,7 @@ namespace MusiC
 			ClassData * pNextClass;
 
 			FileData * pFirstFile;
+			FileData * pLastFile;
 
 			DataCollection * pCollection;
 		};
@@ -76,6 +79,7 @@ namespace MusiC
 			int nFeatures;
 
 			ClassData * pFirstClass;
+			ClassData * pLastClass;
 		};
 	}
 }

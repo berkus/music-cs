@@ -32,6 +32,13 @@ namespace MusiC
 
 		//::::::::::::::::::::::::::::::::::::::://
 		
+		public void AddWarning(string str)
+		{
+			Warning(str);
+		}
+
+		//::::::::::::::::::::::::::::::::::::::://
+		
 		public void AddError(string str)
 		{
 			Error(str);

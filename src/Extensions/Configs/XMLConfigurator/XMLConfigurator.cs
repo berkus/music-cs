@@ -22,6 +22,7 @@
  */
  
 using System;
+using System.IO;
 using System.Xml;
 using System.Collections.Generic;
 
@@ -56,7 +57,7 @@ namespace MusiC.Configs
 		/// XML file with library configuration.
 		/// </param>
 		override
-		public void Load(String cfgPath)
+		protected void Load(String cfgPath)
 		{
 			XmlDocument cfgFile = new XmlDocument();
 			cfgFile.Load(cfgPath);
@@ -66,6 +67,24 @@ namespace MusiC.Configs
 			ParseData(cfgFile);
 			
 			BuildAlgorithmList(cfgFile);
+		}
+
+		//::::::::::::::::::::::::::::::::::::::://
+
+		/// <summary>
+		/// 
+		/// </summary>
+		/// <param name="file">
+		/// A <see cref="System.String"/>
+		/// </param>
+		/// <returns>
+		/// A <see cref="System.Boolean"/>
+		/// </returns>
+		override
+		public bool CanHandle(string file)
+		{
+			///@todo check version.
+			return Path.GetExtension(file).ToUpper() == ".XML";
 		}
 		
 		//::::::::::::::::::::::::::::::::::::::://

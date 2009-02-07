@@ -145,7 +145,7 @@ namespace MusiC
 		/// <param name="featName">
 		/// A <see cref="System.String"/>
 		/// </param>
-		/// <param name="dt">
+		/// <param name="data">
 		/// A <see cref="System.Single"/>
 		/// </param>
 		/// <returns>

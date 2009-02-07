@@ -1,6 +1,6 @@
 /*
  * The MIT License
- * Copyright (c) 2008-2009 Marcos Jos√© Sant'Anna Magalh√£es
+ * Copyright (c) 2008-2009 Marcos JosÈ Sant'Anna Magalh„es
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -36,7 +36,7 @@ int t = 0;
 MusiC::Native::DBHandler::DBHandler()
 {
 	/// @todo Add Logging initialization
-	log.open("Native_DBHandler.txt");
+	log.open( "Native_DBHandler.txt" );
 }
 
 //::::::::::::::::::::::::::::::::::::::://
@@ -50,46 +50,47 @@ MusiC::Native::DBHandler::~DBHandler()
 
 //::::::::::::::::::::::::::::::::::::::://
 
-void MusiC::Native::DBHandler::OpenDB(const char * dbName)
+void MusiC::Native::DBHandler::OpenDB( const char * dbName )
 {
 	CloseDB();
 
 	_dataSectionSz = 0;
 
 	log << "Opening: " << dbName << endl;
-	db.open(dbName, ios_base::in | ios_base::out | ios_base::app | ios_base::binary);
-    log << "Is Open: " << db.is_open() << endl;
+	db.open( dbName, ios_base::in | ios_base::out | ios_base::app | ios_base::binary );
+	log << "Is Open: " << db.is_open() << endl;
 }
 
 //::::::::::::::::::::::::::::::::::::::://
 
 void MusiC::Native::DBHandler::CloseDB()
 {
-	if(db.is_open())
+	if ( db.is_open() )
 	{
-	    log << "Closing. . ." << endl;
+		log << "Closing. . ." << endl;
 		db.close();
 	}
 	else
 	{
-	    log << "Current DB is closed." << endl;
+		log << "Current DB is closed." << endl;
 	}
 }
 
 //::::::::::::::::::::::::::::::::::::::://
 
-bool MusiC::Native::DBHandler::HasData(const char * sectionLabel, const char * dtLabel)
+bool MusiC::Native::DBHandler::HasData( const char * sectionLabel, const char * dtLabel )
 {
 	Reset();
 
-    log << "Section: " << sectionLabel << "   Label: " << dtLabel << "   - Searching. . ." << endl;
-	while(LoadNext())
+	log << "Section: " << sectionLabel << "   Label: " << dtLabel << "   - Searching. . ." << endl;
+
+	while ( LoadNext() )
 	{
-		if(!strcmp(sectionLabel, GetSection()))
+		if ( !strcmp( sectionLabel, GetSection() ) )
 		{
-			if(!strcmp(dtLabel, GetDataLabel()))
+			if ( !strcmp( dtLabel, GetDataLabel() ) )
 			{
-			    log << "FOUND" << endl;
+				log << "FOUND" << endl;
 				return true;
 			}
 		}
@@ -104,45 +105,45 @@ bool MusiC::Native::DBHandler::HasData(const char * sectionLabel, const char * d
 
 ///@brief Returns the data stored in the .db file.
 ///@details trusts that hasData has already positioned get-pointer
-int MusiC::Native::DBHandler::ReadData(float * dt)
+int MusiC::Native::DBHandler::ReadData( float * dt )
 {
 	long offset = db.tellg();
 
 	//Hopes ReadData was allocated outside.
 	//dt = new float[_dataSectionSz/sizeof(float)];
 
-	db.read((char *)dt, _dataSectionSz);
+	db.read( ( char * )dt, _dataSectionSz );
 
 	//LOG("Bytes Read:" << db.gcount());
 
 	int count = db.gcount();
-	db.seekg(offset, ios_base::beg);
+	db.seekg( offset, ios_base::beg );
 
 	return count;
 }
 
 //::::::::::::::::::::::::::::::::::::::://
 
-void MusiC::Native::DBHandler::AddData(const char * sectionLabel, const char * dataLabel, float * data, int dataSectionSz)
+void MusiC::Native::DBHandler::AddData( const char * sectionLabel, const char * dataLabel, float * data, int dataSectionSz )
 {
 	Set();//Positioning Put-Pointer
-	WriteHeader(sectionLabel, dataLabel, dataSectionSz);
-	WriteData(data, dataSectionSz);
+	WriteHeader( sectionLabel, dataLabel, dataSectionSz );
+	WriteData( data, dataSectionSz );
 }
 
 //::::::::::::::::::::::::::::::::::::::://
 
 bool MusiC::Native::DBHandler::LoadNext()
 {
-	if(!IsDBOpen())
+	if ( !IsDBOpen() )
 	{
-	    log << "DB Closed!" << endl;
+		log << "DB Closed!" << endl;
 		return false;
 	}
 
-	if(IsEndOfFile())
+	if ( IsEndOfFile() )
 	{
-	    log << "No more data available!" << endl;
+		log << "No more data available!" << endl;
 		return false;
 	}
 
@@ -151,9 +152,11 @@ bool MusiC::Native::DBHandler::LoadNext()
 
 	// Fileformat
 	ReadHeader();
+
 	PrintHeader();
 
 	LOG_OUT();
+
 	return true;
 }
 
@@ -171,62 +174,74 @@ void MusiC::Native::DBHandler::PrintHeader()
 void MusiC::Native::DBHandler::JumpDataSection()
 {
 	log << "Current:" << db.tellg() << " - Skipping:" << _dataSectionSz << endl;
-	db.seekg(_dataSectionSz, ios_base::cur);
+	db.seekg( _dataSectionSz, ios_base::cur );
 }
 
 //::::::::::::::::::::::::::::::::::::::://
 
 void MusiC::Native::DBHandler::ReadHeader()
 {
-	db.read((char *)&_sectionLabelSz, sizeof(int));LOG("Bytes Read:" << db.gcount());
+	db.read( ( char * )&_sectionLabelSz, sizeof( int ) );
+	LOG( "Bytes Read:" << db.gcount() );
 	log << "Section Label Size: " << _sectionLabelSz;
 
-	db.read((char *)&_dataLabelSz, sizeof(int));LOG("Bytes Read:" << db.gcount());
+	db.read( ( char * )&_dataLabelSz, sizeof( int ) );
+	LOG( "Bytes Read:" << db.gcount() );
 	log << "   Data Label Size: " << _dataLabelSz;
 
-	db.read((char *)&_dataSectionSz, sizeof(int));LOG("Bytes Read:" << db.gcount());
+	db.read( ( char * )&_dataSectionSz, sizeof( int ) );
+	LOG( "Bytes Read:" << db.gcount() );
 	log << "   Data Section Size: " << _dataSectionSz << endl;
 
-	if( _sectionLabel )
+	if ( _sectionLabel )
 	{
 		delete _sectionLabel;
 	}
+
 	_sectionLabel = new char [_sectionLabelSz];
 
-	if( _dataLabel )
+	if ( _dataLabel )
 	{
 		delete _dataLabel;
 	}
+
 	_dataLabel = new char [_dataLabelSz];
 
-	db.read(_sectionLabel, _sectionLabelSz + 1); LOG("Bytes Read:" << db.gcount());
-	db.read(_dataLabel, _dataLabelSz + 1); LOG("Bytes Read:" << db.gcount());
+	db.read( _sectionLabel, _sectionLabelSz + 1 );
+	LOG( "Bytes Read:" << db.gcount() );
+	db.read( _dataLabel, _dataLabelSz + 1 );
+	LOG( "Bytes Read:" << db.gcount() );
 }
 
 //::::::::::::::::::::::::::::::::::::::://
 
-void MusiC::Native::DBHandler::WriteHeader(const char * sectionLabel, const char * dataLabel, int dataSectionSz)
+void MusiC::Native::DBHandler::WriteHeader( const char * sectionLabel, const char * dataLabel, int dataSectionSz )
 {
-	int sectionLabelSz = strlen(sectionLabel);
-	LOG("Section Label:`" << sectionLabel << "' - Size:" << sectionLabelSz);
-	db.write((char *) &sectionLabelSz, sizeof(int));LOG("Good:" << !db.fail());
+	int sectionLabelSz = strlen( sectionLabel );
+	LOG( "Section Label:`" << sectionLabel << "' - Size:" << sectionLabelSz );
+	db.write( ( char * ) &sectionLabelSz, sizeof( int ) );
+	LOG( "Good:" << !db.fail() );
 
-	int dataLabelSz = strlen(dataLabel);
-	LOG("Data Label:`" << dataLabel << "' - Size:" << dataLabelSz);
-	db.write((char *) &dataLabelSz, sizeof(int));LOG("Good:" << !db.fail());
+	int dataLabelSz = strlen( dataLabel );
+	LOG( "Data Label:`" << dataLabel << "' - Size:" << dataLabelSz );
+	db.write( ( char * ) &dataLabelSz, sizeof( int ) );
+	LOG( "Good:" << !db.fail() );
 
-	LOG("Data Section Size:" << dataSectionSz);
-	db.write((char *) &dataSectionSz, sizeof(int));LOG("Good:" << !db.fail());
+	LOG( "Data Section Size:" << dataSectionSz );
+	db.write( ( char * ) &dataSectionSz, sizeof( int ) );
+	LOG( "Good:" << !db.fail() );
 
-	db.write(const_cast<char *>(sectionLabel), sectionLabelSz + 1);LOG("Good:" << !db.fail());
-	db.write(const_cast<char *>(dataLabel), dataLabelSz + 1);LOG("Good:" << !db.fail());
+	db.write( const_cast<char *>( sectionLabel ), sectionLabelSz + 1 );
+	LOG( "Good:" << !db.fail() );
+	db.write( const_cast<char *>( dataLabel ), dataLabelSz + 1 );
+	LOG( "Good:" << !db.fail() );
 }
 
 //::::::::::::::::::::::::::::::::::::::://
 
-void MusiC::Native::DBHandler::WriteData(float * data, int dataSectionSz)
+void MusiC::Native::DBHandler::WriteData( float * data, int dataSectionSz )
 {
-	db.write((char *)data, dataSectionSz);
+	db.write( ( char * )data, dataSectionSz );
 	db.flush();
 }
 
@@ -249,12 +264,12 @@ char * MusiC::Native::DBHandler::GetDataLabel()
 void MusiC::Native::DBHandler::Reset()
 {
 	LOG_IN();
-	LOG("Current:" << db.tellp());
+	LOG( "Current:" << db.tellp() );
 
 	_dataSectionSz = 0;
-	db.seekg(0, ios_base::beg);
+	db.seekg( 0, ios_base::beg );
 
-	LOG("After Seek:" << db.tellp());
+	LOG( "After Seek:" << db.tellp() );
 	LOG_OUT();
 }
 
@@ -263,12 +278,12 @@ void MusiC::Native::DBHandler::Reset()
 void MusiC::Native::DBHandler::Set()
 {
 	LOG_IN();
-	LOG("Current:" << db.tellp());
+	LOG( "Current:" << db.tellp() );
 
 	db.clear();
-	db.seekp(0, ios_base::end);
+	db.seekp( 0, ios_base::end );
 
-	LOG("After Seek:" << db.tellp());
+	LOG( "After Seek:" << db.tellp() );
 	LOG_OUT();
 }
 

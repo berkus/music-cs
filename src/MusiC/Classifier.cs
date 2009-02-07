@@ -135,6 +135,11 @@ namespace MusiC
 			/// </param>
 			abstract unsafe
 			public void Train(Data.Unmanaged.DataCollection* dtCol);
+
+			//::::::::::::::::::::::::::::::::::::::://
+
+			//abstract
+			//public int Classify();
 		}
 	}
 }

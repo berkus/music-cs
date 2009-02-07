@@ -46,8 +46,10 @@ namespace MusiC.Data.Unmanaged
 		public long nFrames;
 		
 		public FileData * pNextFile;
+		public FileData * pPrevFile;
 		
 		public FrameData * pFirstFrame;
+		public FrameData * pLastFrame;
 		
 		public FrameData * pFiltered;
 		
@@ -67,6 +69,7 @@ namespace MusiC.Data.Unmanaged
 		public ClassData * pNextClass;
 		
 		public FileData * pFirstFile;
+		public FileData * pLastFile;
 		
 		public DataCollection * pCollection;
 	}
@@ -82,6 +85,7 @@ namespace MusiC.Data.Unmanaged
 		public int nFeatures;
 		
 		public ClassData * pFirstClass;
+		public ClassData * pLastClass;
 	}
 	
 	//---------------------------------------//
@@ -93,6 +97,25 @@ namespace MusiC.Data.Unmanaged
 	unsafe 
 	public class DataHandler
 	{
+		private class ExtractedDataReporter : Reporter
+		{
+		}
+
+		//---------------------------------------//
+
+		static
+		private ExtractedDataReporter reporter;
+
+		//::::::::::::::::::::::::::::::::::::::://
+
+		static
+		DataHandler()
+		{
+			reporter = new ExtractedDataReporter();
+		}
+		
+		//::::::::::::::::::::::::::::::::::::::://
+		
 		/// <summary>
 		/// 
 		/// </summary>
@@ -105,7 +128,8 @@ namespace MusiC.Data.Unmanaged
 		static
 		public DataCollection * BuildCollection(int nFeatures)
 		{
-			DataCollection * data = (DataCollection *) Marshal.AllocHGlobal(sizeof(DataCollection)).ToPointer();
+			DataCollection * data = 
+				(DataCollection *) Marshal.AllocHGlobal(sizeof(DataCollection)).ToPointer();
 
 			data->nClasses = 0;
 			data->nFeatures = nFeatures;
@@ -129,11 +153,13 @@ namespace MusiC.Data.Unmanaged
 		static
 		public ClassData * BuildClassData(DataCollection * dtCol)
 		{
-			ClassData * newClass = (ClassData *) Marshal.AllocHGlobal(sizeof(ClassData)).ToPointer();
+			ClassData * newClass = 
+				(ClassData *) Marshal.AllocHGlobal(sizeof(ClassData)).ToPointer();
 			
 			newClass->pNextClass = null;
 			
 			newClass->pFirstFile = null;
+			newClass->pLastFile = null;
 				
 			newClass->nFrames = 0;
 			newClass->nFiles = 0;
@@ -145,12 +171,14 @@ namespace MusiC.Data.Unmanaged
 			if(dtCol->pFirstClass == null)
 			{
 				dtCol->pFirstClass = newClass;
+				dtCol->pLastClass = newClass;
 				
 				return newClass;
 			}
 			
-			newClass->pNextClass = dtCol->pFirstClass;
-			dtCol->pFirstClass = newClass;
+			// newClass->pNextClass = dtCol->pFirstClass;
+			dtCol->pLastClass->pNextClass = newClass;
+			dtCol->pLastClass = newClass;
 			
 			return newClass;
 		}
@@ -168,22 +196,79 @@ namespace MusiC.Data.Unmanaged
 		/// </returns>
 		static
 		public FileData * BuildFileData(ClassData * currentClass)
+		{	
+			FileData * newFile = BuildFileData();
+			AddFileData(newFile, currentClass);
+			
+			return newFile;
+		}
+
+		//::::::::::::::::::::::::::::::::::::::://
+
+		/// <summary>
+		/// 
+		/// </summary>
+		/// <returns>
+		/// A <see cref="FileData"/>
+		/// </returns>
+		static
+		public FileData * BuildFileData()
 		{
 			FileData * newFile = (FileData *) Marshal.AllocHGlobal(sizeof(FileData)).ToPointer();
 			
 			newFile->pNextFile = null;
+			newFile->pPrevFile = null;
+			
 			newFile->pFirstFrame = null;
+			newFile->pLastFrame = null;
+			
 			newFile->pFiltered = null;
+			newFile->pClass = null;
 			
 			newFile->nFrames = 0;
+
+			return newFile;
+		}
+
+		//::::::::::::::::::::::::::::::::::::::://
+
+		/// <summary>
+		/// 
+		/// </summary>
+		/// <param name="newFile">
+		/// A <see cref="FileData"/>
+		/// </param>
+		/// <param name="currentClass">
+		/// A <see cref="ClassData"/>
+		/// </param>
+		/// <returns>
+		/// A <see cref="System.Boolean"/>
+		/// </returns>
+		static
+		public bool AddFileData(FileData * newFile, ClassData * currentClass)
+		{
+			if( ( newFile == null ) || ( currentClass == null ) )
+			{
+				reporter.AddWarning("The file or the current class is NULL");
+				return false;
+			}
+			
 			newFile->pClass = currentClass;
 			
+			newFile->pPrevFile = currentClass->pLastFile;
+
 			currentClass->nFiles++;
+			currentClass->nFrames += newFile->nFrames;
+
+			if( currentClass->pLastFile != null )
+				currentClass->pLastFile->pNextFile = newFile;
 			
-			newFile->pNextFile = currentClass->pFirstFile;
-			currentClass->pFirstFile = newFile;
+			currentClass->pLastFile = newFile;
 			
-			return newFile;
+			if( currentClass->pFirstFile == null )
+				currentClass->pFirstFile = newFile;
+
+			return true;
 		}
 		
 		//::::::::::::::::::::::::::::::::::::::://
@@ -191,38 +276,71 @@ namespace MusiC.Data.Unmanaged
 		/// <summary>
 		/// 
 		/// </summary>
-		/// <param name="currentFile">
-		/// A <see cref="FileData"/>
+		/// <param name="featCount">
+		/// A <see cref="System.Int32"/>
 		/// </param>
 		/// <returns>
 		/// A <see cref="FrameData"/>
 		/// </returns>
 		static
-		public FrameData * BuildFrameData(FileData * currentFile)
+		public FrameData * BuildFrameData(int featCount)
 		{
 			FrameData * newFrame = (FrameData *) Marshal.AllocHGlobal(sizeof(FrameData)).ToPointer();
 			
-			newFrame->pData = (Single *) Marshal.AllocHGlobal( (currentFile->pClass->pCollection->nFeatures) * sizeof(float)).ToPointer();
+			newFrame->pData = (Single *) Marshal.AllocHGlobal( featCount * sizeof( float ) ).ToPointer();
+		 	newFrame->pNextFrame = null;
+			
+			return newFrame;
+		}
+
+		//::::::::::::::::::::::::::::::::::::::://
+		
+		/// <summary>
+		/// 
+		/// </summary>
+		/// <param name="newFrame">
+		/// A <see cref="FrameData"/>
+		/// </param>
+		/// <param name="currentFile">
+		/// A <see cref="FileData"/>
+		/// </param>
+		/// <returns>
+		/// A <see cref="System.Boolean"/>
+		/// </returns>
+		static
+		public bool AddFrameData(FrameData * newFrame, FileData * currentFile)
+		{
+			if( ( newFrame == null ) || ( currentFile == null ) )
+			{
+				reporter.AddWarning("The frame or the current file is NULL");
+				return false;
+			}
 			
 			currentFile->nFrames++;
-			currentFile->pClass->nFrames++;
 			
-			if( currentFile->pFirstFrame != null )
+			if( currentFile->pClass != null )
+				currentFile->pClass->nFrames++;
+			
+			if( currentFile->pLastFrame != null )
 			{
-				newFrame->pNextFrame = currentFile->pFirstFrame;
+				currentFile->pLastFrame->pNextFrame = newFrame;
+				currentFile->pLastFrame = newFrame;
 			}
 			else
 			{
 				// First frame of the file links the last frame of the previous file.
-				if(currentFile->pNextFile != null)
+				currentFile->pFirstFrame = newFrame;
+				currentFile->pLastFrame = newFrame;
+
+				if( currentFile->pNextFile != null )
 					newFrame->pNextFrame = currentFile->pNextFile->pFirstFrame;
-				else
-					// First frame of the class.
-					newFrame->pNextFrame = null;
+				
+				if( currentFile->pPrevFile != null )
+					currentFile->pPrevFile->pLastFrame->pNextFrame = newFrame;
+
 			}
-			
-			currentFile->pFirstFrame = newFrame;
-			return newFrame;
+
+			return true;
 		}
 	}
 }
@@ -323,7 +441,7 @@ namespace MusiC.Data.Managed
 		public static void AddVectorList(ClassData wClass, Double[] data, Int64 nWindows)
 		{
 			if(wClass == null )
-				Console.WriteLine("MCClassData is NULL");
+				Console.WriteLine("ClassData is NULL");
 			
 			FrameData vec = new FrameData();
 			vec.pData = data;

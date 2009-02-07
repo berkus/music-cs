@@ -107,6 +107,7 @@ namespace MusiC
 				
 				BaseHandler bdb = wnd.HandlerInterface as BaseHandler;
 				DBHandler db = bdb.GetDBHandler();
+				int featCount = 0;
 				
 				LinkedList<FeatureHelper> parsedList = new LinkedList<FeatureHelper>();
 				
@@ -129,10 +130,11 @@ namespace MusiC
 					}
 					else
 					{
-						reporter.AddMessage("Feature Found     - Bytes Read: " + read);
+						reporter.AddMessage("Feature Found - Bytes Read: " + read);
 						fh.extracted = true;
 					}
-					
+
+					featCount++;
 					parsedList.AddLast(fh);
 				}
 
@@ -146,7 +148,9 @@ namespace MusiC
 					}
 					
 					Data.Unmanaged.FrameData* frame = 
-						Data.Unmanaged.DataHandler.BuildFrameData(dataStg);
+						Data.Unmanaged.DataHandler.BuildFrameData(featCount);
+
+					Data.Unmanaged.DataHandler.AddFrameData(frame, dataStg);
 					
                     fIdx = 0;
                     foreach( FeatureHelper fh in parsedList )

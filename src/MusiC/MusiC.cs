@@ -141,14 +141,14 @@ namespace MusiC
 		{
 			try
 			{
-				_cfg = _cache.GetConfigurator();
-				_cfg.Load(ConfigFile);
+				_cfg = _cache.GetConfigurator(ConfigFile);
+				Config conf = _cfg.LoadConfig(ConfigFile);
 				
 				Message(_configFile + " ... [LOADED]");
 				
-				foreach(Algorithm a in _cfg.AlgorithmList)
+				foreach(Algorithm a in conf.AlgorithmList)
 				{
-					a.Execute(_cache);
+					a.Execute(conf);
 				}
 			}
 			catch(MCException mce)

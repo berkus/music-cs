@@ -22,13 +22,6 @@
  */
 
 using System;
-using System.Collections.Generic;
-using System.Reflection;
-using System.Xml;
-using System.IO;
-
-using MusiC.Exceptions;
-using MusiC.Extensions;
 
 namespace MusiC
 {
@@ -41,17 +34,9 @@ namespace MusiC
 	/// 
 	/// </summary>
 	/// <see cref="MusiC.Algorithms"/>
-	abstract public class Configurator : Extension
-	{
-		private LinkedList<IAlgorithm> _algList = new LinkedList<IAlgorithm>();
-		private LinkedList<ILabel> _trainList = new LinkedList<ILabel>();
-		private LinkedList<String> _classifyList = new LinkedList<String>();
-		
-		static readonly 
-		protected Intantiator New = new Intantiator();
-		
-		//::::::::::::::::::::::::::::::::::::::://
-		
+	abstract 
+	public class Configurator : Extension
+	{	
 		/// <value>
 		/// 
 		/// </value>
@@ -64,6 +49,8 @@ namespace MusiC
 			{
 				return new Algorithm();
 			}
+
+			//::::::::::::::::::::::::::::::::::::::://
 			
 			/// <value>
 			/// 
@@ -72,6 +59,8 @@ namespace MusiC
 			{
 				return new TrainLabel();
 			}
+
+			//::::::::::::::::::::::::::::::::::::::://
 			
 			/// <value>
 			/// 
@@ -81,26 +70,13 @@ namespace MusiC
 				return new ParamList();
 			}
 		}
-		
-		//::::::::::::::::::::::::::::::::::::::://
-		
-		/// <value>
-		/// 
-		/// </value>
-		public LinkedList<IAlgorithm> AlgorithmList
-		{
-			get { return _algList; }
-		}
-		
-		//::::::::::::::::::::::::::::::::::::::://
-		
-		/// <value>
-		/// 
-		/// </value>
-		public LinkedList<ILabel> LabelList
-		{
-			get { return _trainList; }
-		}
+
+		//---------------------------------------//
+
+		static readonly 
+		protected Intantiator New = new Intantiator();
+
+		private Config _currentConf;
 		
 		//::::::::::::::::::::::::::::::::::::::://
 		
@@ -122,7 +98,7 @@ namespace MusiC
 		/// </param>
 		protected void AddAlgorithm(IAlgorithm algorithm)
 		{
-			_algList.AddLast(algorithm);
+			_currentConf.AddAlgorithm(algorithm);
 		}
 		
 		//::::::::::::::::::::::::::::::::::::::://
@@ -135,8 +111,7 @@ namespace MusiC
 		/// </param>
 		protected void AddTrainLabel(ILabel label)
 		{
-			if(label.Validate())
-				_trainList.AddLast(label);
+			_currentConf.AddTrainLabel(label);
 		}
 		
 		//::::::::::::::::::::::::::::::::::::::://
@@ -150,14 +125,32 @@ namespace MusiC
 		/// <returns>
 		/// A <see cref="System.Boolean"/>
 		/// </returns>
-		protected bool AddDir(String dir)
+		protected bool AddDir(string dir)
 		{
-			bool returnValue;
-			
-			if(returnValue=Directory.Exists(dir))
-				_classifyList.AddLast(dir);
-			
-			return returnValue;
+			return _currentConf.AddDir(dir);
+		}
+
+		//::::::::::::::::::::::::::::::::::::::://
+
+		/// <summary>
+		/// 
+		/// </summary>
+		/// <param name="file">
+		/// A <see cref="System.String"/>
+		/// </param>
+		/// <returns>
+		/// A <see cref="Config"/>
+		/// </returns>
+		public Config LoadConfig(string file)
+		{
+			Config conf = new Config();
+			_currentConf = conf;
+
+			Load(file);
+
+			_currentConf = null;
+
+			return conf;
 		}
 		
 		//::::::::::::::::::::::::::::::::::::::://
@@ -169,6 +162,20 @@ namespace MusiC
 		/// A <see cref="String"/>
 		/// </param>
 		abstract 
-		public void Load(String file);
+		protected void Load(string file);
+
+		//::::::::::::::::::::::::::::::::::::::://
+
+		/// <summary>
+		/// 
+		/// </summary>
+		/// <param name="file">
+		/// A <see cref="System.String"/>
+		/// </param>
+		/// <returns>
+		/// A <see cref="System.Boolean"/>
+		/// </returns>
+		abstract 
+		public bool CanHandle(string file);
 	}
 }

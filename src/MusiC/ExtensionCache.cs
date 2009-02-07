@@ -153,6 +153,7 @@ namespace MusiC.Extensions
 		/// <returns>
 		/// A <see cref="Managed.Handler"/>
 		/// </returns>
+		static
 		public Managed.Handler GetManagedHandler(String file)
 		{
 //			foreach(IHandler h in _handlerList)
@@ -177,6 +178,7 @@ namespace MusiC.Extensions
 		/// <returns>
 		/// A <see cref="Unmanaged.Handler"/>
 		/// </returns>
+		static
 		public Unmanaged.Handler GetUnmanagedHandler(String file)
 		{
 			IHandler hnd = null;
@@ -191,7 +193,7 @@ namespace MusiC.Extensions
 					where (hnd = _hndPool.ElementAt(int.Parse( element.Elements("Handler_Index").ElementAt(0).Value ))).CanHandle(file)
 					select hnd;
 			
-			Message("GetUnmanagedHandler - Handlers Found: " + result.Count());
+			//Message("GetUnmanagedHandler - Handlers Found: " + result.Count());
 			
 			if( result.Count() > 0 )
 				return result.ElementAt(0) as Unmanaged.Handler;
@@ -208,9 +210,14 @@ namespace MusiC.Extensions
 		/// <summary>
 		/// 
 		/// </summary>
+		/// <param name="file">
+		/// A <see cref="System.String"/>
+		/// </param>
+		/// <returns>
+		/// A <see cref="Configurator"/>
+		/// </returns>
 		/// <exception cref="MusiC.Exceptions.MissingExtensionException"></exception>
-		/// <returns></returns>
-		public Configurator GetConfigurator()
+		public Configurator GetConfigurator(string file)
 		{
 			if(_objConfig!=null)
 				return _objConfig;
@@ -224,19 +231,6 @@ namespace MusiC.Extensions
 			_objConfig = Invoker.LoadConfig(result.ElementAt(0).Class);
 			
 			return _objConfig;
-		}
-		
-		//::::::::::::::::::::::::::::::::::::::://
-		
-		/// <summary>
-		/// 
-		/// </summary>
-		/// <param name="configObj">
-		/// A <see cref="Configurator"/>
-		/// </param>
-		public void SetConfigurator(Configurator configObj)
-		{
-			_objConfig = configObj;
 		}
 		
 		#endregion
@@ -308,6 +302,9 @@ namespace MusiC.Extensions
 
 		//::::::::::::::::::::::::::::::::::::::://
 
+		/// <summary>
+		/// 
+		/// </summary>
 		public void Say()
 		{
 			Message(_doc.ToString());

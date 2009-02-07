@@ -90,10 +90,10 @@ namespace MusiC
 		/// <summary>
 		/// 
 		/// </summary>
-		/// <param name="cache">
-		/// A <see cref="ExtensionCache"/>
+		/// <param name="conf">
+		/// A <see cref="Config"/>
 		/// </param>
-		public void Execute(ExtensionCache cache)
+		public void Execute(Config conf)
 		{
 			MemoryModel status = _pipe.Check();
 			
@@ -103,7 +103,7 @@ namespace MusiC
 				Say();
 			}
 			
-			_pipe.Execute(cache);
+			_pipe.Execute(conf);
 		}
 		
 		//::::::::::::::::::::::::::::::::::::::://
@@ -244,20 +244,20 @@ namespace MusiC
 		/// <summary>
 		/// 
 		/// </summary>
-		/// <param name="cache">
-		/// A <see cref="ExtensionCache"/>
+		/// <param name="conf">
+		/// A <see cref="Config"/>
 		/// </param>
-		public void Execute(ExtensionCache cache)
+		public void Execute(Config conf)
 		{
 			if (_status == MemoryModel.Managed)
 			{
-				_mPipe.Execute(cache);
+				_mPipe.Execute(conf);
 				return;
 			}
 			
 			if (_status == MemoryModel.Unmanaged)
 			{
-				_uPipe.Execute(cache);
+				_uPipe.Execute(conf);
 				return;
 			}
 			
@@ -348,10 +348,10 @@ namespace MusiC
 		/// <summary>
 		/// 
 		/// </summary>
-		/// <param name="cache">
-		/// A <see cref="ExtensionCache"/>
+		/// <param name="conf">
+		/// A <see cref="Config"/>
 		/// </param>
-		public void Execute(ExtensionCache cache)
+		public void Execute(Config conf)
 		{
 		}
 		
@@ -384,6 +384,42 @@ namespace MusiC
 		private Unmanaged.Window _window;
 		private Unmanaged.Classifier _classifier;
 		private LinkedList<Unmanaged.Feature> _featureList = new LinkedList<Unmanaged.Feature>();
+		
+		//::::::::::::::::::::::::::::::::::::::://
+
+		/// <summary>
+		/// 
+		/// </summary>
+		/// <param name="file">
+		/// A <see cref="System.String"/>
+		/// </param>
+		/// <returns>
+		/// A <see cref="Data.Unmanaged.FileData"/>
+		/// </returns>
+		unsafe
+		private Data.Unmanaged.FileData * Extract(string file)
+		{
+			BeginReportSection(file);
+					
+			Unmanaged.Handler h = ExtensionCache.GetUnmanagedHandler(file);
+			if( h == null )
+			{
+				Warning(file + ": No handler supports this file");
+				return null;
+			}
+			
+			h.Attach(file);
+			_window.Attach(h);
+			
+			Data.Unmanaged.FileData * currentFile = Data.Unmanaged.DataHandler.BuildFileData( );
+			Unmanaged.Extractor.Extract( _window, _featureList, currentFile );
+			
+			h.Detach();
+
+			EndReportSection(true);
+
+			return currentFile;
+		}
 		
 		//::::::::::::::::::::::::::::::::::::::://
 		
@@ -444,44 +480,28 @@ namespace MusiC
 		//::::::::::::::::::::::::::::::::::::::://
 		
 		/// <summary>
-		///
+		/// 
 		/// </summary>
-		/// <param name="cache"></param>
+		/// <param name="conf">
+		/// A <see cref="Config"/>
+		/// </param>
 		/// @todo Create a handler cache and pass it here.
 		unsafe
-		public void Execute(ExtensionCache cache)
+		public void Execute(Config conf)
 		{
-			IEnumerable<ILabel> tLabel = cache.GetConfigurator().LabelList;
+			IEnumerable<ILabel> tLabel = conf.LabelList;
 			Data.Unmanaged.DataCollection* dtCol = Data.Unmanaged.DataHandler.BuildCollection(_featureList.Count);
 			
 			foreach (TrainLabel label in tLabel)
 			{
 				Data.Unmanaged.ClassData* currentClass = Data.Unmanaged.DataHandler.BuildClassData(dtCol);
 				
-				//Message("Processing " + label.InputDir);
 				BeginReportSection("Processing " + label.InputDir);
 				
 				foreach (string file in Directory.GetFiles(label.InputDir, "*.wav"))
 				{
-					BeginReportSection(file);
-					
-					Data.Unmanaged.FileData* currentFile = Data.Unmanaged.DataHandler.BuildFileData(currentClass);
-					Unmanaged.Handler h = cache.GetUnmanagedHandler(file);
-					
-					if( h == null )
-					{
-						Warning(file + ": No handler supports this file");
-						continue;
-					}
-					
-					h.Attach(file);
-					_window.Attach(h);
-					
-					Unmanaged.Extractor.Extract(_window, _featureList, currentFile);
-					
-					h.Detach();
-
-					EndReportSection(true);
+					Data.Unmanaged.FileData * currentFile = Extract(file);
+					Data.Unmanaged.DataHandler.AddFileData(currentFile, currentClass);
 				}
 
 				EndReportSection(true);
@@ -492,13 +512,19 @@ namespace MusiC
 			Summarize(dtCol);
 			
 			if (_classifier != null) {
-				Message("Beginning Classification");
-				Data.Unmanaged.DataCollection* filteredData = _classifier.Filter(dtCol);
+				Message("Beginning Training");
 				
+				Message("Filtering Data ...");
+				Data.Unmanaged.DataCollection* filteredData = _classifier.Filter(dtCol);
+
+				Message("Training ...");
 				if (filteredData == null) 
 					_classifier.Train(dtCol);
 				else 
 					_classifier.Train(filteredData);
+
+				Message("Begining Classification ...");
+				//_classifier.
 			}
 			
 			Message("All Tasks Done");
