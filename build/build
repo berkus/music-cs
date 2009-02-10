@@ -33,9 +33,9 @@ function menu_project()
 function build()
 {
   if [ "$2" = "" ]; then 
-    premake4 --file=premake.lua $1;
+    premake4 $1;
   else
-    premake4 --cc=$2 --file=premake.lua $1
+    premake4 --cc=$2 $1
   fi
 
   echo

@@ -72,44 +72,44 @@ REM echo [Options] Compiler:%compiler%, Version:%version%, Projects:%vsprojects%
 echo.
 
 if %compiler%==g (
-	premake --target gnu
+	premake4 gmake
 	goto pause-before-menu
 )
 
 if %compiler%==v (
 	if %version%==4 (
-		premake --file=premake.lua vs2005
+		premake4 vs2005
 		goto pause-before-menu
 	)
 	if %version%==5 (
-		premake --file=premake.lua vs2008
+		premake4 vs2008
 		goto pause-before-menu
 	)
 )
 
 if %compiler%==c (
 	if %version%==o (
-		premake --target cb-ow
+		premake4 --cc=ow codeblocks
 		goto pause-before-menu
 	)
 	if %version%==g (
-		premake --target cb-gcc
+		premak4e --cc=gcc codeblocks
 		goto pause-before-menu
 	)
 )
 
 if %compiler%==C (
-	premake --target cl-gcc
+	premake4 --cc=gcc codelite
 	goto pause-before-menu
 )
 
 if %compiler%==m (
-	premake --target monodev
+	premake4 vs2005
 	goto pause-before-menu
 )
 
 if %compiler%==s (
-	premake --target sharpdev
+	premake4 vs2005
 	goto pause-before-menu
 )
 

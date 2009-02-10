@@ -1,17 +1,17 @@
 Scripts call premake:
-	Linux
-	Mac
-	Windows ... OK
+	Linux ... ok
+	Mac ... ok
+	Windows ... 
 
 Testing premake.lua
-	Linux
+	Linux ... ok
 	Mac ... ok
-	Windows ... ok
+	Windows ... 
 
 User friendly premake calls
-	Linux
-	Mac
-	Windows ... ok
+	Linux ... ok
+	Mac ... ok
+	Windows ... 
 
 Testing premake projects
 	gnu
@@ -23,17 +23,17 @@ Testing premake projects
 		Windows ... ok - sharpdev, ok - vs2008 express
 		
 	vs2008 - umanaged
-		Windows ... ok - vs2008 express
+		Windows ... 
 		
 	code::blocks gcc
-		Linux
-		Mac
+		Linux ... ok
+		Mac ... ok
 		Windows
 readme
 
 *.xml
 	add to projects ... ok
-	copy after build to /bin ... ok
+	copy after build to /bin ... 
 	
 FIXME:
 	premake --clean
