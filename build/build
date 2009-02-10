@@ -45,16 +45,20 @@ function build()
 
 function build_doc()
 {
+  echo "Running Doxygen . . ."
   doxygen
   cd ../srcDoc/latex
-  make pdf
+  echo "Making Doxygen PDF . . ."
+  make pdf > /dev/null
   cd ../../srcToTex
+  echo "Regenerating Files List . . ."
   mono bin/Release/srcToTex.exe ../src
-  pdflatex printSrc
+  echo "Generating Source Code PDF . . ."
+  pdflatex printSrc > /dev/null
   cd ../build
   cp ../srcDoc/latex/refman.pdf ../srcToTex/printSrc.pdf .
   
-  echo
+  echo "Done."
   echo "Press [Enter] key to continue. . ."
   read enterkey
 }

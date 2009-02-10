@@ -1,11 +1,11 @@
 os=$(uname -s)
 
 if [ "$os" = "Darwin" ]; then
-	export DYLD_LIBRARY_PATH=./;$DYLD_LIBRARY_PATH
+	export DYLD_LIBRARY_PATH=./:$DYLD_LIBRARY_PATH
 else
 	export LD_LIBRARY_PATH=./:$LD_LIBRARY_PATH
 fi
 
-# mono --debug --trace MusiC.Apps.GenreC.exe | grep ": MusiC" > trace.txt
-
-mono --debug MusiC.Apps.GenreC.exe
+#mono --debug --trace MusiC.Apps.GenreC.exe | grep ": MusiC" > trace.txt
+#mono --debug --profile=default:alloc MusiC.Apps.GenreC.exe
+mono MusiC.Apps.GenreC.exe
