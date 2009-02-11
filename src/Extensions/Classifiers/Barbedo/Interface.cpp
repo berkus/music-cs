@@ -27,18 +27,24 @@ using namespace MusiC::Native;
 
 extern "C"
 {
-    DataCollection * Barbedo_Filter (DataCollection * extractedData);
-    void Barbedo_Train (DataCollection * extractedData);
+    DataCollection * Barbedo_Filter( DataCollection * extractedData );
+    void * Barbedo_Train( DataCollection * extractedData );
+    int Barbedo_Classify( void * data );
 }
 
-DataCollection * Barbedo_Filter (DataCollection * extractedData)
+DataCollection * Barbedo_Filter( DataCollection * extractedData )
 {
     Barbedo b;
-    return b.Filter(extractedData);
+    return b.Filter( extractedData );
 }
 
-void Barbedo_Train (DataCollection * extractedData)
+void * Barbedo_Train( DataCollection * extractedData )
 {
     Barbedo b;
-    b.Train(extractedData);
+    return b.Train( extractedData );
+}
+
+int Barbedo_Classify( void * data )
+{
+    return 0;
 }

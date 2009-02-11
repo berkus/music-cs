@@ -57,7 +57,7 @@ namespace MusiC
 			/// </value>
 			public ILabel Label()
 			{
-				return new TrainLabel();
+				return new Label();
 			}
 
 			//::::::::::::::::::::::::::::::::::::::://
@@ -111,7 +111,7 @@ namespace MusiC
 		/// </param>
 		protected void AddTrainLabel(ILabel label)
 		{
-			_currentConf.AddTrainLabel(label);
+			_currentConf.AddTrainLabel(label as Label);
 		}
 		
 		//::::::::::::::::::::::::::::::::::::::://
@@ -125,9 +125,9 @@ namespace MusiC
 		/// <returns>
 		/// A <see cref="System.Boolean"/>
 		/// </returns>
-		protected bool AddDir(string dir)
+		protected bool AddClassificationDir(string dir)
 		{
-			return _currentConf.AddDir(dir);
+			return _currentConf.AddClassificationDir(dir);
 		}
 
 		//::::::::::::::::::::::::::::::::::::::://
@@ -141,7 +141,7 @@ namespace MusiC
 		/// <returns>
 		/// A <see cref="Config"/>
 		/// </returns>
-		public Config LoadConfig(string file)
+		internal Config LoadConfig(string file)
 		{
 			Config conf = new Config();
 			_currentConf = conf;

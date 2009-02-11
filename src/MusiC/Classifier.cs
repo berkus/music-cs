@@ -70,7 +70,7 @@ namespace MusiC
 			/// 
 			/// </summary>
 			virtual
-			public void Classify()
+			public int Classify()
 			{
 				throw new NotImplementedException();
 			}
@@ -134,12 +134,12 @@ namespace MusiC
 			/// A <see cref="Data.Unmanaged.DataCollection"/>
 			/// </param>
 			abstract unsafe
-			public void Train(Data.Unmanaged.DataCollection* dtCol);
+			public void * Train(Data.Unmanaged.DataCollection* dtCol);
 
 			//::::::::::::::::::::::::::::::::::::::://
 
-			//abstract
-			//public int Classify();
+			abstract unsafe
+			public int Classify( Data.Unmanaged.FileData * fd, void * data );
 		}
 	}
 }

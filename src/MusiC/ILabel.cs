@@ -34,7 +34,7 @@ namespace MusiC
 		//// <value>
 		/// 
 		/// </value>
-		string Label 
+		string Name 
 		{
 			get;
 			set;
@@ -52,16 +52,18 @@ namespace MusiC
 		}
 
 		//::::::::::::::::::::::::::::::::::::::://
-
-		//// <value>
+		
+		/// <summary>
 		/// 
-		/// </value>
-		string InputDir 
-		{
-			get;
-			set;
-		}
-
+		/// </summary>
+		/// <param name="dir">
+		/// A <see cref="System.String"/>
+		/// </param>
+		/// <returns>
+		/// A <see cref="System.Boolean"/>
+		/// </returns>
+		bool AddInputDir(string dir);
+		
 		//::::::::::::::::::::::::::::::::::::::://
 
 		/// <summary>

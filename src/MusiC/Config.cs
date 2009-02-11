@@ -31,11 +31,11 @@ namespace MusiC
 	/// <summary>
 	/// 
 	/// </summary>
-	public class Config
+	internal class Config
 	{
 		private LinkedList<IAlgorithm> _algList = new LinkedList<IAlgorithm>();
-		private LinkedList<ILabel> _trainList = new LinkedList<ILabel>();
-		private LinkedList<String> _classifyList = new LinkedList<String>();
+		private LinkedList<Label> _trainList = new LinkedList<Label>();
+		private Label _classify = new Label();
 
 		//::::::::::::::::::::::::::::::::::::::://
 
@@ -52,9 +52,18 @@ namespace MusiC
 		/// <value>
 		/// 
 		/// </value>
-		public LinkedList<ILabel> LabelList
+		public LinkedList<Label> LabelList
 		{
 			get { return _trainList; }
+		}
+		//::::::::::::::::::::::::::::::::::::::://
+		
+		//// <value>
+		/// 
+		/// </value>
+		public Label Classify
+		{
+			get { return _classify; }
 		}
 		
 		//::::::::::::::::::::::::::::::::::::::://
@@ -78,9 +87,9 @@ namespace MusiC
 		/// <param name="label">
 		/// A <see cref="ILabel"/>
 		/// </param>
-		public void AddTrainLabel(ILabel label)
+		public void AddTrainLabel(Label label)
 		{
-			if(label.Validate())
+			if( label.Validate() )
 				_trainList.AddLast(label);
 		}
 		
@@ -95,12 +104,12 @@ namespace MusiC
 		/// <returns>
 		/// A <see cref="System.Boolean"/>
 		/// </returns>
-		public bool AddDir(String dir)
+		public bool AddClassificationDir(String dir)
 		{
 			bool returnValue;
 			
 			if(returnValue = Directory.Exists(dir))
-				_classifyList.AddLast(dir);
+				_classify.AddInputDir( dir );
 			
 			return returnValue;
 		}

@@ -446,7 +446,7 @@ DataCollection * Barbedo::Filter( DataCollection * extractedData )
 ///
 ///
 ///
-void Barbedo::Train( DataCollection * extractedData )
+void * Barbedo::Train( DataCollection * extractedData )
 {
 	DataHandler data;
 	data.Attach( extractedData );
@@ -511,7 +511,7 @@ void Barbedo::Train( DataCollection * extractedData )
 		if ( refVecsIndex == NULL )
 		{
 			log << "Combination structure out of memory" << endl;
-			return;
+			return NULL;
 		}
 
 		// Frames Combination Loop
@@ -645,12 +645,13 @@ void Barbedo::Train( DataCollection * extractedData )
 				" - " << aElem.str( ) << " & " << bElem.str( ) << endl;
 			}
 
+			/// @todo Grab vectors.
+
 			potentialsCombinationIndex++;
 		}
 		while ( combine( refVecsIndex ) == GSL_SUCCESS ); // Stop Condition: Class Comparison
 
 		gsl_combination_free( refVecsIndex->a );
-
 		gsl_combination_free( refVecsIndex->b );
 
 		delete refVecsIndex;
@@ -658,6 +659,8 @@ void Barbedo::Train( DataCollection * extractedData )
 		if ( gsl_combination_next( selectedGenres ) == GSL_FAILURE ) // Stop Condition: Genre Comparison
 			break;
 	}
+
+	return NULL;
 }
 
 //::::::::::::::::::::::::::::::::::::::://

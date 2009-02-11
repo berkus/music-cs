@@ -41,9 +41,9 @@ namespace MusiC.Extensions.Classifiers
 		/// A <see cref="DataCollection"/>
 		/// </param>
 		override unsafe 
-		public void Train(DataCollection* dtCol)
+		public void * Train( DataCollection* dtCol )
 		{
-			uTrain(ref (*dtCol));
+			return uTrain( ref ( *dtCol ) );
 		}
 		
 		//::::::::::::::::::::::::::::::::::::::://
@@ -58,10 +58,42 @@ namespace MusiC.Extensions.Classifiers
 		/// A <see cref="Data.Unmanaged.DataCollection"/>
 		/// </returns>
 		override unsafe 
-		public Data.Unmanaged.DataCollection * Filter(DataCollection* dataIn)
+		public Data.Unmanaged.DataCollection * Filter( DataCollection* dataIn )
 		{
 			return uFilter(ref *dataIn);
 		}
+		
+		//::::::::::::::::::::::::::::::::::::::://
+		
+		/// <summary>
+		/// 
+		/// </summary>
+		/// <param name="dataIn">
+		/// A <see cref="System.Void"/>
+		/// </param>
+		/// <returns>
+		/// A <see cref="System.Int32"/>
+		/// </returns>
+		override unsafe 
+		public int Classify( FileData * f, void * dataIn )
+		{
+			return uClassify(dataIn);
+		}
+		
+		//::::::::::::::::::::::::::::::::::::::://
+		
+		/// <summary>
+		/// 
+		/// </summary>
+		/// <param name="data">
+		/// A <see cref="System.Void"/>
+		/// </param>
+		/// <returns>
+		/// A <see cref="System.Int32"/>
+		/// </returns>
+		[DllImport("MusiC.Extensions.Classifiers.uBarbedo.dll", EntryPoint="Barbedo_Classify")]
+		static extern unsafe
+		public int uClassify( void * data );
 		
 		//::::::::::::::::::::::::::::::::::::::://
 		
@@ -72,8 +104,8 @@ namespace MusiC.Extensions.Classifiers
 		/// A <see cref="DataCollection"/>
 		/// </param>
 		[DllImport("MusiC.Extensions.Classifiers.uBarbedo.dll", EntryPoint="Barbedo_Train")]
-		static extern 
-		public void uTrain(ref DataCollection dtCol);
+		static extern unsafe
+		public void * uTrain(ref DataCollection dtCol);
 		
 		//::::::::::::::::::::::::::::::::::::::://
 		

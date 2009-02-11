@@ -420,6 +420,40 @@ namespace MusiC
 
 			return currentFile;
 		}
+
+		//::::::::::::::::::::::::::::::::::::::://
+
+		/// <summary>
+		/// 
+		/// </summary>
+		/// <param name="tLabel">
+		/// A <see cref="IEnumerable"/>
+		/// </param>
+		/// <returns>
+		/// A <see cref="Data.Unmanaged.DataCollection"/>
+		/// </returns>
+		unsafe
+		private Data.Unmanaged.DataCollection * Extract(IEnumerable<Label> tLabel)
+		{
+			Data.Unmanaged.DataCollection* dtCol = Data.Unmanaged.DataHandler.BuildCollection(_featureList.Count);
+			
+			foreach (Label label in tLabel)
+			{
+				Data.Unmanaged.ClassData* currentClass = Data.Unmanaged.DataHandler.BuildClassData(dtCol);	
+				BeginReportSection("Processing Label: " + label.Name);
+				
+				//foreach (string file in Directory.GetFiles(label.InputDir, "*.wav"))
+				foreach (string file in label)
+				{
+					Data.Unmanaged.FileData * currentFile = Extract(file);
+					Data.Unmanaged.DataHandler.AddFileData(currentFile, currentClass);
+				}
+
+				EndReportSection(true);
+			}
+
+			return dtCol;
+		}
 		
 		//::::::::::::::::::::::::::::::::::::::://
 		
@@ -489,45 +523,43 @@ namespace MusiC
 		unsafe
 		public void Execute(Config conf)
 		{
-			IEnumerable<ILabel> tLabel = conf.LabelList;
-			Data.Unmanaged.DataCollection* dtCol = Data.Unmanaged.DataHandler.BuildCollection(_featureList.Count);
-			
-			foreach (TrainLabel label in tLabel)
-			{
-				Data.Unmanaged.ClassData* currentClass = Data.Unmanaged.DataHandler.BuildClassData(dtCol);
-				
-				BeginReportSection("Processing " + label.InputDir);
-				
-				foreach (string file in Directory.GetFiles(label.InputDir, "*.wav"))
-				{
-					Data.Unmanaged.FileData * currentFile = Extract(file);
-					Data.Unmanaged.DataHandler.AddFileData(currentFile, currentClass);
-				}
+			IEnumerable<Label> tLabel = conf.LabelList;
 
-				EndReportSection(true);
-			}
+			//check resume support.
+			//check if a new training is needed.
 			
-			Message("Extraction Done.");
+			Message("Extracting . . .");
+			Data.Unmanaged.DataCollection * dtCol = Extract(tLabel);
 			
 			Summarize(dtCol);
 			
-			if (_classifier != null) {
+			if( _classifier != null ) 
+			{
 				Message("Beginning Training");
 				
-				Message("Filtering Data ...");
+				Message("Filtering . . .");
 				Data.Unmanaged.DataCollection* filteredData = _classifier.Filter(dtCol);
-
-				Message("Training ...");
-				if (filteredData == null) 
-					_classifier.Train(dtCol);
+				
+				void * tData;
+				
+				Message("Training . . .");
+				
+				if( filteredData == null )
+					tData =_classifier.Train( dtCol );
 				else 
-					_classifier.Train(filteredData);
+					tData = _classifier.Train( filteredData );
 
-				Message("Begining Classification ...");
-				//_classifier.
+				Message( "Begining Classification . . ." );
+				
+				foreach( string file in conf.Classify )
+				{
+					Message( "Classifying: " + file );
+					Data.Unmanaged.FileData * f = Extract( file );
+					_classifier.Classify( f, tData );
+				}
 			}
 			
-			Message("All Tasks Done");
+			Message( "All Tasks Done" );
 		}
 		
 		//::::::::::::::::::::::::::::::::::::::://

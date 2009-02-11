@@ -135,6 +135,7 @@ namespace MusiC.Configs
 		//::::::::::::::::::::::::::::::::::::::://
 
 		#region Parsing Methods
+		
 		/// <summary>
 		/// 
 		/// </summary>
@@ -169,20 +170,21 @@ namespace MusiC.Configs
 					if(xmlLabelNode.Name == "Label")
 					{
 						ILabel l = New.Label();
-						l.Label=XmlSafeAttribute(xmlLabelNode,"name");
+						l.Name = XmlSafeAttribute(xmlLabelNode,"name");
 						
 						/// @todo Add support to multiple input dirs
-						l.InputDir=XmlSafeAttribute(xmlLabelNode,"input", true);
-						if(l.InputDir==null)
+						string iDir = XmlSafeAttribute(xmlLabelNode,"input", true);
+						if( iDir == null )
 						{
-							/// @todo Check baseDir availability
-							l.InputDir = System.IO.Path.Combine(baseDir, l.Label);
+							/// @todo Check return
+							iDir = System.IO.Path.Combine(baseDir, l.Name);
+							l.AddInputDir(iDir);
 						}
 						
-						l.OutputDir=XmlSafeAttribute(xmlLabelNode,"output", true);
+						l.OutputDir = XmlSafeAttribute(xmlLabelNode,"output", true);
 						
 						if(l.OutputDir == null)
-							l.OutputDir=l.InputDir;
+							l.OutputDir=iDir;
 						
 						AddTrainLabel(l);
 					}
@@ -193,9 +195,9 @@ namespace MusiC.Configs
 			foreach(XmlNode classifyNode in cfgFile.GetElementsByTagName("MusiC-Classify"))
 			{
 				/// @todo Add support to allow/deny algorithms to use this folder
-				String dir = XmlSafeAttribute(classifyNode,"dir");
+				string dir = XmlSafeAttribute(classifyNode,"dir");
 				
-				if(!AddDir(dir))
+				if( !AddClassificationDir( dir ) )
 					Warning("A non-existent directory ("+ dir +
 					        ") wasn't added to the processing queue.");
 			}
@@ -257,6 +259,7 @@ namespace MusiC.Configs
 				AddAlgorithm(algorithm);
 			}
 		}
+		
 		#endregion
 	}
 }

@@ -96,7 +96,7 @@ namespace MusiC
         public:
 
             DataCollection * Filter (DataCollection * extractedData);
-            void Train (DataCollection * extractedData);
+            void * Train (DataCollection * extractedData);
         };
     }
 }
