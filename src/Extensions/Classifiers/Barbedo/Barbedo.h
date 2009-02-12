@@ -26,14 +26,14 @@
 
 #include <iostream>
 #include <fstream>
-#include <sstream>
-
 #include <cmath>
 
 #include <gsl/gsl_combination.h>
 #include <gsl/gsl_sf.h>
 
 #include <MusiC-Native.h>
+
+#include "BarbedoData.h"
 
 //::::::::::::::::::::::::::::::::::::::://
 
@@ -43,16 +43,6 @@ namespace MusiC
     {
         class Barbedo
         {
-            ///
-            ///
-            ///
-            struct RefVecIndex
-            {
-                gsl_combination * a;
-                gsl_combination * b;
-            };
-
-            //---------------------------------------//
 
         private:
 
@@ -71,7 +61,7 @@ namespace MusiC
 
         private:
 
-            RefVecIndex * createCombination (int szA, int szB);
+            RefVecIndex * createCombination (ClassData * classA, ClassData * classB);
             ClassData * filterCandidates (ClassData * cl);
             int combine (RefVecIndex * ref);
             float dist (float * src, float * ref, int size);
@@ -83,7 +73,7 @@ namespace MusiC
 
             Barbedo()
             {
-                log.open("Barbedo_Filter.txt", std::ios_base::app);
+                log.open("Barbedo_Filter.txt",  std::ios_base::app );
             }
 
             ~Barbedo()
@@ -96,7 +86,9 @@ namespace MusiC
         public:
 
             DataCollection * Filter (DataCollection * extractedData);
+            FileData * Filter ( FileData * file, unsigned int nFeat );
             void * Train (DataCollection * extractedData);
+            int Classify(FrameData * pCurrent, FrameData ** a, FrameData ** b, unsigned int nFeat);
         };
     }
 }

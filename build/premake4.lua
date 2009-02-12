@@ -10,6 +10,9 @@ function MakeManagedProjects()
 	dofile("MusiC.Extensions.Classifiers.Barbedo.lua")
 	dofile("MusiC.Extensions.Configs.XMLConfigurator.lua")
 	dofile("MusiC.Extensions.Features.SpecRollOff.lua")
+	dofile("MusiC.Extensions.Features.SpectralFlux.lua")
+	dofile("MusiC.Extensions.Features.Loudness.lua")
+	dofile("MusiC.Extensions.Features.Bandwidth.lua")
 	dofile("MusiC.Extensions.Handlers.WAVHandler.lua")
 	dofile("MusiC.Extensions.Windows.Hamming.lua")
 end
@@ -32,7 +35,10 @@ function CreateProject()
 		
 		solution("uMusiC")
 		configurations({"Debug", "Release"})
-		location(base_prj_dir.."u")
+		
+		-- this will change the location of the projects.
+		base_prj_dir = base_prj_dir.."u"
+		location(base_prj_dir)
 		
 		MakeUnmanagedProjects()
 	elseif

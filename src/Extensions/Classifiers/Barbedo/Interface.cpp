@@ -23,19 +23,29 @@
 
 #include "Barbedo.h"
 
+#include <iostream>
+
+using namespace std;
 using namespace MusiC::Native;
 
 extern "C"
 {
-    DataCollection * Barbedo_Filter( DataCollection * extractedData );
+    FileData * Barbedo_CFilter( FileData * data, unsigned int nfeat );
+    DataCollection * Barbedo_EFilter( DataCollection * dtCol );
     void * Barbedo_Train( DataCollection * extractedData );
-    int Barbedo_Classify( void * data );
+    int Barbedo_Classify( FileData * f, void * data );
 }
 
-DataCollection * Barbedo_Filter( DataCollection * extractedData )
+FileData * Barbedo_CFilter( FileData * data, unsigned int nfeat )
 {
     Barbedo b;
-    return b.Filter( extractedData );
+    return b.Filter( data, nfeat );
+}
+
+DataCollection * Barbedo_EFilter( DataCollection * dtCol )
+{
+    Barbedo b;
+    return b.Filter( dtCol );
 }
 
 void * Barbedo_Train( DataCollection * extractedData )
@@ -44,7 +54,52 @@ void * Barbedo_Train( DataCollection * extractedData )
     return b.Train( extractedData );
 }
 
-int Barbedo_Classify( void * data )
+int Barbedo_Classify( FileData * fd, void * data )
 {
-    return 0;
+    BarbedoTData * tdata = reinterpret_cast< BarbedoTData * >( data );
+    Barbedo b;
+
+    cout << "info" << endl;
+    cout << tdata->nFeat << endl;
+    cout << tdata->genreCount << endl;
+    cout << tdata->genreCombinationCount << endl;
+
+    FrameData * frame = fd->pFirstFrame;
+    unsigned int * votes = new unsigned int[ tdata->genreCount ];
+
+    for(int idx = 0; idx < tdata->genreCount; idx++)
+    {
+        votes[ idx ] = 0;
+    }
+
+    while( frame )
+    {
+        for(int idx = 0; idx < tdata->genreCombinationCount; idx++)
+        {
+            // returns 0 or 1 representing class a or b.
+            int res = b.Classify( frame, tdata->data[ idx ].frames_a, tdata->data[ idx ].frames_a, tdata->nFeat );
+            if( res == 0 )
+            {
+                votes[ tdata->data[ idx ].genre_a ]++;
+            }
+            else
+            {
+                votes[ tdata->data[ idx ].genre_b ]++;
+            }
+        }
+
+        frame = frame->pNextFrame;
+    }
+    unsigned int winner, score = 0;
+
+    for(int idx = 0; idx < tdata->genreCount; idx++)
+    {
+        if( votes[ idx ] > score )
+        {
+            score = votes[ idx ];
+            winner = idx;
+        }
+    }
+
+    return winner;
 }

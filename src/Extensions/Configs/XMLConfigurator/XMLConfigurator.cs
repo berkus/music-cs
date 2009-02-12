@@ -220,8 +220,10 @@ namespace MusiC.Configs
 
 				foreach (XmlNode child in n.ChildNodes)
 				{
-					if(child.Name == "MusiC-Extension")
-						className = XmlSafeAttribute(child, "name");
+					if( child.Name == "MusiC-Extension" )
+					{
+						className = XmlSafeAttribute(child, "class");
+					}
 					else
 					{
 						if(!_tagCache.TryGetValue(child.Name, out className))
@@ -246,7 +248,7 @@ namespace MusiC.Configs
 					
 					try
 					{
-						if(!algorithm.Add(className, paramList))
+						if( !algorithm.Add( className, paramList ) )
 							break;
 					} catch (MissingExtensionException e)
 					{

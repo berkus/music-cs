@@ -50,12 +50,15 @@ const int MusiC::Native::Barbedo::FRAME_COUNT =
 /// <param name="szB">
 /// A <see cref="std::int"/>
 /// </param>
-Barbedo::RefVecIndex * Barbedo::createCombination( int szA, int szB )
+RefVecIndex * Barbedo::createCombination( ClassData * classA, ClassData * classB )
 {
-	RefVecIndex * r = new RefVecIndex( );
+    if( classA->nFrames < 3 || classB->nFrames < 3 )
+    {
+        log << "ERROR: A class must have at least 3 vectors" << endl;
+        return NULL;
+    }
 
-	r->a = gsl_combination_calloc( szA, 3 );
-	r->b = gsl_combination_calloc( szB, 3 );
+	RefVecIndex * r = new RefVecIndex(classA, classB);
 
 	return r;
 }
@@ -96,6 +99,8 @@ ClassData * Barbedo::filterCandidates( ClassData * cl )
 
 	FileData * fileDt = cl->pFirstFile;
 	FrameData * frameDt = fileDt->pFirstFrame;
+
+	unsigned int nframes_before = cl->nFrames;
 
 	// Calculating mean, var of all frames.
 	// var = E( x^2 ) - E( x )^2
@@ -173,9 +178,9 @@ ClassData * Barbedo::filterCandidates( ClassData * cl )
                 lastkept->pNextFrame = frameDt->pNextFrame;
 
 			fileDt->nFrames--;
+			cl->nFrames--;
 
 			delete frameDt->pData;
-
 			delete frameDt;
 
 			frameDt = frameDt->pNextFrame;
@@ -191,19 +196,16 @@ ClassData * Barbedo::filterCandidates( ClassData * cl )
 		lastkept = frameDt;
 
 		frameDt = frameDt->pNextFrame;
+		if( frameDt == fileDt->pLastFrame )
+            fileDt = fileDt->pNextFile;
 	}
 
 	if ( lastkept ) lastkept->pNextFrame = NULL;
 
 	log << "- Frame Count -" << endl;
-
-	log << "after selection: " << fileDt->nFrames << endl;
-
+	log << "after selection: " << cl->nFrames << endl;
 	log << "total aproved: " << candidates_counter << endl;
-
-	log << "before selection: " << cl->nFrames << endl;
-
-	cl->nFrames = fileDt->nFrames;
+	log << "before selection: " << nframes_before << endl;
 
 	return cl;
 }
@@ -216,14 +218,21 @@ ClassData * Barbedo::filterCandidates( ClassData * cl )
 /// <param name="ref">
 /// A <see cref="::RefVecIndex"/>
 /// </param>
-int Barbedo::combine( Barbedo::RefVecIndex * ref )
+int Barbedo::combine( RefVecIndex * ref )
 {
-	if ( gsl_combination_next( ref->b ) == GSL_FAILURE )
+	if ( gsl_combination_next( ref->b->raw ) == GSL_FAILURE )
 	{
-		if ( gsl_combination_next( ref->a ) == GSL_FAILURE )
+		if ( gsl_combination_next( ref->a->raw ) == GSL_FAILURE )
 			return GSL_FAILURE;
+        else
+            ref->a->update();
 
-		gsl_combination_init_first( ref->b );
+		gsl_combination_init_first( ref->b->raw );
+		ref->b->reset();
+	}
+	else
+	{ // update b
+	    ref->b->update();
 	}
 
 	return GSL_SUCCESS;
@@ -275,6 +284,130 @@ float * Barbedo::seq_access( ClassData * cl, Int64 idx )
 
 	return fr->pData;
 }
+FileData * Barbedo::Filter( FileData * fileDt, unsigned int nFeat )
+{
+    // loop counters
+	unsigned int frame_counter = 0;
+	unsigned int cluster_sz_counter = 0;
+	unsigned int cluster_counter = 0;
+
+	register int idx = 0;
+	register unsigned int nfeat = nFeat;
+
+    float mean[ nFeat ];
+	float var[ nFeat ];
+	float max[ nFeat ];
+
+	for ( idx = 0; idx < nfeat; idx++ )
+	{
+		mean[ idx ] = 0.0f;
+		var[ idx ] = 0.0f;
+		max[ idx ] = -INFINITY;
+	}
+
+	int firstFrameIdx = ( int ) ceil( ( fileDt->nFrames - 1 ) / 2 ) - ( int ) floor( FRAME_COUNT / 2 );
+
+    if ( firstFrameIdx < 0 )
+    {
+        log << "File too short" << endl;
+        return NULL;
+    }
+
+    log << "frame Count: " << fileDt->nFrames << endl;
+    log << "first selected frame: " << firstFrameIdx << endl;
+    log << "last selected frame: " << firstFrameIdx + FRAME_COUNT - 1 << endl;
+    log << endl;
+
+    FileData * nfl = new FileData();
+    nfl->pFirstFrame = NULL;
+    nfl->nFrames = 0;
+
+    FrameData * frameDt = fileDt->pFirstFrame;
+
+    float * currentFrame;
+
+    for ( frame_counter = 0; frame_counter < firstFrameIdx; frame_counter++ )
+    {
+        frameDt = frameDt->pNextFrame;
+    }
+
+    for ( cluster_counter = 0; cluster_counter < CLUSTER_COUNT; cluster_counter++ )
+    {
+        FrameData * nfd = new FrameData( );
+        nfd->pData = new float[ nFeat * 3 ];
+        nfd->pNextFrame = NULL;
+
+        currentFrame = frameDt->pData;
+
+        for ( idx = 0; idx < nfeat; idx++ )
+        {
+            mean[ idx ] = 0.0f;
+            var[ idx ] = 0.0f;
+            max[ idx ] = -INFINITY;
+        }
+
+        for ( cluster_sz_counter = 0; cluster_sz_counter < CLUSTER_SIZE; cluster_sz_counter++ )
+        {
+            for ( idx = 0; idx < nfeat; idx++ )
+            {
+                mean[ idx ] += currentFrame[ idx ] / CLUSTER_SIZE;
+                var[ idx ] += currentFrame[ idx ] * currentFrame[ idx ] / CLUSTER_SIZE;
+
+                if ( currentFrame[ idx ] > max[ idx ] ) max[ idx ] = currentFrame[ idx ];
+            }
+        }
+
+        for ( idx = 0; idx < nfeat; idx++ )
+        {
+            var[ idx ] = abs( var[ idx ] - mean[ idx ] * mean[ idx ] );
+
+            nfd->pData[ 3 * idx ] = mean[ idx ];
+            nfd->pData[ 3 * idx + 1 ] = var[ idx ];
+            nfd->pData[ 3 * idx + 2 ] = max[ idx ] / mean[ idx ];
+
+            log << "cluster: " << cluster_counter <<
+            " feature: " << idx <<
+            " mean: " << mean[ idx ] <<
+            " var: " << var[ idx ] <<
+            " ppp: " << max[ idx ] / mean[ idx ] << endl;
+        }
+
+        nfl->nFrames++;
+
+        if( nfl->pFirstFrame == NULL )
+        {
+            nfl->pFirstFrame = nfd;
+            nfl->pLastFrame = nfd;
+        }
+        else
+        {
+            nfl->pLastFrame->pNextFrame = nfd;
+            nfl->pLastFrame = nfd;
+        }
+
+        frameDt = frameDt->pNextFrame;
+    }
+
+//    if( fileDt->pPrevFile )
+//    {
+//        fileDt->pPrevFile->pNextFile = nfl;
+//
+//        if( fileDt->pPrevFile->pLastFrame )
+//            fileDt->pPrevFile->pLastFrame->pNextFrame = nfl->pFirstFrame;
+//    }
+//
+//    if( fileDt->pNextFile )
+//    {
+//        fileDt->pNextFile->pPrevFile = nfl;
+//
+//        if( fileDt->pNextFile->pFirstFrame )
+//            nfl->pLastFrame->pNextFrame = fileDt->pNextFile->pFirstFrame;
+//    }
+
+    log << endl;
+
+    return nfl;
+}
 
 //::::::::::::::::::::::::::::::::::::::://
 
@@ -296,143 +429,69 @@ DataCollection * Barbedo::Filter( DataCollection * extractedData )
 	log << "Clusters per file: " << CLUSTER_COUNT << endl;
 	log << "=========================================" << endl;
 
-	// loop counters
-	int frame_counter = 0;
-	int cluster_sz_counter = 0;
-	int cluster_counter = 0;
-
-	register int idx = 0;
-	register int nFeat = extractedData->nFeatures;
-
-	float mean[ nFeat ];
-	float var[ nFeat ];
-	float max[ nFeat ];
-
-	for ( idx = 0; idx < nFeat; idx++ )
-	{
-		mean[ idx ] = 0.0f;
-		var[ idx ] = 0.0f;
-		max[ idx ] = -INFINITY;
-	}
-
-	float * currentFrame;
-
-	int firstFrameIdx = 0;
-
 	DataCollection * dtCol = new DataCollection( );
 
 	dtCol->nFeatures = 3 * extractedData->nFeatures;
 	dtCol->nClasses = extractedData->nClasses;
 
 	dtCol->pFirstClass = NULL;
+	dtCol->pLastClass = NULL;
 
 	ClassData * cl = extractedData->pFirstClass;
-
 	for ( int class_counter = 0; class_counter < dtCol->nClasses; class_counter++ )
 	{
 		// New Class
 		ClassData * ncl = new ClassData( );
-		ncl->pNextClass = dtCol->pFirstClass;
-		dtCol->pFirstClass = ncl;
-
+		ncl->pNextClass = NULL;
+		ncl->pFirstFile = NULL;
+		ncl->pLastFile = NULL;
 		ncl->pCollection = dtCol;
 
-		// New File
-		FileData * nfl = new FileData( );
-		nfl->pNextFile = NULL;
-		nfl->pClass = ncl;
-		nfl->pFirstFrame = NULL;
+		ncl->nFrames = 0;
+		ncl->nFiles = 0;
 
-		// The only file this class will have.
-		ncl->pFirstFile = nfl;
-		ncl->nFiles = 1;
+		if( !dtCol->pFirstClass )
+            dtCol->pFirstClass = ncl;
+
+        if( dtCol->pLastClass )
+            dtCol->pLastClass->pNextClass = ncl;
+
+        dtCol->pLastClass = ncl;
+
+        ////////////////////////
 
 		FileData * fileDt = cl->pFirstFile;
-		FrameData * frameDt;
 
 		log << "class: " << class_counter << endl;
 		log << "#files: " << cl->nFiles << "   #frames: " << cl->nFrames << endl << endl;
 
 		for ( int file_counter = 0; file_counter < cl->nFiles; file_counter++ )
 		{
-			firstFrameIdx = ( int ) ceil( ( fileDt->nFrames - 1 ) / 2 ) - ( int ) floor( FRAME_COUNT / 2 );
+			FileData * nfl = Filter( fileDt, hnd.getNumFeatures() );
 
-			if ( firstFrameIdx < 0 )
-			{
-				log << "File too short" << endl;
-				continue;
-			}
+			nfl->pNextFile = NULL;
+            nfl->pPrevFile = NULL;
+            nfl->pClass = ncl;
 
-			log << "file: " << file_counter << endl;
+            ncl->nFiles++;
+            ncl->nFrames += nfl->nFrames;
 
-			log << "frame Count: " << fileDt->nFrames << endl;
-			log << "first selected frame: " << firstFrameIdx << endl;
-			log << "last selected frame: " << firstFrameIdx + FRAME_COUNT - 1 << endl;
-			log << endl;
-
-			frameDt = fileDt->pFirstFrame;
-
-			for ( frame_counter = 0; frame_counter < firstFrameIdx; frame_counter++ )
-			{
-				frameDt = frameDt->pNextFrame;
-			}
-
-			for ( cluster_counter = 0; cluster_counter < CLUSTER_COUNT; cluster_counter++ )
-			{
-				FrameData * nfd = new FrameData( );
-				nfd->pData = new float[ extractedData->nFeatures * 3 ];
-
-				currentFrame = frameDt->pData;
-
-				for ( idx = 0; idx < nFeat; idx++ )
-				{
-					mean[ idx ] = 0.0f;
-					var[ idx ] = 0.0f;
-					max[ idx ] = -INFINITY;
-				}
-
-				for ( cluster_sz_counter = 0; cluster_sz_counter < CLUSTER_SIZE; cluster_sz_counter++ )
-				{
-					for ( idx = 0; idx < nFeat; idx++ )
-					{
-						mean[ idx ] += currentFrame[ idx ] / CLUSTER_SIZE;
-						var[ idx ] += currentFrame[ idx ] * currentFrame[ idx ] / CLUSTER_SIZE;
-
-						if ( currentFrame[ idx ] > max[ idx ] ) max[ idx ] = currentFrame[ idx ];
-					}
-				}
-
-				for ( idx = 0; idx < nFeat; idx++ )
-				{
-					var[ idx ] = abs( var[ idx ] - mean[ idx ] * mean[ idx ] );
-
-					nfd->pData[ 3 * idx ] = mean[ idx ];
-					nfd->pData[ 3 * idx + 1 ] = var[ idx ];
-					nfd->pData[ 3 * idx + 2 ] = max[ idx ] / mean[ idx ];
-
-					log << "cluster: " << cluster_counter <<
-					" feature: " << idx <<
-					" mean: " << mean[ idx ] <<
-					" var: " << var[ idx ] <<
-					" ppp: " << max[ idx ] / mean[ idx ] << endl;
-				}
-
-				nfd->pNextFrame = nfl->pFirstFrame;
-
-				nfl->pFirstFrame = nfd;
-
-				nfl->nFrames++;
-				frameDt = frameDt->pNextFrame;
-			}
-
-			log << endl;
+            if( ncl->pFirstFile == NULL )
+            {
+                ncl->pFirstFile = nfl;
+                ncl->pLastFile = nfl;
+            }
+            else
+            {
+                ncl->pLastFile->pLastFrame->pNextFrame = nfl->pFirstFrame;
+                ncl->pLastFile->pNextFile = nfl;
+                ncl->pLastFile = nfl;
+            }
 
 			fileDt = fileDt->pNextFile;
 		}
 
-		log << "Output Summary frames: " << nfl->nFrames << endl << endl;
-
-		ncl->nFrames = nfl->nFrames;
+		log << "Output Summary frames: " << ncl->nFrames << endl << endl;
 		cl = cl->pNextClass;
 	}
 
@@ -463,8 +522,11 @@ void * Barbedo::Train( DataCollection * extractedData )
 	log << "Algorithm Rounds: " << genreCombinationCount << endl;
 	log << "========================" << endl << endl;
 
+    BarbedoTData * tdata = new BarbedoTData( data.getNumClasses() );
+    tdata->nFeat = data.getNumFeatures();
+
 	// Genre Combination Loop
-	gsl_combination * selectedGenres = gsl_combination_calloc( extractedData->nClasses, 2 );
+	gsl_combination * selectedGenres = gsl_combination_calloc( data.getNumClasses(), 2 );
 
 	for ( ;genreCombinationIndex < genreCombinationCount; genreCombinationIndex++ )
 	{
@@ -496,17 +558,13 @@ void * Barbedo::Train( DataCollection * extractedData )
 		log << "============" << endl;
 		log.flush( );
 
-		// ----------- Frames Combintation -----------
-		long score, score_max, winner;
+		// ----------- Frames Combintation -----------//
+		long score_a, score_b, score_max, winner;
 		long potentialsCombinationIndex = 0;
-		//long potentialsCombinationCount = gsl_sf_choose( , 2 );
 		score_max = winner = 0;
 
-		double tmp_dist = 0;
-		int loop_min = 0;
-
 		// Create combination control structure
-		RefVecIndex * refVecsIndex = createCombination( fClassA->nFrames, fClassB->nFrames );
+		RefVecIndex * refVecsIndex = createCombination( fClassA, fClassB );
 
 		if ( refVecsIndex == NULL )
 		{
@@ -517,111 +575,40 @@ void * Barbedo::Train( DataCollection * extractedData )
 		// Frames Combination Loop
 		do
 		{
-			score = 0;
+			score_a = 0;
+			score_b = 0;
 
 			// Dist 1 - Class A
 			FrameData * refVec = classA->pFirstFile->pFirstFrame;
 
-			for ( Int64 idx = 0; idx < fClassA->nFrames; idx++ )
+			for( Int64 idx = 0; idx < fClassA->nFrames; idx++ )
 			{
-				float dist_loop_min = INFINITY;
+				if( Classify(refVec, refVecsIndex->a->frames, refVecsIndex->b->frames, tdata->nFeat) == 0 )
+					score_a++;
 
-				// dist A - A
-				// Each Vector from class A in the 6-vector combination
-
-				for ( int vec = 0; vec < 3; vec++ )
-				{
-					size_t idx = gsl_combination_get( refVecsIndex->a, vec );
-
-					float * pTarget = seq_access( fClassA, idx );
-					float * pCurrent = refVec->pData;
-
-					tmp_dist = dist( pCurrent, pTarget, data.getNumFeatures( ) );
-
-					if ( tmp_dist < dist_loop_min )
-					{
-						dist_loop_min = tmp_dist;
-						loop_min = vec;
-					}
-				}
-
-				// dist A - B
-				for ( int vec = 0; vec < 3; vec++ )
-				{
-					size_t idx = gsl_combination_get( refVecsIndex->b, vec );
-
-					float * pTarget = seq_access( fClassB, idx );
-					float *pCurrent = refVec->pData;
-
-					tmp_dist = dist( pCurrent, pTarget, extractedData->nFeatures );
-
-					if ( tmp_dist < dist_loop_min )
-					{
-						dist_loop_min = tmp_dist;
-						loop_min = vec + 3;
-					}
-				}
-
-				// Get Next Frame
+                // Get Next Frame
 				refVec = refVec->pNextFrame;
-
-				if ( loop_min < 3 )
-					score++;
 			}
 
 			// Dist 2 - Class B
 			refVec = classB->pFirstFile->pFirstFrame;
 
-			for ( Int64 idx = 0; idx < fClassB->nFrames; idx++ )
+			for( Int64 idx = 0; idx < fClassB->nFrames; idx++ )
 			{
-				double dist_loop_min = 1e300;
+				if( Classify(refVec, refVecsIndex->a->frames, refVecsIndex->b->frames, tdata->nFeat) == 1 )
+					score_b++;
 
-				// Class B-A
-
-				for ( int vec = 0; vec < 3; vec++ )
-				{
-					size_t idx = gsl_combination_get( refVecsIndex->a, vec );
-
-					float * pTarget = seq_access( fClassA, idx );
-					float *pCurrent = refVec->pData;
-
-					tmp_dist = dist( pCurrent, pTarget, extractedData->nFeatures );
-
-					if ( tmp_dist < dist_loop_min )
-					{
-						dist_loop_min = tmp_dist;
-						loop_min = vec;
-					}
-				}
-
-				// Class B-B
-				for ( int vec = 0; vec < 3; vec++ )
-				{
-					size_t idx = gsl_combination_get( refVecsIndex->b, vec );
-
-					float * pTarget = seq_access( classB, idx );
-					float *pCurrent = refVec->pData;
-
-					tmp_dist = dist( pCurrent, pTarget, extractedData->nFeatures );
-
-					if ( tmp_dist < dist_loop_min )
-					{
-						dist_loop_min = tmp_dist;
-						loop_min = vec + 3;
-					}
-				}
-
-				refVec = refVec->pNextFrame;
-
-				if ( loop_min >= 3 )
-					score++;
+                refVec = refVec->pNextFrame;
 			} // Frame Comparison
 
 			// Scoring System
-			if ( score > score_max )
+			if ( score_a + score_b > score_max )
 			{
-				score_max = score;
+				score_max = score_a + score_b;
 				winner = potentialsCombinationIndex;
+				tdata->setPair(genreCombinationIndex, selectedGenres, refVecsIndex);
+
+				/// @todo Grab vectors.s
 
 				ostringstream aElem;
 				ostringstream bElem;
@@ -631,28 +618,24 @@ void * Barbedo::Train( DataCollection * extractedData )
 
 				for ( int elemIdx = 0; elemIdx < 3; elemIdx++ )
 				{
-					aElem << gsl_combination_get( refVecsIndex->a, elemIdx ) << " ";
-					bElem << gsl_combination_get( refVecsIndex->b, elemIdx ) << " ";
+					aElem << gsl_combination_get( refVecsIndex->a->raw, elemIdx ) << " ";
+					bElem << gsl_combination_get( refVecsIndex->b->raw, elemIdx ) << " ";
 				}
 
 				aElem << "]";
-
 				bElem << "]";
 
 				log << "New Winner: " << winner << " / " <<
 				( Int64 ) ( gsl_sf_choose( fClassA->nFrames, 3 ) *
 							gsl_sf_choose( fClassA->nFrames, 3 ) ) <<
+                " - score: A(" << score_a << "/" << fClassA->nFrames << ")" <<
+                " B(" << score_b << "/" << fClassB->nFrames << ")" <<
 				" - " << aElem.str( ) << " & " << bElem.str( ) << endl;
 			}
 
-			/// @todo Grab vectors.
-
 			potentialsCombinationIndex++;
 		}
-		while ( combine( refVecsIndex ) == GSL_SUCCESS ); // Stop Condition: Class Comparison
-
-		gsl_combination_free( refVecsIndex->a );
-		gsl_combination_free( refVecsIndex->b );
+		while( combine( refVecsIndex ) == GSL_SUCCESS ); // Stop Condition: Class Comparison
 
 		delete refVecsIndex;
 
@@ -660,10 +643,45 @@ void * Barbedo::Train( DataCollection * extractedData )
 			break;
 	}
 
-	return NULL;
+	return tdata;
 }
 
 //::::::::::::::::::::::::::::::::::::::://
+
+int Barbedo::Classify( FrameData * pCurrent,  FrameData ** a, FrameData ** b, unsigned int nFeat )
+{
+    float dist_loop_min = INFINITY, tmp_dist;
+    unsigned int loop_min;
+
+    for ( int vec = 0; vec < 3; vec++ )
+    {
+        float * pTarget = a[ vec ]->pData;
+        tmp_dist = dist( pCurrent->pData, pTarget, nFeat );
+
+        if ( tmp_dist < dist_loop_min )
+        {
+            dist_loop_min = tmp_dist;
+            loop_min = vec;
+        }
+    }
+
+    for ( int vec = 0; vec < 3; vec++ )
+    {
+        float * pTarget = b[ vec ]->pData;
+        tmp_dist = dist( pCurrent->pData, pTarget, nFeat );
+
+        if ( tmp_dist < dist_loop_min )
+        {
+            dist_loop_min = tmp_dist;
+            loop_min = vec + 3;
+        }
+    }
+
+    if ( loop_min < 3 )
+        return 0;
+    else
+        return 1;
+}
 
 #if defined( MUSIC_TEST )
 

@@ -60,6 +60,8 @@ namespace MusiC
 		/// <returns>Success</returns>
 		public bool Add(string extensionClass, IParamList args)
 		{
+			Message("Appended: " + extensionClass );
+			
 			ExtensionInfo info = ExtensionCache.GetInfo(extensionClass);
 			
 			if (info == null) throw new Exceptions.MissingExtensionException(extensionClass + " wasn't found.");
@@ -435,7 +437,7 @@ namespace MusiC
 		unsafe
 		private Data.Unmanaged.DataCollection * Extract(IEnumerable<Label> tLabel)
 		{
-			Data.Unmanaged.DataCollection* dtCol = Data.Unmanaged.DataHandler.BuildCollection(_featureList.Count);
+			Data.Unmanaged.DataCollection* dtCol = Data.Unmanaged.DataHandler.BuildCollection( (uint) _featureList.Count);
 			
 			foreach (Label label in tLabel)
 			{
@@ -538,7 +540,7 @@ namespace MusiC
 				Message("Beginning Training");
 				
 				Message("Filtering . . .");
-				Data.Unmanaged.DataCollection* filteredData = _classifier.Filter(dtCol);
+				Data.Unmanaged.DataCollection* filteredData = _classifier.ExtractionFilter( dtCol );
 				
 				void * tData;
 				
@@ -554,8 +556,11 @@ namespace MusiC
 				foreach( string file in conf.Classify )
 				{
 					Message( "Classifying: " + file );
+					
 					Data.Unmanaged.FileData * f = Extract( file );
-					_classifier.Classify( f, tData );
+					_classifier.ClassificationFilter( f, dtCol->nFeatures );
+					
+					Message( "RESULT: " + _classifier.Classify( f, tData ) );
 				}
 			}
 			

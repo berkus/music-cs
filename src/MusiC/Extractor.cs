@@ -117,6 +117,7 @@ namespace MusiC
 				{
 					FeatureHelper fh = new FeatureHelper();
 					fh.feat = f;
+					fh.feat.Clear();
 					fh.data = NativeMethods.Pointer.fgetmem(wnd.WindowCount);
 					
 					// fh.data is null if the window/feature combination is not available
@@ -169,7 +170,7 @@ namespace MusiC
 							// This code breaks mono compiler. It generates invalid IL instructions.
 							//*(fh.data + i) = *(frame->pData + fIdx) = fh.feat.Extract(windowBuffer, wnd.WindowSize);
 
-							// FIX: Mono Bad IL  Instructions Generated
+							// FIX: Mono Bad IL Instructions Generated
 							float val = fh.feat.Extract(windowBuffer, wnd.WindowSize);
 							*(frame->pData + fIdx) = val;
 							*(fh.data + i) = val;
@@ -184,6 +185,7 @@ namespace MusiC
 				{
 					if( !fh.extracted )
 						db.AddFeature(wnd.GetID(), fh.feat.GetID(), fh.data, wnd.WindowCount);
+					NativeMethods.Pointer.free( fh.data );
 				}
 
 				db.Terminate();

@@ -120,7 +120,15 @@ namespace MusiC
 			/// A <see cref="Data.Unmanaged.DataCollection"/>
 			/// </returns>
 			virtual unsafe
-			public Data.Unmanaged.DataCollection * Filter(Data.Unmanaged.DataCollection * dataIn)
+			public Data.Unmanaged.DataCollection * ExtractionFilter( Data.Unmanaged.DataCollection * dtCol )
+			{
+				return null;
+			}
+			
+			//::::::::::::::::::::::::::::::::::::::://
+			
+			virtual unsafe
+			public Data.Unmanaged.FileData * ClassificationFilter( Data.Unmanaged.FileData * fileDt, uint nfeat )
 			{
 				return null;
 			}

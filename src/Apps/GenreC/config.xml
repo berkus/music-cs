@@ -19,6 +19,8 @@
 			<Param name="Overlap" value="512" class="System.Int32"/>
 		</Hamming>
 
+		<MusiC-Extension class="MusiC.Extensions.Features.SpectralFlux"/>
+
 		<RollOff/>
 
 		<Barbedo/>

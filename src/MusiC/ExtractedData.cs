@@ -81,8 +81,8 @@ namespace MusiC.Data.Unmanaged
 	unsafe 
 	public struct DataCollection
 	{
-		public int nClasses;
-		public int nFeatures;
+		public uint nClasses;
+		public uint nFeatures;
 		
 		public ClassData * pFirstClass;
 		public ClassData * pLastClass;
@@ -126,7 +126,7 @@ namespace MusiC.Data.Unmanaged
 		/// A <see cref="DataCollection"/>
 		/// </returns>
 		static
-		public DataCollection * BuildCollection(int nFeatures)
+		public DataCollection * BuildCollection(uint nFeatures)
 		{
 			DataCollection * data = 
 				(DataCollection *) Marshal.AllocHGlobal(sizeof(DataCollection)).ToPointer();
