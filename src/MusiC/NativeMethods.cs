@@ -72,10 +72,10 @@ namespace MusiC
 			/// A <see cref="System.Single"/>
 			/// </returns>
 			static unsafe
-			public Single * fgetmem(Int32 size)
+			public float * fgetmem( int size )
 			{
 				IntPtr ptr = Marshal.AllocHGlobal(size * sizeof(float));
-				return (Single *) ptr.ToPointer();
+				return (float *) ptr.ToPointer();
 			}
 			
 			//::::::::::::::::::::::::::::::::::::::://

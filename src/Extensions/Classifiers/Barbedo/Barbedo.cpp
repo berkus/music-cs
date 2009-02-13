@@ -123,12 +123,12 @@ ClassData * Barbedo::filterCandidates( ClassData * cl )
 	{
 		var[ idx ] = abs( var[ idx ] - mean[ idx ] * mean[ idx ] );
 
-		if ( var[ idx ] < 0.01 * mean[ idx ] )
-			var[ idx ] = 0.01 * mean[ idx ];
+        // 1% of the standard deviation
+		if ( var[ idx ] < 0.0001 * mean[ idx ] )
+			var[ idx ] = 0.0001 * mean[ idx ];
 
-		high_bound[ idx ] = mean[ idx ] + 1 * sqrt( var[ idx ] );
-
-		low_bound[ idx ] = mean[ idx ] - 1 * sqrt( var[ idx ] );
+		high_bound[ idx ] = mean[ idx ] + 1.5 * sqrt( var[ idx ] );
+		low_bound[ idx ] = mean[ idx ] - 1.5 * sqrt( var[ idx ] );
 
 		log << "feature: " << idx <<
 		" mean: " << mean[ idx ] <<

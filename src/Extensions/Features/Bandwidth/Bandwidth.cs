@@ -20,3 +20,42 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
+
+using System;
+
+namespace MusiC.Extensions.Features
+{
+	unsafe
+	public class Bandwidth : Unmanaged.Feature
+	{
+		override unsafe
+		public float Extract (float * wndData, int wndSize)
+		{
+			float * _x = GetBuffer( wndSize );
+			NativeMethods.Math.FFTMagnitude(wndData, _x, wndSize );
+
+			// weighted-squared-sum
+			// squared-sum
+			float wss = 0.0f, ss = 0.0f, aux = 0.0f;
+			
+			for( int idx = 0; idx < wndSize; idx++ )
+			{
+				aux = _x[ idx ] * _x[ idx ];
+				ss += aux;
+				wss += idx * aux;
+			}
+
+			float centr = wss / ss, bw = 0.0f;
+
+			for( int idx = 0; idx < wndSize; idx++ )
+			{
+				aux = (centr - idx) *_x[ idx ];
+				bw += aux * aux;
+			}
+
+			bw = (float) Math.Sqrt( (float) (bw / ss) );
+			
+			return bw;
+		}
+	}
+}

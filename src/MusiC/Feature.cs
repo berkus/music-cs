@@ -67,6 +67,16 @@ namespace MusiC
 		{
 			private float * _buf;
 			private int _sz;
+
+			//::::::::::::::::::::::::::::::::::::::://
+			
+			/// <summary>
+			/// 
+			/// </summary>
+			~Feature()
+			{
+				ReleaseBuffer();
+			}
 			
 			//::::::::::::::::::::::::::::::::::::::://
 			
@@ -79,7 +89,7 @@ namespace MusiC
 			/// <returns>
 			/// A <see cref="Single"/>
 			/// </returns>
-			protected Single * GetBuffer(int sz)
+			protected Single * GetBuffer( int sz )
 			{
 				if(sz <= _sz)
 				{
@@ -87,12 +97,22 @@ namespace MusiC
 				}
 				
 				if(_buf == null)
-					NativeMethods.Pointer.free(_buf);
+					NativeMethods.Pointer.free( _buf );
 				
-				_buf = NativeMethods.Pointer.fgetmem(sz);
+				_buf = NativeMethods.Pointer.fgetmem( sz );
 				_sz = sz;
 				
 				return _buf;
+			}
+			
+			//::::::::::::::::::::::::::::::::::::::://
+			
+			/// <summary>
+			/// 
+			/// </summary>
+			private void ReleaseBuffer()
+			{
+				NativeMethods.Pointer.free( _buf );
 			}
 			
 			//::::::::::::::::::::::::::::::::::::::://
