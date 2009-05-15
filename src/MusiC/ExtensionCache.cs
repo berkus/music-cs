@@ -79,7 +79,12 @@ namespace MusiC.Extensions
 			foreach(String ext in Directory.GetFiles(extensionsDir, "*.dll"))
 			{
 				// FIX: When MusiC.dll is loaded the Type.IsSubClassOf() fails.
-				if(Path.GetFileName(ext) == "MusiC.dll")
+                // FIX: No need to load log4net classes.
+				if (
+                    Path.GetFileName(ext) == "MusiC.dll" ||
+                    Path.GetFileName(ext) == "log4net.dll"
+                    )
+
 					continue;
 					
 				try {
@@ -95,7 +100,7 @@ namespace MusiC.Extensions
 				}
 				catch {
 					// Probably trying to load an unmanaged assembly.
-					Warning(ext+" ... [LOADING FAILED]");
+					Warning(ext+" ... [FAILED - UNMANAGED]");
 				}
 			}
 		}
@@ -129,6 +134,16 @@ namespace MusiC.Extensions
 			
 			ExtensionInfo info = new ExtensionInfo(extensionType);
 			
+            // Check for duplicated entries.
+            IEnumerable<ExtensionInfo> result =
+            from ExtensionInfo _info in _infoList where _info.Class.FullName == extensionType.FullName select _info;
+
+            if (result.Count() != 0)
+            {
+                Message(extensionType.ToString() + " ... [REJECTED - DUPLICATED]");
+                return;
+            }
+
 			_root.Add(BuildEntry(info));
 			_infoList.AddLast(info);
 
@@ -195,7 +210,7 @@ namespace MusiC.Extensions
 			
 			//Message("GetUnmanagedHandler - Handlers Found: " + result.Count());
 			
-			if( result.Count() > 0 )
+			if (result.Count() > 0)
 				return result.ElementAt(0) as Unmanaged.Handler;
 			else
 				return null;
@@ -250,15 +265,9 @@ namespace MusiC.Extensions
 		/// </returns>
 		static public ExtensionInfo GetInfo(String className)
 		{
-			IEnumerable<ExtensionInfo> result =
-			from ExtensionInfo info in _infoList where info.Class.FullName == className select info;
+            IEnumerable<ExtensionInfo> result =
+            from ExtensionInfo _info in _infoList where _info.Class.FullName == className select _info;
 
-			if( result.Count() == 0 )
-				return null;
-
-			if( result.Count() > 1 )
-				return null;
-			
 			return result.ElementAt(0);
 		}
 		
