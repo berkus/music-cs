@@ -2,7 +2,7 @@
 -- Project: MusiC --
 --------------------
 
-project("MusiC.Test.Unit")
+project("MusiC.Test")
 location(base_prj_dir)
 
 -----------
@@ -12,7 +12,7 @@ location(base_prj_dir)
 language("c#")
 
 files({
-	base_src_dir.."/MusiC/Test/Unit/**.cs"
+	base_src_dir.."/MusiC/Test/**.cs"
 })
 
 includedirs({
@@ -22,6 +22,7 @@ links({
 	"System",
 	"System.Core",
 	"MusiC",
+	"MusiC.Test.Unit",
 	"log4net"
 })
 
@@ -48,9 +49,9 @@ flags({"Unsafe"})
 -- Output --
 ------------
 
-kind("SharedLib")
+kind("ConsoleApp")
 
-targetname("MusiC.Test.Unit")
+targetname("MusiC.Test")
 targetdir(base_bin_dir)
 objdir(base_bin_dir.."/obj")
 

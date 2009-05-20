@@ -17,6 +17,11 @@ function MakeManagedProjects()
 	dofile("MusiC.Extensions.Windows.Hamming.lua")
 end
 
+function MakeTestingProjects()
+	dofile("MusiC.Test.lua")
+	dofile("MusiC.Test.Unit.lua")
+end
+
 function CreateProject()
 	base_deps_dir = "../deps"
 	base_src_dir = "../src"
@@ -32,6 +37,7 @@ function CreateProject()
 	_ACTION == "vs2005" 
 	then
 		MakeManagedProjects()
+		MakeTestingProjects()
 		
 		solution("uMusiC")
 		configurations({"Debug", "Release"})
