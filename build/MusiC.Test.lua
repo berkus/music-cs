@@ -12,7 +12,7 @@ location(base_prj_dir)
 language("c#")
 
 files({
-	base_src_dir.."/MusiC/Test/**.cs"
+	base_src_dir.."/Test/*.cs"
 })
 
 includedirs({
