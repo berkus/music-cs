@@ -37,7 +37,7 @@ flags({"Unicode"})
 -- Output --
 ------------
 
-kind("SharedLib")
+kind("StaticLib")
 
 targetname("MusiC.Native.Base")
 --targetprefix("")
