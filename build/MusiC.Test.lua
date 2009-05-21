@@ -22,7 +22,6 @@ links({
 	"System",
 	"System.Core",
 	"MusiC",
-	"MusiC.Test.Unit",
 	"log4net"
 })
 
