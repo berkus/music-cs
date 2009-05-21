@@ -33,7 +33,7 @@ void DataHandler::Attach(DataCollection * dtCol)
     _data = dtCol;
 }
 
-ClassData * DataHandler::getClass(int idx)
+ClassData * DataHandler::getClass(unsigned int idx)
 {
     if (idx > _data->nClasses - 1)
         return NULL;

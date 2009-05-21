@@ -44,16 +44,16 @@ namespace MusiC
 
 				void Attach (DataCollection *);
 
-				int getNumClasses()
+				unsigned int getNumClasses()
 				{
 					return _data->nClasses;
 				}
-				int getNumFeatures()
+				unsigned int getNumFeatures()
 				{
 					return _data->nFeatures;
 				}
 
-				ClassData * getClass (int idx);
+				ClassData * getClass (unsigned int idx);
 				ClassData * getNextClass();
 		};
 	}
