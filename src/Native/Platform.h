@@ -21,47 +21,19 @@
  * THE SOFTWARE.
  */
 
-#if !defined(_MUSIC_NATIVE_MATH_H_)
-#define _MUSIC_NATIVE_MATH_H_
+#if !defined(_MUSIC_PLATFORM_H_)
+#define _MUSIC_PLATFORM_H_
 
-#include <limits>
+#if defined(_MSC_VER)
 
-#ifdef INFINITY
-#undef INFINITY 
+#define MUSIC_EXPORT __declspec(dllexport)
+typedef __int64 Int64;
+
+#elif
+
+#define MUSIC_EXPORT
+typedef long long Int64;
+
 #endif
 
-#define INFINITY numeric_limits<float>::infinity();
-
-#include "MemoryManager.h"
-
-namespace MusiC
-{
-	namespace Native
-	{
-		class Math
-		{
-			private:
-
-				MusiC::Native::MemoryManager mgr;
-
-				float * _sintbl;
-				float * cplx;
-				int maxfftsize;
-
-				int checkm (int m);
-
-			public:
-
-                Math() : _sintbl(NULL), cplx(NULL), maxfftsize(0)
-                {}
-
-				int fft (float *x, float *y, const int m);
-				int fftr (float* x, int m);
-				int fftr_mag (float * x, int m);
-
-				~Math();
-		};
-	}
-}
-
-#endif // _MUSIC_NATIVE_MATH_H_
+#endif

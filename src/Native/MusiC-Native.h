@@ -21,12 +21,15 @@
  * THE SOFTWARE.
  */
 
-#ifndef MUSIC_NATIVE_H_INCLUDED
-#define MUSIC_NATIVE_H_INCLUDED
+#if !defined(_MUSIC_NATIVE_H_)
+#define _MUSIC_NATIVE_H_
 
+#include "Platform.h"
+
+#include "DBHandler.h"
 #include "DataHandler.h"
 #include "ExtractedData.h"
 #include "MathF.h"
 
-#endif // MUSIC_NATIVE_H_INCLUDED
+#endif // _MUSIC_NATIVE_H_
 

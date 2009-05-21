@@ -21,6 +21,9 @@
  * THE SOFTWARE.
  */
 
+#if !defined(_MUSIC_NATIVE_DBHANDLER_H_)
+#define _MUSIC_NATIVE_DBHANDLER_H_
+
 #include <fstream>
 #include <iostream>
 #include <sstream>
@@ -97,3 +100,5 @@ namespace MusiC
 		};
 	}
 }
+
+#endif

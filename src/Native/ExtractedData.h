@@ -24,11 +24,7 @@
 #if !defined(_MUSIC_NATIVE_EXTRACTEDDATA_H_)
 #define _MUSIC_NATIVE_EXTRACTEDDATA_H_
 
-#if defined(_MSC_VER)
-	typedef __int64 Int64;
-#else
-	typedef long long Int64;
-#endif
+#include "Platform.h"
 
 namespace MusiC
 {

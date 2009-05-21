@@ -21,8 +21,8 @@
  * THE SOFTWARE.
  */
 
-#ifndef MEMORYMANAGER_H_INCLUDED
-#define MEMORYMANAGER_H_INCLUDED
+#if !defined(_MUSIC_NATIVE_MEMORYMANAGER_H_)
+#define _MUSIC_NATIVE_MEMORYMANAGER_H_
 
 #include <list>
 #include <cstdlib>
