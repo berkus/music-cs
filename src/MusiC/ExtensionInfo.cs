@@ -29,7 +29,7 @@ namespace MusiC
 	/// <summary>
 	/// Identifies the kind of the extension.
 	/// </summary>
-	enum ExtensionKind
+	public enum ExtensionKind
 	{
 		Classifier,
 		Feature,
@@ -51,7 +51,7 @@ namespace MusiC
 	/// <summary>
 	/// Identifies to which Pipeline an extension should go.
 	/// </summary>
-	enum MemoryModel
+	public enum MemoryModel
 	{
 		Managed,
 		Unmanaged,
@@ -65,7 +65,7 @@ namespace MusiC
 	/// <summary>
 	/// Holds information about available extensions.
 	/// </summary>
-	class ExtensionInfo : MusiCObject
+	public class ExtensionInfo : MusiCObject
 	{
 		#region Attributes
 		/// <summary>

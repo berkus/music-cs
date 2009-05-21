@@ -33,7 +33,7 @@ namespace MusiC.Extensions
 	/// <summary>
 	/// 
 	/// </summary>
-	internal class ExtensionCache : MusiCObject
+	public class ExtensionCache : MusiCObject
 	{
 		// Attributes
 		private Configurator _objConfig;
@@ -193,6 +193,7 @@ namespace MusiC.Extensions
 		/// <returns>
 		/// A <see cref="Unmanaged.Handler"/>
 		/// </returns>
+        [CLSCompliant(false)]
 		static
 		public Unmanaged.Handler GetUnmanagedHandler(String file)
 		{

@@ -29,7 +29,7 @@ namespace MusiC
 	/// <summary>
 	/// 
 	/// </summary>
-	internal 
+	public 
 	class Instantiable : ParamList
 	{
 		private string _name;

@@ -29,7 +29,7 @@ namespace MusiC
 	/// <summary>
 	/// 
 	/// </summary>
-	class ParamList : MusiCObject, IParamList
+	public class ParamList : MusiCObject, IParamList
 	{
 		private bool _isParamInitiated = false;
 
