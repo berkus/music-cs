@@ -80,7 +80,7 @@ namespace MusiC
 			
 			ParamList pList = args as ParamList;
 			
-			if(pList == null)
+			if (pList == null)
 				return false;
 			
 			Extension ext = info.Instantiate(pList);
@@ -121,7 +121,7 @@ namespace MusiC
 	
 	//---------------------------------------//
 	
-	#region Classes
+	#region Pipeline Classes
 	
 	/// <summary>
 	/// 
@@ -526,44 +526,62 @@ namespace MusiC
 		public void Execute(Config conf)
 		{
 			IEnumerable<Label> tLabel = conf.LabelList;
-
-			//check resume support.
-			//check if a new training is needed.
 			
 			Message("Extracting . . .");
 			Data.Unmanaged.DataCollection * dtCol = Extract(tLabel);
 			
+            // Report what we have after extractor
 			Summarize(dtCol);
-			
-			if( _classifier != null ) 
-			{
-				Message("Beginning Training");
-				
-				Message("Filtering . . .");
-				Data.Unmanaged.DataCollection* filteredData = _classifier.ExtractionFilter( dtCol );
-				
-				void * tData;
-				
-				Message("Training . . .");
-				
-				if( filteredData == null )
-					tData =_classifier.Train( dtCol );
-				else 
-					tData = _classifier.Train( filteredData );
 
-				Message( "Begining Classification . . ." );
-				
-				foreach( string file in conf.Classify )
-				{
-					Message( "Classifying: " + file );
-					
-					Data.Unmanaged.FileData * f = Extract( file );
-					_classifier.ClassificationFilter( f, dtCol->nFeatures );
-					
-					Message( "RESULT: " + _classifier.Classify( f, tData ) );
-				}
-			}
-			
+            if (_classifier != null)
+            {
+                Message("Beginning Training");
+
+                Message("Filtering . . .");
+                Data.Unmanaged.DataCollection* filteredData = _classifier.ExtractionFilter(dtCol);
+
+                // Training data returned by the classifier
+                void * tData;
+
+                Message("Training . . .");
+
+                if (filteredData == null)
+                    tData = _classifier.Train(dtCol);
+                else
+                    tData = _classifier.Train(filteredData);
+
+                Message("Begining Classification . . .");
+
+                foreach (string file in conf.Classify)
+                {
+                    Message("Classifying: " + file);
+
+                    Data.Unmanaged.FileData * f = Extract(file);
+                    Data.Unmanaged.FileData * filteredFile = _classifier.ClassificationFilter(f, dtCol->nFeatures);
+
+                    int result;
+
+                    if( filteredFile == null )
+                        result = _classifier.Classify(f, tData);
+                    else
+                        result = _classifier.Classify(filteredFile, tData);
+
+                    Message("RESULT: " + result );
+                }
+
+                Message("Freeing Extracted Data");
+                Data.Unmanaged.DataHandler.DestroyCollection(dtCol);
+
+                Message("Freeing Filtered Data");
+                if (filteredData != null)
+                    Data.Unmanaged.DataHandler.DestroyCollection(filteredData);
+            }
+            else
+            {
+                Message("Freeing Extracted Data");
+                Data.Unmanaged.DataHandler.DestroyCollection(dtCol);
+            }
+
 			Message( "All Tasks Done" );
 		}
 		
