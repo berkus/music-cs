@@ -41,7 +41,7 @@ namespace MusiC
 
 		struct FileData
 		{
-			Int64 nFrames;
+			UInt64 nFrames;
 
 			FileData * pNextFile;
 			FileData * pPrevFile;
@@ -58,8 +58,8 @@ namespace MusiC
 
 		struct ClassData
 		{
-			Int64 nFiles;
-			Int64 nFrames;
+			UInt64 nFiles;
+			UInt64 nFrames;
 
 			ClassData * pNextClass;
 

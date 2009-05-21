@@ -43,7 +43,7 @@ namespace MusiC.Data.Unmanaged
 	unsafe 
 	public struct FileData
 	{
-		public long nFrames;
+		public ulong nFrames;
 		
 		public FileData * pNextFile;
 		public FileData * pPrevFile;
@@ -63,8 +63,8 @@ namespace MusiC.Data.Unmanaged
 	unsafe 
 	public struct ClassData
 	{
-		public long nFiles;
-		public long nFrames;
+		public ulong nFiles;
+		public ulong nFrames;
 		
 		public ClassData * pNextClass;
 		
@@ -348,9 +348,9 @@ namespace MusiC.Data.Unmanaged
         static
         public void DestroyCollection(DataCollection * dtCol)
         {
-            int idxClass = 0; ClassData * pClass = null;
-            int idxFile = 0; FileData * pFile = null;
-            int idxFrame = 0; FrameData* pFrame = null;
+            uint idxClass = 0; ClassData * pClass = null;
+            uint idxFile = 0; FileData * pFile = null;
+            uint idxFrame = 0; FrameData* pFrame = null;
             FrameData* pNextFrame = null;
 
             while (idxClass < dtCol->nClasses)
