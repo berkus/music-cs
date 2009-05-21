@@ -82,10 +82,10 @@ ClassData * Barbedo::filterCandidates( ClassData * cl )
 	register int idx = 0;
 	register int nFeat = cl->pCollection->nFeatures;
 
-	float mean[ nFeat ];
-	float var[ nFeat ];
-	float high_bound[ nFeat ];
-	float low_bound[ nFeat ];
+	float * mean = new float[ nFeat ];
+	float * var = new float[ nFeat ];
+	float * high_bound = new float[ nFeat ];
+	float * low_bound = new float[ nFeat ];
 
 	for ( idx = 0; idx < nFeat; idx++ )
 	{
@@ -207,6 +207,11 @@ ClassData * Barbedo::filterCandidates( ClassData * cl )
 	log << "total aproved: " << candidates_counter << endl;
 	log << "before selection: " << nframes_before << endl;
 
+	delete mean;
+	delete var;
+	delete low_bound;
+	delete high_bound;
+
 	return cl;
 }
 
@@ -294,9 +299,9 @@ FileData * Barbedo::Filter( FileData * fileDt, unsigned int nFeat )
 	register int idx = 0;
 	register unsigned int nfeat = nFeat;
 
-    float mean[ nFeat ];
-	float var[ nFeat ];
-	float max[ nFeat ];
+    float * mean = new float[ nFeat ];
+	float * var = new float[ nFeat ];
+	float * max = new float[ nFeat ];
 
 	for ( idx = 0; idx < nfeat; idx++ )
 	{
@@ -305,7 +310,7 @@ FileData * Barbedo::Filter( FileData * fileDt, unsigned int nFeat )
 		max[ idx ] = -INFINITY;
 	}
 
-	int firstFrameIdx = ( int ) ceil( ( fileDt->nFrames - 1 ) / 2 ) - ( int ) floor( FRAME_COUNT / 2 );
+	int firstFrameIdx = ( int ) ceil( (float) ( fileDt->nFrames - 1 ) / 2 ) - floor( (float) FRAME_COUNT / 2 );
 
     if ( firstFrameIdx < 0 )
     {
@@ -405,6 +410,10 @@ FileData * Barbedo::Filter( FileData * fileDt, unsigned int nFeat )
 //    }
 
     log << endl;
+
+	delete max;
+	delete mean;
+	delete var;
 
     return nfl;
 }
@@ -650,7 +659,8 @@ void * Barbedo::Train( DataCollection * extractedData )
 
 int Barbedo::Classify( FrameData * pCurrent,  FrameData ** a, FrameData ** b, unsigned int nFeat )
 {
-    float dist_loop_min = INFINITY, tmp_dist;
+    float dist_loop_min = INFINITY;
+	float tmp_dist;
     unsigned int loop_min;
 
     for ( int vec = 0; vec < 3; vec++ )
