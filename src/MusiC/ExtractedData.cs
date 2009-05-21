@@ -342,7 +342,53 @@ namespace MusiC.Data.Unmanaged
 
 			return true;
 		}
-	}
+
+        //::::::::::::::::::::::::::::::::::::::://
+
+        static
+        public void DestroyCollection(DataCollection * dtCol)
+        {
+            int idxClass = 0; ClassData * pClass = null;
+            int idxFile = 0; FileData * pFile = null;
+            int idxFrame = 0; FrameData* pFrame = null;
+            FrameData* pNextFrame = null;
+
+            while (idxClass < dtCol->nClasses)
+            {
+                pClass = dtCol->pFirstClass;
+
+                while (idxFile < pClass->nFiles)
+                {
+                    pFile = pClass->pFirstFile;
+
+                    while (idxFrame < pFile->nFrames)
+                    {
+                        pFrame = pFile->pFirstFrame;
+                        pFile->pFirstFrame = pFrame->pNextFrame;
+
+                        NativeMethods.Pointer.free(pFrame->pData);
+                        NativeMethods.Pointer.free(pFrame);
+
+                        idxFrame++;
+                    }
+
+                    pClass->pFirstFile = pFile->pNextFile;
+
+                    NativeMethods.Pointer.free(pFile);
+
+                    idxFile++;
+                }
+
+                dtCol->pFirstClass = pClass->pNextClass;
+
+                NativeMethods.Pointer.free(pClass);
+
+                idxClass++;
+            }
+
+            NativeMethods.Pointer.free(dtCol);
+        }
+    }
 }
 
 //---------------------------------------//
