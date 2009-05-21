@@ -19,7 +19,6 @@ end
 
 function MakeTestingProjects()
 	dofile("MusiC.Test.lua")
-	dofile("MusiC.Test.Unit.lua")
 end
 
 function CreateProject()
