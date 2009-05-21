@@ -100,7 +100,7 @@ ClassData * Barbedo::filterCandidates( ClassData * cl )
 	FileData * fileDt = cl->pFirstFile;
 	FrameData * frameDt = fileDt->pFirstFrame;
 
-	unsigned int nframes_before = cl->nFrames;
+	Int64 nframes_before = cl->nFrames;
 
 	// Calculating mean, var of all frames.
 	// var = E( x^2 ) - E( x )^2
@@ -124,11 +124,11 @@ ClassData * Barbedo::filterCandidates( ClassData * cl )
 		var[ idx ] = abs( var[ idx ] - mean[ idx ] * mean[ idx ] );
 
         // 1% of the standard deviation
-		if ( var[ idx ] < 0.0001 * mean[ idx ] )
-			var[ idx ] = 0.0001 * mean[ idx ];
+		if ( var[ idx ] < 0.0001f * mean[ idx ] )
+			var[ idx ] = 0.0001f * mean[ idx ];
 
-		high_bound[ idx ] = mean[ idx ] + 1.5 * sqrt( var[ idx ] );
-		low_bound[ idx ] = mean[ idx ] - 1.5 * sqrt( var[ idx ] );
+		high_bound[ idx ] = mean[ idx ] + 1.5f * sqrt( var[ idx ] );
+		low_bound[ idx ] = mean[ idx ] - 1.5f * sqrt( var[ idx ] );
 
 		log << "feature: " << idx <<
 		" mean: " << mean[ idx ] <<
@@ -269,7 +269,7 @@ float Barbedo::dist( float * src, float * ref, int size )
 		ret += cum * cum;
 	}
 
-	return sqrt( ret );
+	return (float) sqrt( ret );
 }
 
 //::::::::::::::::::::::::::::::::::::::://
@@ -296,7 +296,7 @@ FileData * Barbedo::Filter( FileData * fileDt, unsigned int nFeat )
 	unsigned int cluster_sz_counter = 0;
 	unsigned int cluster_counter = 0;
 
-	register int idx = 0;
+	register unsigned int idx = 0;
 	register unsigned int nfeat = nFeat;
 
     float * mean = new float[ nFeat ];
@@ -310,7 +310,7 @@ FileData * Barbedo::Filter( FileData * fileDt, unsigned int nFeat )
 		max[ idx ] = -INFINITY;
 	}
 
-	int firstFrameIdx = ( int ) ceil( (float) ( fileDt->nFrames - 1 ) / 2 ) - floor( (float) FRAME_COUNT / 2 );
+	unsigned int firstFrameIdx = ( unsigned int ) ceil( (float) ( fileDt->nFrames - 1 ) / 2 ) - floor( (float) FRAME_COUNT / 2 );
 
     if ( firstFrameIdx < 0 )
     {
@@ -447,7 +447,7 @@ DataCollection * Barbedo::Filter( DataCollection * extractedData )
 	dtCol->pLastClass = NULL;
 
 	ClassData * cl = extractedData->pFirstClass;
-	for ( int class_counter = 0; class_counter < dtCol->nClasses; class_counter++ )
+	for ( unsigned int class_counter = 0; class_counter < dtCol->nClasses; class_counter++ )
 	{
 		// New Class
 		ClassData * ncl = new ClassData( );
@@ -526,8 +526,8 @@ void * Barbedo::Train( DataCollection * extractedData )
 	log << "Received " << data.getNumClasses( ) << " Classes" << endl;
 	log << "Received " << data.getNumFeatures( ) << " Features" << endl;
 
-	double genreCombinationIndex = 0;
-	double genreCombinationCount = gsl_sf_choose( extractedData->nClasses, 2 );
+	UInt64 genreCombinationIndex = 0;
+	UInt64 genreCombinationCount = (UInt64) gsl_sf_choose( extractedData->nClasses, 2 );
 	log << "Algorithm Rounds: " << genreCombinationCount << endl;
 	log << "========================" << endl << endl;
 
@@ -590,7 +590,7 @@ void * Barbedo::Train( DataCollection * extractedData )
 			// Dist 1 - Class A
 			FrameData * refVec = classA->pFirstFile->pFirstFrame;
 
-			for( Int64 idx = 0; idx < fClassA->nFrames; idx++ )
+			for( UInt64 idx = 0; idx < fClassA->nFrames; idx++ )
 			{
 				if( Classify(refVec, refVecsIndex->a->frames, refVecsIndex->b->frames, tdata->nFeat) == 0 )
 					score_a++;
@@ -602,7 +602,7 @@ void * Barbedo::Train( DataCollection * extractedData )
 			// Dist 2 - Class B
 			refVec = classB->pFirstFile->pFirstFrame;
 
-			for( Int64 idx = 0; idx < fClassB->nFrames; idx++ )
+			for( UInt64 idx = 0; idx < fClassB->nFrames; idx++ )
 			{
 				if( Classify(refVec, refVecsIndex->a->frames, refVecsIndex->b->frames, tdata->nFeat) == 1 )
 					score_b++;
@@ -635,7 +635,7 @@ void * Barbedo::Train( DataCollection * extractedData )
 				bElem << "]";
 
 				log << "New Winner: " << winner << " / " <<
-				( Int64 ) ( gsl_sf_choose( fClassA->nFrames, 3 ) *
+				( UInt64 ) ( gsl_sf_choose( fClassA->nFrames, 3 ) *
 							gsl_sf_choose( fClassA->nFrames, 3 ) ) <<
                 " - score: A(" << score_a << "/" << fClassA->nFrames << ")" <<
                 " B(" << score_b << "/" << fClassB->nFrames << ")" <<

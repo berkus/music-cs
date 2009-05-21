@@ -51,7 +51,7 @@
             {
                 unsigned int base = 3;
 
-                raw = gsl_combination_calloc( a->nFrames, 3 );
+                raw = gsl_combination_calloc( (size_t) a->nFrames, 3 );
                 data = a;
                 frames = new FrameData * [base];
                 idx = new unsigned int[base];
@@ -72,7 +72,7 @@
                 unsigned int base = 3;
 
                 FrameData * ta = data->pFirstFile->pFirstFrame;
-                for( int i = 0; i < base; i++ )
+                for( unsigned int i = 0; i < base; i++ )
                 {
                     frames[ i ] = ta; ta = ta->pNextFrame;
                     idx[ i ] = i;
@@ -84,7 +84,7 @@
             {
                 unsigned int base = 3;
 
-                for( int i = 0; i < base; i++)
+                for( unsigned int i = 0; i < base; i++)
                 {
                     if( raw->data[ i ] == idx[ i ] )
                         continue;
@@ -116,7 +116,7 @@
                     a1 << "[ ";
                     a2 << "[ ";
 
-                    for ( int elemIdx = 0; elemIdx < 3; elemIdx++ )
+                    for ( unsigned int elemIdx = 0; elemIdx < 3; elemIdx++ )
                     {
                         a1 << gsl_combination_get( raw, elemIdx ) << " ";
                         a2 << idx[ elemIdx ] << " ";
@@ -214,7 +214,7 @@
                 }
             }
 
-            void setPair( unsigned int idx, gsl_combination * genres, RefVecIndex * ref )
+            void setPair( UInt64 idx, gsl_combination * genres, RefVecIndex * ref )
             {
                 data[ idx ].setData(
                     gsl_combination_get(genres, 0),

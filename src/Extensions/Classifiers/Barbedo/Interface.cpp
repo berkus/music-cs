@@ -30,31 +30,31 @@ using namespace MusiC::Native;
 
 extern "C"
 {
-    FileData * Barbedo_CFilter( FileData * data, unsigned int nfeat );
-    DataCollection * Barbedo_EFilter( DataCollection * dtCol );
-    void * Barbedo_Train( DataCollection * extractedData );
-    int Barbedo_Classify( FileData * f, void * data );
+    MUSIC_EXPORT FileData * Barbedo_CFilter( FileData * data, unsigned int nfeat );
+    MUSIC_EXPORT DataCollection * Barbedo_EFilter( DataCollection * dtCol );
+    MUSIC_EXPORT void * Barbedo_Train( DataCollection * extractedData );
+    MUSIC_EXPORT int Barbedo_Classify( FileData * f, void * data );
 }
 
-FileData * Barbedo_CFilter( FileData * data, unsigned int nfeat )
+MUSIC_EXPORT FileData * Barbedo_CFilter( FileData * data, unsigned int nfeat )
 {
     Barbedo b;
     return b.Filter( data, nfeat );
 }
 
-DataCollection * Barbedo_EFilter( DataCollection * dtCol )
+MUSIC_EXPORT DataCollection * Barbedo_EFilter( DataCollection * dtCol )
 {
     Barbedo b;
     return b.Filter( dtCol );
 }
 
-void * Barbedo_Train( DataCollection * extractedData )
+MUSIC_EXPORT void * Barbedo_Train( DataCollection * extractedData )
 {
     Barbedo b;
     return b.Train( extractedData );
 }
 
-int Barbedo_Classify( FileData * fd, void * data )
+MUSIC_EXPORT int Barbedo_Classify( FileData * fd, void * data )
 {
     BarbedoTData * tdata = reinterpret_cast< BarbedoTData * >( data );
     Barbedo b;
@@ -67,14 +67,14 @@ int Barbedo_Classify( FileData * fd, void * data )
     FrameData * frame = fd->pFirstFrame;
     unsigned int * votes = new unsigned int[ tdata->genreCount ];
 
-    for(int idx = 0; idx < tdata->genreCount; idx++)
+    for ( unsigned int idx = 0; idx < tdata->genreCount; idx++)
     {
         votes[ idx ] = 0;
     }
 
     while( frame )
     {
-        for(int idx = 0; idx < tdata->genreCombinationCount; idx++)
+        for ( unsigned int idx = 0; idx < tdata->genreCombinationCount; idx++)
         {
             // returns 0 or 1 representing class a or b.
             int res = b.Classify( frame, tdata->data[ idx ].frames_a, tdata->data[ idx ].frames_a, tdata->nFeat );
@@ -92,7 +92,7 @@ int Barbedo_Classify( FileData * fd, void * data )
     }
     unsigned int winner, score = 0;
 
-    for(int idx = 0; idx < tdata->genreCount; idx++)
+    for(unsigned int idx = 0; idx < tdata->genreCount; idx++)
     {
         if( votes[ idx ] > score )
         {
