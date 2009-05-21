@@ -28,12 +28,13 @@
 
 #define MUSIC_EXPORT __declspec(dllexport)
 typedef __int64 Int64;
+typedef unsigned __int64 UInt64;
 
 #elif
 
 #define MUSIC_EXPORT
 typedef long long Int64;
-
+typedef unsigned long long UInt64;
 #endif
 
 #endif
