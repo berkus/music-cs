@@ -36,7 +36,7 @@ namespace MusiC
 	/// </summary>
 	class Label : MusiCObject, ILabel, IEnumerable<string>
 	{
-		//// <value>
+		/// <value>
 		/// 
 		/// </value>
 		class DirEntry
@@ -83,7 +83,7 @@ namespace MusiC
 		
 		//---------------------------------------//
 		
-		//// <value>
+		/// <value>
 		/// 
 		/// </value>
 		class FileEntry
@@ -93,7 +93,7 @@ namespace MusiC
 
 			//::::::::::::::::::::::::::::::::::::::://
 
-			//// <value>
+			/// <value>
 			/// 
 			/// </value>
 			public string File
@@ -147,7 +147,7 @@ namespace MusiC
 			
 			//::::::::::::::::::::::::::::::::::::::://
 			
-			//// <value>
+			/// <value>
 			/// 
 			/// </value>
 			string IEnumerator<string>.Current
@@ -232,7 +232,7 @@ namespace MusiC
 		
 		//::::::::::::::::::::::::::::::::::::::://
 		
-		//// <value>
+		/// <value>
 		/// 
 		/// </value>
 		public string Name {
@@ -242,7 +242,7 @@ namespace MusiC
 		
 		//::::::::::::::::::::::::::::::::::::::://
 		
-		//// <value>
+		/// <value>
 		/// 
 		/// </value>
 		public string OutputDir {
