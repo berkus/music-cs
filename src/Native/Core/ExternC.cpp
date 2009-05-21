@@ -21,22 +21,20 @@
  * THE SOFTWARE.
  */
 
-#include "DBHandler.h"
-#include "MemoryManager.h"
-#include "MathF.h"
+#include "MusiC-Native.h"
 
 #include <cstring>
 using namespace std;
 
 extern "C"
 {
-	MusiC::Native::MemoryManager mgr;
+	//MusiC::Native::MemoryManager mgr;
 	MusiC::Native::Math math;
 	MusiC::Native::DBHandler hnd;
 
 	//::::::::::::::::::::::::::::::::::::::://
 
-	int fftr_mag(float* x, float* mag, int m)
+	MUSIC_EXPORT int fftr_mag(float* x, float* mag, int m)
 	{
 		memcpy(mag, x, m * sizeof(int));
 		int ret = math.fftr_mag(mag, m);
@@ -46,21 +44,21 @@ extern "C"
 
 	//::::::::::::::::::::::::::::::::::::::://
 
-	void Initialize(const char * db)
+	MUSIC_EXPORT void Initialize(const char * db)
 	{
 		hnd.OpenDB(db);
 	}
 
 	//::::::::::::::::::::::::::::::::::::::://
 
-	void AddFeature(const char * sectionLabel, const char * dataLabel, float * data, int dataSz)
+	MUSIC_EXPORT void AddFeature(const char * sectionLabel, const char * dataLabel, float * data, int dataSz)
 	{
 		hnd.AddData(sectionLabel, dataLabel, data, dataSz * sizeof(float));
 	}
 
 	//::::::::::::::::::::::::::::::::::::::://
 
-	int GetFeature(const char * wndName, const char * featName, float * data)
+	MUSIC_EXPORT int GetFeature(const char * wndName, const char * featName, float * data)
 	{
 		if(hnd.HasData(wndName, featName))
 		{
@@ -72,7 +70,7 @@ extern "C"
 
 	//::::::::::::::::::::::::::::::::::::::://
 
-	void Terminate()
+	MUSIC_EXPORT void Terminate()
 	{
 		hnd.CloseDB();
 	}
