@@ -27,10 +27,9 @@
 #include <iostream>
 #include <sstream>
 
-#include <gsl/gsl_combination.h>
-#include <gsl/gsl_sf.h>
-
 #include <ExtractedData.h>
+
+#include "gsl.h"
 
  namespace MusiC
  {
