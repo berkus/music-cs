@@ -4,7 +4,7 @@
  * 
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation; either version 2 of the License, or (at
+ * the Free Software Foundation; either version 3 of the License, or (at
  * your option) any later version.
  * 
  * This program is distributed in the hope that it will be useful, but
@@ -21,6 +21,16 @@
  */
 #ifndef __GSL_ODEIV_H__
 #define __GSL_ODEIV_H__
+
+#if !defined( GSL_FUN )
+#  if !defined( GSL_DLL )
+#    define GSL_FUN extern
+#  elif defined( BUILD_GSL_DLL )
+#    define GSL_FUN extern __declspec(dllexport)
+#  else
+#    define GSL_FUN extern __declspec(dllimport)
+#  endif
+#endif
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -123,16 +133,16 @@ GSL_VAR const gsl_odeiv_step_type *gsl_odeiv_step_gear2;
 
 /* Constructor for specialized stepper objects.
  */
-GSL_EXPORT gsl_odeiv_step * gsl_odeiv_step_alloc(const gsl_odeiv_step_type * T, size_t dim);
-GSL_EXPORT int  gsl_odeiv_step_reset(gsl_odeiv_step * s);
-GSL_EXPORT void gsl_odeiv_step_free(gsl_odeiv_step * s);
+GSL_FUN gsl_odeiv_step * gsl_odeiv_step_alloc(const gsl_odeiv_step_type * T, size_t dim);
+GSL_FUN int  gsl_odeiv_step_reset(gsl_odeiv_step * s);
+GSL_FUN void gsl_odeiv_step_free(gsl_odeiv_step * s);
 
 /* General stepper object methods.
  */
-GSL_EXPORT const char * gsl_odeiv_step_name(const gsl_odeiv_step *);
-GSL_EXPORT unsigned int gsl_odeiv_step_order(const gsl_odeiv_step * s);
+GSL_FUN const char * gsl_odeiv_step_name(const gsl_odeiv_step *);
+GSL_FUN unsigned int gsl_odeiv_step_order(const gsl_odeiv_step * s);
 
-GSL_EXPORT int  gsl_odeiv_step_apply(gsl_odeiv_step *, double t, double h, double y[], double yerr[], const double dydt_in[], double dydt_out[], const gsl_odeiv_system * dydt);
+GSL_FUN int  gsl_odeiv_step_apply(gsl_odeiv_step *, double t, double h, double y[], double yerr[], const double dydt_in[], double dydt_out[], const gsl_odeiv_system * dydt);
 
 /* General step size control object.
  *
@@ -144,7 +154,7 @@ GSL_EXPORT int  gsl_odeiv_step_apply(gsl_odeiv_step *, double t, double h, doubl
  * to store state and control their heuristics.
  */
 
-typedef struct
+typedef struct 
 {
   const char * name;
   void * (*alloc) (void);
@@ -154,7 +164,7 @@ typedef struct
 }
 gsl_odeiv_control_type;
 
-typedef struct
+typedef struct 
 {
   const gsl_odeiv_control_type * type;
   void * state;
@@ -167,11 +177,11 @@ gsl_odeiv_control;
 #define GSL_ODEIV_HADJ_NIL   0  /* step unchanged     */
 #define GSL_ODEIV_HADJ_DEC (-1) /* step decreased     */
 
-GSL_EXPORT gsl_odeiv_control * gsl_odeiv_control_alloc(const gsl_odeiv_control_type * T);
-GSL_EXPORT int gsl_odeiv_control_init(gsl_odeiv_control * c, double eps_abs, double eps_rel, double a_y, double a_dydt);
-GSL_EXPORT void gsl_odeiv_control_free(gsl_odeiv_control * c);
-GSL_EXPORT int gsl_odeiv_control_hadjust (gsl_odeiv_control * c, gsl_odeiv_step * s, const double y0[], const double yerr[], const double dydt[], double * h);
-GSL_EXPORT const char * gsl_odeiv_control_name(const gsl_odeiv_control * c);
+GSL_FUN gsl_odeiv_control * gsl_odeiv_control_alloc(const gsl_odeiv_control_type * T);
+GSL_FUN int gsl_odeiv_control_init(gsl_odeiv_control * c, double eps_abs, double eps_rel, double a_y, double a_dydt);
+GSL_FUN void gsl_odeiv_control_free(gsl_odeiv_control * c);
+GSL_FUN int gsl_odeiv_control_hadjust (gsl_odeiv_control * c, gsl_odeiv_step * s, const double y[], const double yerr[], const double dydt[], double * h);
+GSL_FUN const char * gsl_odeiv_control_name(const gsl_odeiv_control * c);
 
 /* Available control object constructors.
  *
@@ -192,16 +202,16 @@ GSL_EXPORT const char * gsl_odeiv_control_name(const gsl_odeiv_control * c);
  * The yp method is the standard method with a_y=0, a_dydt=1.
  */
 
-GSL_EXPORT gsl_odeiv_control * gsl_odeiv_control_standard_new(double eps_abs, double eps_rel, double a_y, double a_dydt);
-GSL_EXPORT gsl_odeiv_control * gsl_odeiv_control_y_new(double eps_abs, double eps_rel);
-GSL_EXPORT gsl_odeiv_control * gsl_odeiv_control_yp_new(double eps_abs, double eps_rel);
+GSL_FUN gsl_odeiv_control * gsl_odeiv_control_standard_new(double eps_abs, double eps_rel, double a_y, double a_dydt);
+GSL_FUN gsl_odeiv_control * gsl_odeiv_control_y_new(double eps_abs, double eps_rel);
+GSL_FUN gsl_odeiv_control * gsl_odeiv_control_yp_new(double eps_abs, double eps_rel);
 
 /* This controller computes errors using different absolute errors for
  * each component
  *
  *    D0 = eps_abs * scale_abs[i] + eps_rel * (a_y |y| + a_dydt h |y'|)
  */
-GSL_EXPORT gsl_odeiv_control * gsl_odeiv_control_scaled_new(double eps_abs, double eps_rel, double a_y, double a_dydt, const double scale_abs[], size_t dim);
+GSL_FUN gsl_odeiv_control * gsl_odeiv_control_scaled_new(double eps_abs, double eps_rel, double a_y, double a_dydt, const double scale_abs[], size_t dim);
 
 /* General evolution object.
  */
@@ -219,11 +229,11 @@ gsl_odeiv_evolve;
 
 /* Evolution object methods.
  */
-GSL_EXPORT gsl_odeiv_evolve * gsl_odeiv_evolve_alloc(size_t dim);
-GSL_EXPORT int gsl_odeiv_evolve_apply(gsl_odeiv_evolve *, gsl_odeiv_control * con, gsl_odeiv_step * step, const gsl_odeiv_system * dydt, double * t, double t1, double * h, double y[]);
-GSL_EXPORT int gsl_odeiv_evolve_reset(gsl_odeiv_evolve *);
-GSL_EXPORT void gsl_odeiv_evolve_free(gsl_odeiv_evolve *);
- 
+GSL_FUN gsl_odeiv_evolve * gsl_odeiv_evolve_alloc(size_t dim);
+GSL_FUN int gsl_odeiv_evolve_apply(gsl_odeiv_evolve *, gsl_odeiv_control * con, gsl_odeiv_step * step, const gsl_odeiv_system * dydt, double * t, double t1, double * h, double y[]);
+GSL_FUN int gsl_odeiv_evolve_reset(gsl_odeiv_evolve *);
+GSL_FUN void gsl_odeiv_evolve_free(gsl_odeiv_evolve *);
+
 
 __END_DECLS
 

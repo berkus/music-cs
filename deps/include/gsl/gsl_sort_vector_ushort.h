@@ -1,10 +1,10 @@
 /* sort/gsl_sort_vector_ushort.h
  * 
- * Copyright (C) 1996, 1997, 1998, 1999, 2000 Thomas Walter, Brian Gough
+ * Copyright (C) 1996, 1997, 1998, 1999, 2000, 2007 Thomas Walter, Brian Gough
  * 
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation; either version 2 of the License, or (at
+ * the Free Software Foundation; either version 3 of the License, or (at
  * your option) any later version.
  * 
  * This program is distributed in the hope that it will be useful, but
@@ -20,11 +20,20 @@
 #ifndef __GSL_SORT_VECTOR_USHORT_H__
 #define __GSL_SORT_VECTOR_USHORT_H__
 
+#if !defined( GSL_FUN )
+#  if !defined( GSL_DLL )
+#    define GSL_FUN extern
+#  elif defined( BUILD_GSL_DLL )
+#    define GSL_FUN extern __declspec(dllexport)
+#  else
+#    define GSL_FUN extern __declspec(dllimport)
+#  endif
+#endif
+
 #include <stdlib.h>
 #include <gsl/gsl_errno.h>
 #include <gsl/gsl_permutation.h>
 #include <gsl/gsl_vector_ushort.h>
-#include <gsl/gsl_types.h>
 
 #undef __BEGIN_DECLS
 #undef __END_DECLS
@@ -38,14 +47,14 @@
 
 __BEGIN_DECLS
 
-GSL_EXPORT void gsl_sort_vector_ushort (gsl_vector_ushort * v);
-GSL_EXPORT int gsl_sort_vector_ushort_index (gsl_permutation * p, const gsl_vector_ushort * v);
+GSL_FUN void gsl_sort_vector_ushort (gsl_vector_ushort * v);
+GSL_FUN int gsl_sort_vector_ushort_index (gsl_permutation * p, const gsl_vector_ushort * v);
 
-GSL_EXPORT int gsl_sort_vector_ushort_smallest (unsigned short * dest, const size_t k, const gsl_vector_ushort * v);
-GSL_EXPORT int gsl_sort_vector_ushort_largest (unsigned short * dest, const size_t k, const gsl_vector_ushort * v);
+GSL_FUN int gsl_sort_vector_ushort_smallest (unsigned short * dest, const size_t k, const gsl_vector_ushort * v);
+GSL_FUN int gsl_sort_vector_ushort_largest (unsigned short * dest, const size_t k, const gsl_vector_ushort * v);
 
-GSL_EXPORT int gsl_sort_vector_ushort_smallest_index (size_t * p, const size_t k, const gsl_vector_ushort * v);
-GSL_EXPORT int gsl_sort_vector_ushort_largest_index (size_t * p, const size_t k, const gsl_vector_ushort * v);
+GSL_FUN int gsl_sort_vector_ushort_smallest_index (size_t * p, const size_t k, const gsl_vector_ushort * v);
+GSL_FUN int gsl_sort_vector_ushort_largest_index (size_t * p, const size_t k, const gsl_vector_ushort * v);
 
 __END_DECLS
 

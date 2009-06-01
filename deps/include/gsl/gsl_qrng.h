@@ -1,11 +1,22 @@
-/* Author: G. Jungman
+/* Author: G. Jungman + modifications from O. Teytaud
  */
 #ifndef __GSL_QRNG_H__
 #define __GSL_QRNG_H__
 
+#if !defined( GSL_FUN )
+#  if !defined( GSL_DLL )
+#    define GSL_FUN extern
+#  elif defined( BUILD_GSL_DLL )
+#    define GSL_FUN extern __declspec(dllexport)
+#  else
+#    define GSL_FUN extern __declspec(dllimport)
+#  endif
+#endif
+
 #include <stdlib.h>
 #include <gsl/gsl_types.h>
 #include <gsl/gsl_errno.h>
+#include <gsl/gsl_inline.h>
 
 #undef __BEGIN_DECLS
 #undef __END_DECLS
@@ -52,53 +63,53 @@ gsl_qrng;
  */
 GSL_VAR const gsl_qrng_type * gsl_qrng_niederreiter_2;
 GSL_VAR const gsl_qrng_type * gsl_qrng_sobol;
+GSL_VAR const gsl_qrng_type * gsl_qrng_halton;
+GSL_VAR const gsl_qrng_type * gsl_qrng_reversehalton;
 
 
 /* Allocate and initialize a generator
  * of the specified type, in the given
  * space dimension.
  */
-GSL_EXPORT gsl_qrng * gsl_qrng_alloc (const gsl_qrng_type * T, unsigned int dimension);
+GSL_FUN gsl_qrng * gsl_qrng_alloc (const gsl_qrng_type * T, unsigned int dimension);
 
 
 /* Copy a generator. */
-GSL_EXPORT int gsl_qrng_memcpy (gsl_qrng * dest, const gsl_qrng * src);
+GSL_FUN int gsl_qrng_memcpy (gsl_qrng * dest, const gsl_qrng * src);
 
 
 /* Clone a generator. */
-GSL_EXPORT gsl_qrng * gsl_qrng_clone (const gsl_qrng * r);
+GSL_FUN gsl_qrng * gsl_qrng_clone (const gsl_qrng * q);
 
 
 /* Free a generator. */
-GSL_EXPORT void gsl_qrng_free (gsl_qrng * r);
+GSL_FUN void gsl_qrng_free (gsl_qrng * q);
 
 
 /* Intialize a generator. */
-GSL_EXPORT void gsl_qrng_init (gsl_qrng * r);
+GSL_FUN void gsl_qrng_init (gsl_qrng * q);
 
 
 /* Get the standardized name of the generator. */
-GSL_EXPORT const char * gsl_qrng_name (const gsl_qrng * r);
+GSL_FUN const char * gsl_qrng_name (const gsl_qrng * q);
 
 
 /* ISN'T THIS CONFUSING FOR PEOPLE?
   WHAT IF SOMEBODY TRIES TO COPY WITH THIS ???
   */
-GSL_EXPORT size_t gsl_qrng_size (const gsl_qrng * r);
+GSL_FUN size_t gsl_qrng_size (const gsl_qrng * q);
 
 
-GSL_EXPORT void * gsl_qrng_state (const gsl_qrng * r);
+GSL_FUN void * gsl_qrng_state (const gsl_qrng * q);
 
 
 /* Retrieve next vector in sequence. */
-GSL_EXPORT int gsl_qrng_get (const gsl_qrng * r, double x[]);
-
+GSL_FUN INLINE_DECL int gsl_qrng_get (const gsl_qrng * q, double x[]);
 
 #ifdef HAVE_INLINE
-extern inline int gsl_qrng_get (const gsl_qrng * r, double x[]);
-extern inline int gsl_qrng_get (const gsl_qrng * r, double x[])
+INLINE_FUN int gsl_qrng_get (const gsl_qrng * q, double x[])
 {
-  return (r->type->get) (r->state, r->dimension, x);
+  return (q->type->get) (q->state, q->dimension, x);
 }
 
 #endif /* HAVE_INLINE */

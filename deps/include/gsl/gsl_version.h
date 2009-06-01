@@ -1,6 +1,16 @@
 #ifndef __GSL_VERSION_H__
 #define __GSL_VERSION_H__
 
+#if !defined( GSL_FUN )
+#  if !defined( GSL_DLL )
+#    define GSL_FUN extern
+#  elif defined( BUILD_GSL_DLL )
+#    define GSL_FUN extern __declspec(dllexport)
+#  else
+#    define GSL_FUN extern __declspec(dllimport)
+#  endif
+#endif
+
 #include <gsl/gsl_types.h>
 
 #undef __BEGIN_DECLS
@@ -15,7 +25,7 @@
 __BEGIN_DECLS
 
 
-#define GSL_VERSION "1.8"
+#define GSL_VERSION "1.12"
 
 GSL_VAR const char * gsl_version;
 

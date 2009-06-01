@@ -4,7 +4,7 @@
  * 
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation; either version 2 of the License, or (at
+ * the Free Software Foundation; either version 3 of the License, or (at
  * your option) any later version.
  * 
  * This program is distributed in the hope that it will be useful, but
@@ -22,7 +22,15 @@
 #ifndef __GSL_SF_RESULT_H__
 #define __GSL_SF_RESULT_H__
 
-#include <gsl/gsl_types.h>
+#if !defined( GSL_FUN )
+#  if !defined( GSL_DLL )
+#    define GSL_FUN extern
+#  elif defined( BUILD_GSL_DLL )
+#    define GSL_FUN extern __declspec(dllexport)
+#  else
+#    define GSL_FUN extern __declspec(dllimport)
+#  endif
+#endif
 
 #undef __BEGIN_DECLS
 #undef __END_DECLS
@@ -53,7 +61,7 @@ struct gsl_sf_result_e10_struct {
 typedef struct gsl_sf_result_e10_struct gsl_sf_result_e10;
 
 
-GSL_EXPORT int gsl_sf_result_smash_e(const gsl_sf_result_e10 * re, gsl_sf_result * r);
+GSL_FUN int gsl_sf_result_smash_e(const gsl_sf_result_e10 * re, gsl_sf_result * r);
 
 
 __END_DECLS

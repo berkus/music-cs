@@ -3,6 +3,16 @@
 #ifndef __GSL_SF_H__
 #define __GSL_SF_H__
 
+#if !defined( GSL_FUN )
+#  if !defined( GSL_DLL )
+#    define GSL_FUN extern
+#  elif defined( BUILD_GSL_DLL )
+#    define GSL_FUN extern __declspec(dllexport)
+#  else
+#    define GSL_FUN extern __declspec(dllimport)
+#  endif
+#endif
+
 #include <gsl/gsl_sf_result.h>
 
 #include <gsl/gsl_sf_airy.h>
@@ -27,6 +37,7 @@
 #include <gsl/gsl_sf_lambert.h>
 #include <gsl/gsl_sf_legendre.h>
 #include <gsl/gsl_sf_log.h>
+#include <gsl/gsl_sf_mathieu.h>
 #include <gsl/gsl_sf_pow_int.h>
 #include <gsl/gsl_sf_psi.h>
 #include <gsl/gsl_sf_synchrotron.h>

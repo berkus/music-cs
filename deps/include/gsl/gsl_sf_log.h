@@ -4,7 +4,7 @@
  * 
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation; either version 2 of the License, or (at
+ * the Free Software Foundation; either version 3 of the License, or (at
  * your option) any later version.
  * 
  * This program is distributed in the hope that it will be useful, but
@@ -22,8 +22,17 @@
 #ifndef __GSL_SF_LOG_H__
 #define __GSL_SF_LOG_H__
 
+#if !defined( GSL_FUN )
+#  if !defined( GSL_DLL )
+#    define GSL_FUN extern
+#  elif defined( BUILD_GSL_DLL )
+#    define GSL_FUN extern __declspec(dllexport)
+#  else
+#    define GSL_FUN extern __declspec(dllimport)
+#  endif
+#endif
+
 #include <gsl/gsl_sf_result.h>
-#include <gsl/gsl_types.h>
 
 #undef __BEGIN_DECLS
 #undef __END_DECLS
@@ -42,16 +51,16 @@ __BEGIN_DECLS
  *
  * exceptions: GSL_EDOM
  */
-GSL_EXPORT int gsl_sf_log_e(const double x, gsl_sf_result * result);
-GSL_EXPORT double gsl_sf_log(const double x);
+GSL_FUN int gsl_sf_log_e(const double x, gsl_sf_result * result);
+GSL_FUN double gsl_sf_log(const double x);
 
 
 /* Log(|x|)
  *
  * exceptions: GSL_EDOM
  */
-GSL_EXPORT int gsl_sf_log_abs_e(const double x, gsl_sf_result * result);
-GSL_EXPORT double gsl_sf_log_abs(const double x);
+GSL_FUN int gsl_sf_log_abs_e(const double x, gsl_sf_result * result);
+GSL_FUN double gsl_sf_log_abs(const double x);
 
 
 /* Complex Logarithm
@@ -60,65 +69,23 @@ GSL_EXPORT double gsl_sf_log_abs(const double x);
  *
  * exceptions: GSL_EDOM
  */
-GSL_EXPORT int gsl_sf_complex_log_e(const double zr, const double zi, gsl_sf_result * lnr, gsl_sf_result * theta);
+GSL_FUN int gsl_sf_complex_log_e(const double zr, const double zi, gsl_sf_result * lnr, gsl_sf_result * theta);
 
 
 /* Log(1 + x)
  *
  * exceptions: GSL_EDOM
  */
-GSL_EXPORT int gsl_sf_log_1plusx_e(const double x, gsl_sf_result * result);
-GSL_EXPORT double gsl_sf_log_1plusx(const double x);
+GSL_FUN int gsl_sf_log_1plusx_e(const double x, gsl_sf_result * result);
+GSL_FUN double gsl_sf_log_1plusx(const double x);
 
 
 /* Log(1 + x) - x
  *
  * exceptions: GSL_EDOM
  */
-GSL_EXPORT int gsl_sf_log_1plusx_mx_e(const double x, gsl_sf_result * result);
-GSL_EXPORT double gsl_sf_log_1plusx_mx(const double x);
-
-
-#ifdef HAVE_INLINE
-#include <gsl/gsl_math.h>
-#include <gsl/gsl_errno.h>
-
-extern inline
-int
-gsl_sf_log_e(const double x, gsl_sf_result * result)
-{
-  /* CHECK_POINTER(result) */
-
-  if(x <= 0.0) {
-    result->val = GSL_NAN;
-    result->err = GSL_NAN;
-    GSL_ERROR ("domain error", GSL_EDOM);
-  }
-  else {
-    result->val = log(x);
-    result->err = 2.0 * GSL_DBL_EPSILON * fabs(result->val);
-    return GSL_SUCCESS;
-  }
-}
-extern inline
-int
-gsl_sf_log_abs_e(const double x, gsl_sf_result * result)
-{
-  /* CHECK_POINTER(result) */
-
-  if(x == 0.0) {
-    result->val = GSL_NAN;
-    result->err = GSL_NAN;
-    GSL_ERROR ("domain error", GSL_EDOM);
-  }
-  else {
-    result->val = log(fabs(x));
-    result->err = 2.0 * GSL_DBL_EPSILON * fabs(result->val);
-    return GSL_SUCCESS;
-  }
-}
-#endif /* HAVE_INLINE */
-
+GSL_FUN int gsl_sf_log_1plusx_mx_e(const double x, gsl_sf_result * result);
+GSL_FUN double gsl_sf_log_1plusx_mx(const double x);
 
 __END_DECLS
 

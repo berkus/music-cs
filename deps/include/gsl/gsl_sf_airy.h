@@ -4,7 +4,7 @@
  * 
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation; either version 2 of the License, or (at
+ * the Free Software Foundation; either version 3 of the License, or (at
  * your option) any later version.
  * 
  * This program is distributed in the hope that it will be useful, but
@@ -22,9 +22,18 @@
 #ifndef __GSL_SF_AIRY_H__
 #define __GSL_SF_AIRY_H__
 
+#if !defined( GSL_FUN )
+#  if !defined( GSL_DLL )
+#    define GSL_FUN extern
+#  elif defined( BUILD_GSL_DLL )
+#    define GSL_FUN extern __declspec(dllexport)
+#  else
+#    define GSL_FUN extern __declspec(dllimport)
+#  endif
+#endif
+
 #include <gsl/gsl_mode.h>
 #include <gsl/gsl_sf_result.h>
-#include <gsl/gsl_types.h>
 
 #undef __BEGIN_DECLS
 #undef __END_DECLS
@@ -43,16 +52,16 @@ __BEGIN_DECLS
  *
  * exceptions: GSL_EUNDRFLW
  */
-GSL_EXPORT int gsl_sf_airy_Ai_e(const double x, const gsl_mode_t mode, gsl_sf_result * result);
-GSL_EXPORT double gsl_sf_airy_Ai(const double x, gsl_mode_t mode);
+GSL_FUN int gsl_sf_airy_Ai_e(const double x, const gsl_mode_t mode, gsl_sf_result * result);
+GSL_FUN double gsl_sf_airy_Ai(const double x, gsl_mode_t mode);
 
 
 /* Airy function Bi(x)
  *
  * exceptions: GSL_EOVRFLW
  */
-GSL_EXPORT int gsl_sf_airy_Bi_e(const double x, gsl_mode_t mode, gsl_sf_result * result);
-GSL_EXPORT double gsl_sf_airy_Bi(const double x, gsl_mode_t mode);
+GSL_FUN int gsl_sf_airy_Bi_e(const double x, gsl_mode_t mode, gsl_sf_result * result);
+GSL_FUN double gsl_sf_airy_Bi(const double x, gsl_mode_t mode);
 
 
 /* scaled Ai(x):
@@ -61,8 +70,8 @@ GSL_EXPORT double gsl_sf_airy_Bi(const double x, gsl_mode_t mode);
  *
  * exceptions: none
  */
-GSL_EXPORT int gsl_sf_airy_Ai_scaled_e(const double x, gsl_mode_t mode, gsl_sf_result * result);
-GSL_EXPORT double gsl_sf_airy_Ai_scaled(const double x, gsl_mode_t mode);
+GSL_FUN int gsl_sf_airy_Ai_scaled_e(const double x, gsl_mode_t mode, gsl_sf_result * result);
+GSL_FUN double gsl_sf_airy_Ai_scaled(const double x, gsl_mode_t mode);
 
 
 /* scaled Bi(x):
@@ -71,24 +80,24 @@ GSL_EXPORT double gsl_sf_airy_Ai_scaled(const double x, gsl_mode_t mode);
  *
  * exceptions: none
  */
-GSL_EXPORT int gsl_sf_airy_Bi_scaled_e(const double x, gsl_mode_t mode, gsl_sf_result * result);
-GSL_EXPORT double gsl_sf_airy_Bi_scaled(const double x, gsl_mode_t mode);
+GSL_FUN int gsl_sf_airy_Bi_scaled_e(const double x, gsl_mode_t mode, gsl_sf_result * result);
+GSL_FUN double gsl_sf_airy_Bi_scaled(const double x, gsl_mode_t mode);
 
 
 /* derivative Ai'(x)
  *
  * exceptions: GSL_EUNDRFLW
  */
-GSL_EXPORT int gsl_sf_airy_Ai_deriv_e(const double x, gsl_mode_t mode, gsl_sf_result * result);
-GSL_EXPORT double gsl_sf_airy_Ai_deriv(const double x, gsl_mode_t mode);
+GSL_FUN int gsl_sf_airy_Ai_deriv_e(const double x, gsl_mode_t mode, gsl_sf_result * result);
+GSL_FUN double gsl_sf_airy_Ai_deriv(const double x, gsl_mode_t mode);
 
 
 /* derivative Bi'(x)
  *
  * exceptions: GSL_EOVRFLW
  */
-GSL_EXPORT int gsl_sf_airy_Bi_deriv_e(const double x, gsl_mode_t mode, gsl_sf_result * result);
-GSL_EXPORT double gsl_sf_airy_Bi_deriv(const double x, gsl_mode_t mode);
+GSL_FUN int gsl_sf_airy_Bi_deriv_e(const double x, gsl_mode_t mode, gsl_sf_result * result);
+GSL_FUN double gsl_sf_airy_Bi_deriv(const double x, gsl_mode_t mode);
 
 
 /* scaled derivative Ai'(x):
@@ -97,8 +106,8 @@ GSL_EXPORT double gsl_sf_airy_Bi_deriv(const double x, gsl_mode_t mode);
  *
  * exceptions: none
  */
-GSL_EXPORT int gsl_sf_airy_Ai_deriv_scaled_e(const double x, gsl_mode_t mode, gsl_sf_result * result);
-GSL_EXPORT double gsl_sf_airy_Ai_deriv_scaled(const double x, gsl_mode_t mode);
+GSL_FUN int gsl_sf_airy_Ai_deriv_scaled_e(const double x, gsl_mode_t mode, gsl_sf_result * result);
+GSL_FUN double gsl_sf_airy_Ai_deriv_scaled(const double x, gsl_mode_t mode);
 
 
 /* scaled derivative:
@@ -107,32 +116,32 @@ GSL_EXPORT double gsl_sf_airy_Ai_deriv_scaled(const double x, gsl_mode_t mode);
  *
  * exceptions: none
  */
-GSL_EXPORT int gsl_sf_airy_Bi_deriv_scaled_e(const double x, gsl_mode_t mode, gsl_sf_result * result);
-GSL_EXPORT double gsl_sf_airy_Bi_deriv_scaled(const double x, gsl_mode_t mode);
+GSL_FUN int gsl_sf_airy_Bi_deriv_scaled_e(const double x, gsl_mode_t mode, gsl_sf_result * result);
+GSL_FUN double gsl_sf_airy_Bi_deriv_scaled(const double x, gsl_mode_t mode);
 
 
 /* Zeros of Ai(x)
  */
-GSL_EXPORT int gsl_sf_airy_zero_Ai_e(unsigned int s, gsl_sf_result * result);
-GSL_EXPORT double gsl_sf_airy_zero_Ai(unsigned int s);
+GSL_FUN int gsl_sf_airy_zero_Ai_e(unsigned int s, gsl_sf_result * result);
+GSL_FUN double gsl_sf_airy_zero_Ai(unsigned int s);
 
 
 /* Zeros of Bi(x)
  */
-GSL_EXPORT int gsl_sf_airy_zero_Bi_e(unsigned int s, gsl_sf_result * result);
-GSL_EXPORT double gsl_sf_airy_zero_Bi(unsigned int s);
+GSL_FUN int gsl_sf_airy_zero_Bi_e(unsigned int s, gsl_sf_result * result);
+GSL_FUN double gsl_sf_airy_zero_Bi(unsigned int s);
 
 
 /* Zeros of Ai'(x)
  */
-GSL_EXPORT int gsl_sf_airy_zero_Ai_deriv_e(unsigned int s, gsl_sf_result * result);
-GSL_EXPORT double gsl_sf_airy_zero_Ai_deriv(unsigned int s);
+GSL_FUN int gsl_sf_airy_zero_Ai_deriv_e(unsigned int s, gsl_sf_result * result);
+GSL_FUN double gsl_sf_airy_zero_Ai_deriv(unsigned int s);
 
 
 /* Zeros of Bi'(x)
  */
-GSL_EXPORT int gsl_sf_airy_zero_Bi_deriv_e(unsigned int s, gsl_sf_result * result);
-GSL_EXPORT double gsl_sf_airy_zero_Bi_deriv(unsigned int s);
+GSL_FUN int gsl_sf_airy_zero_Bi_deriv_e(unsigned int s, gsl_sf_result * result);
+GSL_FUN double gsl_sf_airy_zero_Bi_deriv(unsigned int s);
 
 
 __END_DECLS

@@ -4,7 +4,7 @@
  * 
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation; either version 2 of the License, or (at
+ * the Free Software Foundation; either version 3 of the License, or (at
  * your option) any later version.
  * 
  * This program is distributed in the hope that it will be useful, but
@@ -22,8 +22,17 @@
 #ifndef __GSL_SF_LEGENDRE_H__
 #define __GSL_SF_LEGENDRE_H__
 
+#if !defined( GSL_FUN )
+#  if !defined( GSL_DLL )
+#    define GSL_FUN extern
+#  elif defined( BUILD_GSL_DLL )
+#    define GSL_FUN extern __declspec(dllexport)
+#  else
+#    define GSL_FUN extern __declspec(dllimport)
+#  endif
+#endif
+
 #include <gsl/gsl_sf_result.h>
-#include <gsl/gsl_types.h>
 
 #undef __BEGIN_DECLS
 #undef __END_DECLS
@@ -42,15 +51,15 @@ __BEGIN_DECLS
  *
  * exceptions: GSL_EDOM
  */
-GSL_EXPORT int     gsl_sf_legendre_Pl_e(const int l, const double x, gsl_sf_result * result);
-GSL_EXPORT double  gsl_sf_legendre_Pl(const int l, const double x);
+GSL_FUN int     gsl_sf_legendre_Pl_e(const int l, const double x, gsl_sf_result * result);
+GSL_FUN double  gsl_sf_legendre_Pl(const int l, const double x);
 
 
 /* P_l(x) for l=0,...,lmax; |x| <= 1
  *
  * exceptions: GSL_EDOM
  */
-GSL_EXPORT int gsl_sf_legendre_Pl_array(
+GSL_FUN int gsl_sf_legendre_Pl_array(
   const int lmax, const double x,
   double * result_array
   );
@@ -60,7 +69,7 @@ GSL_EXPORT int gsl_sf_legendre_Pl_array(
  *
  * exceptions: GSL_EDOM
  */
-GSL_EXPORT int gsl_sf_legendre_Pl_deriv_array(
+GSL_FUN int gsl_sf_legendre_Pl_deriv_array(
   const int lmax, const double x,
   double * result_array,
   double * result_deriv_array
@@ -71,36 +80,36 @@ GSL_EXPORT int gsl_sf_legendre_Pl_deriv_array(
  *
  * exceptions: none
  */
-GSL_EXPORT int gsl_sf_legendre_P1_e(double x, gsl_sf_result * result);
-GSL_EXPORT int gsl_sf_legendre_P2_e(double x, gsl_sf_result * result);
-GSL_EXPORT int gsl_sf_legendre_P3_e(double x, gsl_sf_result * result);
-GSL_EXPORT double gsl_sf_legendre_P1(const double x);
-GSL_EXPORT double gsl_sf_legendre_P2(const double x);
-GSL_EXPORT double gsl_sf_legendre_P3(const double x);
+GSL_FUN int gsl_sf_legendre_P1_e(double x, gsl_sf_result * result);
+GSL_FUN int gsl_sf_legendre_P2_e(double x, gsl_sf_result * result);
+GSL_FUN int gsl_sf_legendre_P3_e(double x, gsl_sf_result * result);
+GSL_FUN double gsl_sf_legendre_P1(const double x);
+GSL_FUN double gsl_sf_legendre_P2(const double x);
+GSL_FUN double gsl_sf_legendre_P3(const double x);
 
 
 /* Q_0(x), x > -1, x != 1
  *
  * exceptions: GSL_EDOM
  */
-GSL_EXPORT int gsl_sf_legendre_Q0_e(const double x, gsl_sf_result * result);
-GSL_EXPORT double gsl_sf_legendre_Q0(const double x);
+GSL_FUN int gsl_sf_legendre_Q0_e(const double x, gsl_sf_result * result);
+GSL_FUN double gsl_sf_legendre_Q0(const double x);
 
 
 /* Q_1(x), x > -1, x != 1
  *
  * exceptions: GSL_EDOM
  */
-GSL_EXPORT int gsl_sf_legendre_Q1_e(const double x, gsl_sf_result * result);
-GSL_EXPORT double gsl_sf_legendre_Q1(const double x);
+GSL_FUN int gsl_sf_legendre_Q1_e(const double x, gsl_sf_result * result);
+GSL_FUN double gsl_sf_legendre_Q1(const double x);
 
 
 /* Q_l(x), x > -1, x != 1, l >= 0
  *
  * exceptions: GSL_EDOM
  */
-GSL_EXPORT int gsl_sf_legendre_Ql_e(const int l, const double x, gsl_sf_result * result);
-GSL_EXPORT double gsl_sf_legendre_Ql(const int l, const double x);
+GSL_FUN int gsl_sf_legendre_Ql_e(const int l, const double x, gsl_sf_result * result);
+GSL_FUN double gsl_sf_legendre_Ql(const int l, const double x);
 
 
 /* P_l^m(x)  m >= 0; l >= m; |x| <= 1.0
@@ -120,8 +129,8 @@ GSL_EXPORT double gsl_sf_legendre_Ql(const int l, const double x);
  *
  * exceptions: GSL_EDOM, GSL_EOVRFLW
  */
-GSL_EXPORT int     gsl_sf_legendre_Plm_e(const int l, const int m, const double x, gsl_sf_result * result);
-GSL_EXPORT double  gsl_sf_legendre_Plm(const int l, const int m, const double x);
+GSL_FUN int     gsl_sf_legendre_Plm_e(const int l, const int m, const double x, gsl_sf_result * result);
+GSL_FUN double  gsl_sf_legendre_Plm(const int l, const int m, const double x);
 
 
 /* P_l^m(x)  m >= 0; l >= m; |x| <= 1.0
@@ -129,7 +138,7 @@ GSL_EXPORT double  gsl_sf_legendre_Plm(const int l, const int m, const double x)
  *
  * exceptions: GSL_EDOM, GSL_EOVRFLW
  */
-GSL_EXPORT int gsl_sf_legendre_Plm_array(
+GSL_FUN int gsl_sf_legendre_Plm_array(
   const int lmax, const int m, const double x,
   double * result_array
   );
@@ -140,7 +149,7 @@ GSL_EXPORT int gsl_sf_legendre_Plm_array(
  *
  * exceptions: GSL_EDOM, GSL_EOVRFLW
  */
-GSL_EXPORT int gsl_sf_legendre_Plm_deriv_array(
+GSL_FUN int gsl_sf_legendre_Plm_deriv_array(
   const int lmax, const int m, const double x,
   double * result_array,
   double * result_deriv_array
@@ -159,8 +168,8 @@ GSL_EXPORT int gsl_sf_legendre_Plm_deriv_array(
  *
  * exceptions: GSL_EDOM
  */
-GSL_EXPORT int     gsl_sf_legendre_sphPlm_e(const int l, int m, const double x, gsl_sf_result * result);
-GSL_EXPORT double  gsl_sf_legendre_sphPlm(const int l, const int m, const double x);
+GSL_FUN int     gsl_sf_legendre_sphPlm_e(const int l, int m, const double x, gsl_sf_result * result);
+GSL_FUN double  gsl_sf_legendre_sphPlm(const int l, const int m, const double x);
 
 
 /* sphPlm(l,m,x) values
@@ -169,7 +178,7 @@ GSL_EXPORT double  gsl_sf_legendre_sphPlm(const int l, const int m, const double
  *
  * exceptions: GSL_EDOM
  */
-GSL_EXPORT int gsl_sf_legendre_sphPlm_array(
+GSL_FUN int gsl_sf_legendre_sphPlm_array(
   const int lmax, int m, const double x,
   double * result_array
   );
@@ -181,7 +190,7 @@ GSL_EXPORT int gsl_sf_legendre_sphPlm_array(
  *
  * exceptions: GSL_EDOM
  */
-GSL_EXPORT int gsl_sf_legendre_sphPlm_deriv_array(
+GSL_FUN int gsl_sf_legendre_sphPlm_deriv_array(
   const int lmax, const int m, const double x,
   double * result_array,
   double * result_deriv_array
@@ -192,8 +201,7 @@ GSL_EXPORT int gsl_sf_legendre_sphPlm_deriv_array(
 /* size of result_array[] needed for the array versions of Plm
  * (lmax - m + 1)
  */
-GSL_EXPORT int gsl_sf_legendre_array_size(const int lmax, const int m);
-
+GSL_FUN int gsl_sf_legendre_array_size(const int lmax, const int m);
 
 /* Irregular Spherical Conical Function
  * P^{1/2}_{-1/2 + I lambda}(x)
@@ -201,8 +209,8 @@ GSL_EXPORT int gsl_sf_legendre_array_size(const int lmax, const int m);
  * x > -1.0
  * exceptions: GSL_EDOM
  */
-GSL_EXPORT int gsl_sf_conicalP_half_e(const double lambda, const double x, gsl_sf_result * result);
-GSL_EXPORT double gsl_sf_conicalP_half(const double lambda, const double x);
+GSL_FUN int gsl_sf_conicalP_half_e(const double lambda, const double x, gsl_sf_result * result);
+GSL_FUN double gsl_sf_conicalP_half(const double lambda, const double x);
 
 
 /* Regular Spherical Conical Function
@@ -211,8 +219,8 @@ GSL_EXPORT double gsl_sf_conicalP_half(const double lambda, const double x);
  * x > -1.0
  * exceptions: GSL_EDOM
  */
-GSL_EXPORT int gsl_sf_conicalP_mhalf_e(const double lambda, const double x, gsl_sf_result * result);
-GSL_EXPORT double gsl_sf_conicalP_mhalf(const double lambda, const double x);
+GSL_FUN int gsl_sf_conicalP_mhalf_e(const double lambda, const double x, gsl_sf_result * result);
+GSL_FUN double gsl_sf_conicalP_mhalf(const double lambda, const double x);
 
 
 /* Conical Function
@@ -221,8 +229,8 @@ GSL_EXPORT double gsl_sf_conicalP_mhalf(const double lambda, const double x);
  * x > -1.0
  * exceptions: GSL_EDOM
  */
-GSL_EXPORT int gsl_sf_conicalP_0_e(const double lambda, const double x, gsl_sf_result * result);
-GSL_EXPORT double gsl_sf_conicalP_0(const double lambda, const double x);
+GSL_FUN int gsl_sf_conicalP_0_e(const double lambda, const double x, gsl_sf_result * result);
+GSL_FUN double gsl_sf_conicalP_0(const double lambda, const double x);
 
 
 /* Conical Function
@@ -231,8 +239,8 @@ GSL_EXPORT double gsl_sf_conicalP_0(const double lambda, const double x);
  * x > -1.0
  * exceptions: GSL_EDOM
  */
-GSL_EXPORT int gsl_sf_conicalP_1_e(const double lambda, const double x, gsl_sf_result * result);
-GSL_EXPORT double gsl_sf_conicalP_1(const double lambda, const double x);
+GSL_FUN int gsl_sf_conicalP_1_e(const double lambda, const double x, gsl_sf_result * result);
+GSL_FUN double gsl_sf_conicalP_1(const double lambda, const double x);
 
 
 /* Regular Spherical Conical Function
@@ -241,8 +249,8 @@ GSL_EXPORT double gsl_sf_conicalP_1(const double lambda, const double x);
  * x > -1.0, l >= -1
  * exceptions: GSL_EDOM
  */
-GSL_EXPORT int gsl_sf_conicalP_sph_reg_e(const int l, const double lambda, const double x, gsl_sf_result * result);
-GSL_EXPORT double gsl_sf_conicalP_sph_reg(const int l, const double lambda, const double x);
+GSL_FUN int gsl_sf_conicalP_sph_reg_e(const int l, const double lambda, const double x, gsl_sf_result * result);
+GSL_FUN double gsl_sf_conicalP_sph_reg(const int l, const double lambda, const double x);
 
 
 /* Regular Cylindrical Conical Function
@@ -251,8 +259,8 @@ GSL_EXPORT double gsl_sf_conicalP_sph_reg(const int l, const double lambda, cons
  * x > -1.0, m >= -1
  * exceptions: GSL_EDOM
  */
-GSL_EXPORT int gsl_sf_conicalP_cyl_reg_e(const int m, const double lambda, const double x, gsl_sf_result * result);
-GSL_EXPORT double gsl_sf_conicalP_cyl_reg(const int m, const double lambda, const double x);
+GSL_FUN int gsl_sf_conicalP_cyl_reg_e(const int m, const double lambda, const double x, gsl_sf_result * result);
+GSL_FUN double gsl_sf_conicalP_cyl_reg(const int m, const double lambda, const double x);
 
 
 /* The following spherical functions are specializations
@@ -273,8 +281,8 @@ GSL_EXPORT double gsl_sf_conicalP_cyl_reg(const int m, const double lambda, cons
  * eta >= 0.0
  * exceptions: GSL_EDOM
  */
-GSL_EXPORT int gsl_sf_legendre_H3d_0_e(const double lambda, const double eta, gsl_sf_result * result);
-GSL_EXPORT double gsl_sf_legendre_H3d_0(const double lambda, const double eta);
+GSL_FUN int gsl_sf_legendre_H3d_0_e(const double lambda, const double eta, gsl_sf_result * result);
+GSL_FUN double gsl_sf_legendre_H3d_0(const double lambda, const double eta);
 
 
 /* First radial eigenfunction of the Laplacian on the
@@ -290,8 +298,8 @@ GSL_EXPORT double gsl_sf_legendre_H3d_0(const double lambda, const double eta);
  * eta >= 0.0
  * exceptions: GSL_EDOM
  */
-GSL_EXPORT int gsl_sf_legendre_H3d_1_e(const double lambda, const double eta, gsl_sf_result * result);
-GSL_EXPORT double gsl_sf_legendre_H3d_1(const double lambda, const double eta);
+GSL_FUN int gsl_sf_legendre_H3d_1_e(const double lambda, const double eta, gsl_sf_result * result);
+GSL_FUN double gsl_sf_legendre_H3d_1(const double lambda, const double eta);
 
 
 /* l'th radial eigenfunction of the Laplacian on the
@@ -303,23 +311,13 @@ GSL_EXPORT double gsl_sf_legendre_H3d_1(const double lambda, const double eta);
  * eta >= 0.0, l >= 0
  * exceptions: GSL_EDOM
  */
-GSL_EXPORT int gsl_sf_legendre_H3d_e(const int l, const double lambda, const double eta, gsl_sf_result * result);
-GSL_EXPORT double gsl_sf_legendre_H3d(const int l, const double lambda, const double eta);
+GSL_FUN int gsl_sf_legendre_H3d_e(const int l, const double lambda, const double eta, gsl_sf_result * result);
+GSL_FUN double gsl_sf_legendre_H3d(const int l, const double lambda, const double eta);
 
 
 /* Array of H3d(ell),  0 <= ell <= lmax
  */
-GSL_EXPORT int gsl_sf_legendre_H3d_array(const int lmax, const double lambda, const double eta, double * result_array);
-
-
-#ifdef HAVE_INLINE
-extern inline
-int
-gsl_sf_legendre_array_size(const int lmax, const int m)
-{
-  return lmax-m+1;
-}
-#endif /* HAVE_INLINE */
+GSL_FUN int gsl_sf_legendre_H3d_array(const int lmax, const double lambda, const double eta, double * result_array);
 
 
 __END_DECLS

@@ -1,10 +1,10 @@
 /* err/gsl_errno.h
  * 
- * Copyright (C) 1996, 1997, 1998, 1999, 2000 Gerard Jungman, Brian Gough
+ * Copyright (C) 1996, 1997, 1998, 1999, 2000, 2007 Gerard Jungman, Brian Gough
  * 
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation; either version 2 of the License, or (at
+ * the Free Software Foundation; either version 3 of the License, or (at
  * your option) any later version.
  * 
  * This program is distributed in the hope that it will be useful, but
@@ -19,6 +19,16 @@
 
 #ifndef __GSL_ERRNO_H__
 #define __GSL_ERRNO_H__
+
+#if !defined( GSL_FUN )
+#  if !defined( GSL_DLL )
+#    define GSL_FUN extern
+#  elif defined( BUILD_GSL_DLL )
+#    define GSL_FUN extern __declspec(dllexport)
+#  else
+#    define GSL_FUN extern __declspec(dllimport)
+#  endif
+#endif
 
 #include <stdio.h>
 #include <errno.h>
@@ -74,13 +84,13 @@ enum {
   GSL_EOF      = 32   /* end of file */
 } ;
 
-GSL_EXPORT void gsl_error (const char * reason, const char * file, int line,
-                           int gsl_errno);
+GSL_FUN void gsl_error (const char * reason, const char * file, int line,
+                int gsl_errno);
 
-GSL_EXPORT void gsl_stream_printf (const char *label, const char *file,
-                                   int line, const char *reason);
+GSL_FUN void gsl_stream_printf (const char *label, const char *file,
+                        int line, const char *reason);
 
-GSL_EXPORT const char * gsl_strerror (const int gsl_errno);
+GSL_FUN const char * gsl_strerror (const int gsl_errno);
 
 typedef void gsl_error_handler_t (const char * reason, const char * file,
                                   int line, int gsl_errno);
@@ -88,19 +98,16 @@ typedef void gsl_error_handler_t (const char * reason, const char * file,
 typedef void gsl_stream_handler_t (const char * label, const char * file,
                                    int line, const char * reason);
 
-GSL_EXPORT 
-gsl_error_handler_t * 
+GSL_FUN gsl_error_handler_t * 
 gsl_set_error_handler (gsl_error_handler_t * new_handler);
 
-GSL_EXPORT 
-gsl_error_handler_t *
+GSL_FUN gsl_error_handler_t *
 gsl_set_error_handler_off (void);
 
-GSL_EXPORT 
-gsl_stream_handler_t * 
+GSL_FUN gsl_stream_handler_t * 
 gsl_set_stream_handler (gsl_stream_handler_t * new_handler);
 
-GSL_EXPORT FILE * gsl_set_stream (FILE * new_stream);
+GSL_FUN FILE * gsl_set_stream (FILE * new_stream);
 
 /* GSL_ERROR: call the error handler, and return the error code */
 

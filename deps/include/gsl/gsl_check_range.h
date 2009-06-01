@@ -1,10 +1,10 @@
 /* vector/gsl_check_range.h
  * 
- * Copyright (C) 2003, 2004 Brian Gough
+ * Copyright (C) 2003, 2004, 2007 Brian Gough
  * 
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation; either version 2 of the License, or (at
+ * the Free Software Foundation; either version 3 of the License, or (at
  * your option) any later version.
  * 
  * This program is distributed in the hope that it will be useful, but
@@ -19,6 +19,16 @@
 
 #ifndef __GSL_CHECK_RANGE_H__
 #define __GSL_CHECK_RANGE_H__
+
+#if !defined( GSL_FUN )
+#  if !defined( GSL_DLL )
+#    define GSL_FUN extern
+#  elif defined( BUILD_GSL_DLL )
+#    define GSL_FUN extern __declspec(dllexport)
+#  else
+#    define GSL_FUN extern __declspec(dllimport)
+#  endif
+#endif
 
 #include <stdlib.h>
 #include <gsl/gsl_types.h>

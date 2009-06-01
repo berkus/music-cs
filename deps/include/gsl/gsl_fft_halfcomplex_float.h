@@ -1,10 +1,10 @@
 /* fft/gsl_fft_halfcomplex_float.h
  * 
- * Copyright (C) 1996, 1997, 1998, 1999, 2000 Brian Gough
+ * Copyright (C) 1996, 1997, 1998, 1999, 2000, 2007 Brian Gough
  * 
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation; either version 2 of the License, or (at
+ * the Free Software Foundation; either version 3 of the License, or (at
  * your option) any later version.
  * 
  * This program is distributed in the hope that it will be useful, but
@@ -20,13 +20,22 @@
 #ifndef __GSL_FFT_HALFCOMPLEX_FLOAT_H__
 #define __GSL_FFT_HALFCOMPLEX_FLOAT_H__
 
+#if !defined( GSL_FUN )
+#  if !defined( GSL_DLL )
+#    define GSL_FUN extern
+#  elif defined( BUILD_GSL_DLL )
+#    define GSL_FUN extern __declspec(dllexport)
+#  else
+#    define GSL_FUN extern __declspec(dllimport)
+#  endif
+#endif
+
 #include <stddef.h>
 
 #include <gsl/gsl_math.h>
 #include <gsl/gsl_complex.h>
 #include <gsl/gsl_fft.h>
 #include <gsl/gsl_fft_real_float.h>
-#include <gsl/gsl_types.h>
 
 #undef __BEGIN_DECLS
 #undef __END_DECLS
@@ -40,9 +49,9 @@
 
 __BEGIN_DECLS
 
-GSL_EXPORT int gsl_fft_halfcomplex_float_radix2_backward (float data[], const size_t stride, const size_t n);
-GSL_EXPORT int gsl_fft_halfcomplex_float_radix2_inverse (float data[], const size_t stride, const size_t n);
-GSL_EXPORT int gsl_fft_halfcomplex_float_radix2_transform (float data[], const size_t stride, const size_t n);
+GSL_FUN int gsl_fft_halfcomplex_float_radix2_backward (float data[], const size_t stride, const size_t n);
+GSL_FUN int gsl_fft_halfcomplex_float_radix2_inverse (float data[], const size_t stride, const size_t n);
+GSL_FUN int gsl_fft_halfcomplex_float_radix2_transform (float data[], const size_t stride, const size_t n);
 
 typedef struct
   {
@@ -55,32 +64,29 @@ typedef struct
 gsl_fft_halfcomplex_wavetable_float;
 
 
-GSL_EXPORT gsl_fft_halfcomplex_wavetable_float * gsl_fft_halfcomplex_wavetable_float_alloc (size_t n);
+GSL_FUN gsl_fft_halfcomplex_wavetable_float * gsl_fft_halfcomplex_wavetable_float_alloc (size_t n);
 
-GSL_EXPORT 
-void
+GSL_FUN void
 gsl_fft_halfcomplex_wavetable_float_free (gsl_fft_halfcomplex_wavetable_float * wavetable);
 
-GSL_EXPORT int gsl_fft_halfcomplex_float_backward (float data[], const size_t stride, const size_t n,
-                                                   const gsl_fft_halfcomplex_wavetable_float * wavetable,
-                                                   gsl_fft_real_workspace_float * work);
+GSL_FUN int gsl_fft_halfcomplex_float_backward (float data[], const size_t stride, const size_t n,
+                                        const gsl_fft_halfcomplex_wavetable_float * wavetable,
+                                        gsl_fft_real_workspace_float * work);
 
-GSL_EXPORT int gsl_fft_halfcomplex_float_inverse (float data[], const size_t stride, const size_t n,
-                                                  const gsl_fft_halfcomplex_wavetable_float * wavetable,
-                                                  gsl_fft_real_workspace_float * work);
+GSL_FUN int gsl_fft_halfcomplex_float_inverse (float data[], const size_t stride, const size_t n,
+                                       const gsl_fft_halfcomplex_wavetable_float * wavetable,
+                                       gsl_fft_real_workspace_float * work);
 
-GSL_EXPORT int gsl_fft_halfcomplex_float_transform (float data[], const size_t stride, const size_t n,
-                                                    const gsl_fft_halfcomplex_wavetable_float * wavetable,
-                                                    gsl_fft_real_workspace_float * work);
+GSL_FUN int gsl_fft_halfcomplex_float_transform (float data[], const size_t stride, const size_t n,
+                                         const gsl_fft_halfcomplex_wavetable_float * wavetable,
+                                         gsl_fft_real_workspace_float * work);
 
-GSL_EXPORT 
-int
+GSL_FUN int
 gsl_fft_halfcomplex_float_unpack (const float halfcomplex_coefficient[],
                                   float complex_coefficient[],
                                   const size_t stride, const size_t n);
 
-GSL_EXPORT 
-int
+GSL_FUN int
 gsl_fft_halfcomplex_float_radix2_unpack (const float halfcomplex_coefficient[],
                                          float complex_coefficient[],
                                          const size_t stride, const size_t n);
