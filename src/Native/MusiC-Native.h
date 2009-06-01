@@ -23,6 +23,7 @@
 
 #include "Platform.h"
 
+#include "LogHandler.h"
 #include "DBHandler.h"
 #include "DataHandler.h"
 #include "ExtractedData.h"
