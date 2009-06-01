@@ -1,4 +1,4 @@
-// Copyright (c) 2008-2009 Marcos Jos√© Sant'Anna Magalh√£es
+// Copyright (c) 2008-2009 Marcos JosÈ Sant'Anna Magalh„es
 // 
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -25,24 +25,7 @@
 #include <iostream>
 #include <sstream>
 
-#include <string.h>
-
-//#define DEBUG
-
-#if defined(DEBUG)
-
-#define LOG(msg) cout << __FUNCTION__ << " at " << __LINE__ << " - " << msg << endl
-#else
-#define LOG(m) //m
-#endif
-
-#if defined(TRACE)
-	#define LOG_IN() t++;cout << __FUNCTION__ << endl
-	#define LOG_OUT() cout << __FUNCTION__ << endl;t--
-#else
-	#define LOG_IN() //
-	#define LOG_OUT() //
-#endif
+#include "LogHandler.h"
 
 namespace MusiC
 {
@@ -54,7 +37,7 @@ namespace MusiC
         private:
 
 			std::fstream db;
-			std::ofstream log;
+			LogHandler log;
 
 			char * _sectionLabel;
 			char * _dataLabel;
