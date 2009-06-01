@@ -25,8 +25,7 @@
 #include <fstream>
 #include <cmath>
 
-#include <gsl/gsl_combination.h>
-#include <gsl/gsl_sf.h>
+#include "gsl.h"
 
 #include <MusiC-Native.h>
 
@@ -52,7 +51,7 @@ namespace MusiC
 			static const int CLUSTER_COUNT; // how many seconds
 			static const int FRAME_COUNT;
 
-			std::ofstream log;
+			LogHandler log;
 
 			//::::::::::::::::::::::::::::::::::::::://
 
@@ -70,7 +69,7 @@ namespace MusiC
 
             Barbedo()
             {
-                log.open("Barbedo_Filter.txt",  std::ios_base::app );
+                log.open("Barbedo.txt",  std::ios_base::app );
             }
 
             ~Barbedo()

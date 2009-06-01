@@ -49,14 +49,19 @@ const int MusiC::Native::Barbedo::FRAME_COUNT =
 /// </param>
 RefVecIndex * Barbedo::createCombination( ClassData * classA, ClassData * classB )
 {
+	LOG_IN();
+
     if( classA->nFrames < 3 || classB->nFrames < 3 )
     {
         log << "ERROR: A class must have at least 3 vectors" << endl;
+
+		LOG_OUT();
         return NULL;
     }
 
 	RefVecIndex * r = new RefVecIndex(classA, classB);
 
+	LOG_OUT();
 	return r;
 }
 
@@ -70,6 +75,8 @@ RefVecIndex * Barbedo::createCombination( ClassData * classA, ClassData * classB
 /// </param>
 ClassData * Barbedo::filterCandidates( ClassData * cl )
 {
+	LOG_IN();
+
 	log << "Target Frame Count: " << MAX_CANDIDATES << endl;
 
 	// loop counter
@@ -136,7 +143,6 @@ ClassData * Barbedo::filterCandidates( ClassData * cl )
 	}
 
 	frameDt = fileDt->pFirstFrame;
-
 	FrameData * lastkept = NULL;
 
 	bool keep;
@@ -171,33 +177,46 @@ ClassData * Barbedo::filterCandidates( ClassData * cl )
 
 		if ( !keep )
 		{
-			if ( lastkept )
-                lastkept->pNextFrame = frameDt->pNextFrame;
-
-			fileDt->nFrames--;
+ 			fileDt->nFrames--;
 			cl->nFrames--;
+			
+			
+			if( frameDt == fileDt->pFirstFrame )
+				fileDt->pFirstFrame = frameDt->pNextFrame;
 
-			delete frameDt->pData;
-			delete frameDt;
+			FrameData * tmp = frameDt->pNextFrame;
 
-			frameDt = frameDt->pNextFrame;
+			frameDt->pNextFrame = fileDt->pFiltered;
+			fileDt->pFiltered = frameDt;
+
+			if( frameDt == fileDt->pLastFrame )
+			{
+				fileDt->pLastFrame = lastkept;
+				fileDt = fileDt->pNextFile;
+				LOG("File Done");
+			}
+
+			frameDt = tmp;
 
 			continue;
 		}
 
 		candidates_counter++;
 
-		if ( !lastkept )
-            fileDt->pFirstFrame = frameDt;
+		if( lastkept )
+			lastkept->pNextFrame = frameDt;
 
 		lastkept = frameDt;
 
-		frameDt = frameDt->pNextFrame;
 		if( frameDt == fileDt->pLastFrame )
+		{
+			fileDt->pLastFrame = lastkept;
             fileDt = fileDt->pNextFile;
-	}
+		}
 
-	if ( lastkept ) lastkept->pNextFrame = NULL;
+		frameDt = frameDt->pNextFrame;
+		lastkept->pNextFrame = NULL;
+	}
 
 	log << "- Frame Count -" << endl;
 	log << "after selection: " << cl->nFrames << endl;
@@ -209,6 +228,7 @@ ClassData * Barbedo::filterCandidates( ClassData * cl )
 	delete low_bound;
 	delete high_bound;
 
+	LOG_OUT();
 	return cl;
 }
 
@@ -222,10 +242,15 @@ ClassData * Barbedo::filterCandidates( ClassData * cl )
 /// </param>
 int Barbedo::combine( RefVecIndex * ref )
 {
+	LOG_IN();
+
 	if ( gsl_combination_next( ref->b->raw ) == GSL_FAILURE )
 	{
 		if ( gsl_combination_next( ref->a->raw ) == GSL_FAILURE )
+		{
+			LOG_OUT();
 			return GSL_FAILURE;
+		}
         else
             ref->a->update();
 
@@ -237,6 +262,7 @@ int Barbedo::combine( RefVecIndex * ref )
 	    ref->b->update();
 	}
 
+	LOG_OUT();
 	return GSL_SUCCESS;
 }
 
@@ -256,6 +282,8 @@ int Barbedo::combine( RefVecIndex * ref )
 /// </param>
 float Barbedo::dist( float * src, float * ref, int size )
 {
+	LOG_IN();
+
 	// column order
 	double ret = 0;
 	double cum = 0;
@@ -266,6 +294,7 @@ float Barbedo::dist( float * src, float * ref, int size )
 		ret += cum * cum;
 	}
 
+	LOG_OUT();
 	return (float) sqrt( ret );
 }
 
@@ -276,6 +305,8 @@ float Barbedo::dist( float * src, float * ref, int size )
 ///
 float * Barbedo::seq_access( ClassData * cl, Int64 idx )
 {
+	LOG_IN();
+
 	FrameData * fr = cl->pFirstFile->pFirstFrame;
 
 	while ( idx > 0 )
@@ -284,10 +315,13 @@ float * Barbedo::seq_access( ClassData * cl, Int64 idx )
 		fr = fr->pNextFrame;
 	}
 
+	LOG_OUT();
 	return fr->pData;
 }
 FileData * Barbedo::Filter( FileData * fileDt, unsigned int nFeat )
 {
+	LOG_IN();
+
     // loop counters
 	unsigned int frame_counter = 0;
 	unsigned int cluster_sz_counter = 0;
@@ -312,13 +346,14 @@ FileData * Barbedo::Filter( FileData * fileDt, unsigned int nFeat )
     if ( firstFrameIdx < 0 )
     {
         log << "File too short" << endl;
+
+		LOG_OUT();
         return NULL;
     }
 
     log << "frame Count: " << fileDt->nFrames << endl;
     log << "first selected frame: " << firstFrameIdx << endl;
-    log << "last selected frame: " << firstFrameIdx + FRAME_COUNT - 1 << endl;
-    log << endl;
+    log << "last selected frame: " << firstFrameIdx + FRAME_COUNT - 1 << endl << endl;
 
     FileData * nfl = new FileData();
     nfl->pFirstFrame = NULL;
@@ -406,12 +441,13 @@ FileData * Barbedo::Filter( FileData * fileDt, unsigned int nFeat )
 //            nfl->pLastFrame->pNextFrame = fileDt->pNextFile->pFirstFrame;
 //    }
 
-    log << endl;
+	log.put('\n');
 
 	delete max;
 	delete mean;
 	delete var;
 
+	LOG_OUT();
     return nfl;
 }
 
@@ -422,11 +458,14 @@ FileData * Barbedo::Filter( FileData * fileDt, unsigned int nFeat )
 ///
 DataCollection * Barbedo::Filter( DataCollection * extractedData )
 {
+	LOG_IN();
+	
+
 	DataHandler hnd;
 	hnd.Attach( extractedData );
 
 	log << "============ Barbedo::Filter ============" << endl;
-	//log << "Address( target ):" << reinterpret_cast<size_t>( extractedData ) << endl;
+	log << "Address (target):" << reinterpret_cast<size_t>( extractedData ) << endl;
 	//log << "Address( pointer ):" << reinterpret_cast<size_t>( &extractedData ) << endl;
 	log << "Received " << hnd.getNumClasses( ) << " Classes" << endl;
 	log << "Received " << hnd.getNumFeatures( ) << " Features" << endl;
@@ -503,6 +542,7 @@ DataCollection * Barbedo::Filter( DataCollection * extractedData )
 
 	log << "End Filter" << endl << endl;
 
+	LOG_OUT();
 	return dtCol;
 }
 
@@ -513,18 +553,25 @@ DataCollection * Barbedo::Filter( DataCollection * extractedData )
 ///
 void * Barbedo::Train( DataCollection * extractedData )
 {
+	LOG_IN();
+
 	DataHandler data;
 	data.Attach( extractedData );
 
+	log << "DataCollection: " << sizeof(DataCollection) << endl;
+	log << "ClassData: " << sizeof(ClassData) << endl;
+	log << "FileData: " << sizeof(FileData) << endl;
+	log << "FrameData: " << sizeof(FrameData) << endl;
+
+	log << "Architecture:  size_t: " << sizeof(size_t) << "  pointer: " << sizeof(int *) << endl;
+
 	log << "Address:" << reinterpret_cast<size_t>( extractedData ) << endl;
-	log << "Size of MCClassData:" << sizeof( ClassData ) << endl;
-	log << "Size of MCClassData *:" << sizeof( ClassData* ) << endl;
-	log << "Size of Int64:" << sizeof( Int64 ) << " long:" << sizeof( long ) << endl;
 	log << "Received " << data.getNumClasses( ) << " Classes" << endl;
 	log << "Received " << data.getNumFeatures( ) << " Features" << endl;
 
 	UInt64 genreCombinationIndex = 0;
-	UInt64 genreCombinationCount = (UInt64) gsl_sf_choose( extractedData->nClasses, 2 );
+	log << "========================" << endl;
+	double genreCombinationCount = gsl_sf_choose( data.getNumClasses(), 2 );
 	log << "Algorithm Rounds: " << genreCombinationCount << endl;
 	log << "========================" << endl << endl;
 
@@ -575,6 +622,8 @@ void * Barbedo::Train( DataCollection * extractedData )
 		if ( refVecsIndex == NULL )
 		{
 			log << "Combination structure out of memory" << endl;
+
+			LOG_OUT();
 			return NULL;
 		}
 
@@ -649,6 +698,7 @@ void * Barbedo::Train( DataCollection * extractedData )
 			break;
 	}
 
+	LOG_OUT();
 	return tdata;
 }
 
@@ -656,6 +706,8 @@ void * Barbedo::Train( DataCollection * extractedData )
 
 int Barbedo::Classify( FrameData * pCurrent,  FrameData ** a, FrameData ** b, unsigned int nFeat )
 {
+	LOG_IN();
+
     float dist_loop_min = INFINITY;
 	float tmp_dist;
     unsigned int loop_min;
@@ -685,14 +737,19 @@ int Barbedo::Classify( FrameData * pCurrent,  FrameData ** a, FrameData ** b, un
     }
 
     if ( loop_min < 3 )
+	{
+		LOG_OUT();
         return 0;
-    else
-        return 1;
+	}
+
+    LOG_OUT();
+	return 1;
 }
+
 
 #if defined( MUSIC_TEST )
 
-int main( )
+int main()
 {
 	int featCount, nFeat = 2;
 	int classCount, nClasses = 2;
@@ -735,7 +792,7 @@ int main( )
 				newFrame->pData = new float[ nFeat ];
 
 				for ( int idx = 0; idx < nFeat; idx++ )
-					newFrame->pData[ idx ] = random( );
+					newFrame->pData[ idx ] = 1;
 
 				newFrame->pNextFrame = newfile->pFirstFrame;
 
@@ -748,9 +805,9 @@ int main( )
 		}
 	}
 
-	DataCollection * col = Barbedo_Filter( dtCol );
-
-	Barbedo_Train( col );
+	Barbedo b;
+	DataCollection * col = b.Filter( dtCol );
+	b.Train( col );
 
 	return 0;
 }
