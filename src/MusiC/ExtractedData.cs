@@ -109,6 +109,11 @@ namespace MusiC.Data.Unmanaged
 		DataHandler()
 		{
 			reporter = new ExtractedDataReporter();
+
+            reporter.AddMessage("DataCollection: " + sizeof(DataCollection) + " bytes");
+            reporter.AddMessage("ClassData: " + sizeof(ClassData) + " bytes");
+            reporter.AddMessage("FileData: " + sizeof(FileData) + " bytes");
+            reporter.AddMessage("FrameData: " + sizeof(FrameData) + " bytes");
 		}
 		
 		//::::::::::::::::::::::::::::::::::::::://
