@@ -20,7 +20,7 @@
 
 namespace MusiC
 {
-	internal class Reporter : MusiCObject
+	public class Reporter : MusiCObject
 	{
 		public void AddMessage(string str)
 		{
