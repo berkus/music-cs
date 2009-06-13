@@ -492,7 +492,7 @@ SHOW_FILES             = NO
 # Namespaces page.  This will remove the Namespaces entry from the Quick Index 
 # and from the Folder Tree View (if specified). The default is YES.
 
-SHOW_NAMESPACES        = NO
+SHOW_NAMESPACES        = YES
 
 # The FILE_VERSION_FILTER tag can be used to specify a program or script that 
 # doxygen should invoke to get the current version for each file (typically from 
@@ -581,7 +581,7 @@ INPUT                  = ../src
 # into libc) for the transcoding. See http://www.gnu.org/software/libiconv for 
 # the list of possible encodings.
 
-INPUT_ENCODING         = ISO-8859-15
+INPUT_ENCODING         = UTF-8
 
 # If the value of the INPUT tag contains directories, you can use the 
 # FILE_PATTERNS tag to specify one or more wildcard pattern (like *.cpp 
