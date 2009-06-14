@@ -152,5 +152,16 @@ namespace MusiC
 
 			return paramValue;
 		}
+
+        //::::::::::::::::::::::::::::::::::::::://
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <returns></returns>
+        public IEnumerable<Instantiable> GetParamList()
+        {
+            return _paramList;
+        }
 	}
 }
