@@ -28,7 +28,7 @@ using MusiC;
 using MusiC.Extensions;
 using MusiC.Exceptions;
 
-namespace MusiC.Configs
+namespace MusiC.Extensions.Configs
 {
 	/// <summary>
 	/// A XML parser that knows how to configure the library.
@@ -59,12 +59,35 @@ namespace MusiC.Configs
 		{
 			XmlDocument cfgFile = new XmlDocument();
 			cfgFile.Load(cfgPath);
-			
-			BuildTagCache(cfgFile);
-			
-			ParseData(cfgFile);
-			
-			BuildAlgorithmList(cfgFile);
+
+            XmlNodeList rootCandidates = cfgFile.GetElementsByTagName("MusiC");
+
+            if (rootCandidates.Count != 1)
+            {
+                Error("It is allowed and required to have just 1 MusiC node.");
+                return;
+            }
+
+            XmlNode root = rootCandidates[0];
+
+            foreach (XmlNode node in root.ChildNodes)
+            {
+                switch (node.Name)
+                {
+                    case "MusiC-Alias":
+                        _tagCache.Add(XmlSafeAttribute(node, "name"), XmlSafeAttribute(node, "class"));
+                        break;
+                    case "MusiC-Train":
+                        HandleNode_Train(node);
+                        break;
+                    case "MusiC-Classify":
+                        HandleNode_Classify(node);
+                        break;
+                    case "MusiC-Algorithm":
+                        HandleNode_Algorithm(node);
+                        break;
+                }
+            }
 		}
 
 		//::::::::::::::::::::::::::::::::::::::://
@@ -133,131 +156,113 @@ namespace MusiC.Configs
 		//::::::::::::::::::::::::::::::::::::::://
 
 		#region Parsing Methods
-		
-		/// <summary>
-		/// 
-		/// </summary>
-		/// <param name="cfgFile">
-		/// A <see cref="XmlDocument"/>
-		/// </param>
-		void BuildTagCache(XmlDocument cfgFile)
-		{
-			foreach(XmlNode n in cfgFile.GetElementsByTagName("MusiC-Alias"))
-			{				
-				_tagCache.Add(XmlSafeAttribute(n, "name"), XmlSafeAttribute(n, "class"));
-			}
-		}
-
-		//::::::::::::::::::::::::::::::::::::::://
 
 		/// <summary>
 		/// 
 		/// </summary>
-		/// <param name="cfgFile">
-		/// A <see cref="XmlDocument"/>
+		/// <param name="train">
+		/// A <see cref="XmlNode"/>
 		/// </param>
-		private void ParseData(XmlDocument cfgFile)
+		private void HandleNode_Train(XmlNode node_train)
 		{
-			foreach(XmlNode train in cfgFile.GetElementsByTagName("MusiC-Train"))
+			String baseDir = XmlSafeAttribute(node_train, "dir", true);
+			
+			XmlNodeList nList = node_train.ChildNodes;
+			foreach(XmlNode xmlLabelNode in nList)
 			{
-				String baseDir = XmlSafeAttribute(train, "dir", true);
-				
-				XmlNodeList nList = train.ChildNodes;
-				foreach(XmlNode xmlLabelNode in nList)
+				if(xmlLabelNode.Name == "Label")
 				{
-					if(xmlLabelNode.Name == "Label")
+					ILabel l = New.Label();
+					l.Name = XmlSafeAttribute(xmlLabelNode,"name");
+					
+					/// @todo Add support to multiple input dirs
+					string iDir = XmlSafeAttribute(xmlLabelNode,"input", true);
+					if( iDir == null )
 					{
-						ILabel l = New.Label();
-						l.Name = XmlSafeAttribute(xmlLabelNode,"name");
-						
-						/// @todo Add support to multiple input dirs
-						string iDir = XmlSafeAttribute(xmlLabelNode,"input", true);
-						if( iDir == null )
-						{
-							/// @todo Check return
-							iDir = System.IO.Path.Combine(baseDir, l.Name);
-							l.AddInputDir(iDir);
-						}
-						
-						l.OutputDir = XmlSafeAttribute(xmlLabelNode,"output", true);
-						
-						if(l.OutputDir == null)
-							l.OutputDir=iDir;
-						
-						AddTrainLabel(l);
+						/// @todo Check return
+						iDir = System.IO.Path.Combine(baseDir, l.Name);
+						l.AddInputDir(iDir);
 					}
+					
+					l.OutputDir = XmlSafeAttribute(xmlLabelNode,"output", true);
+					
+					if(l.OutputDir == null)
+						l.OutputDir=iDir;
+					
+					AddTrainLabel(l);
 				}
 			}
-			
-			// Adding Train/Classify support
-			foreach(XmlNode classifyNode in cfgFile.GetElementsByTagName("MusiC-Classify"))
-			{
-				/// @todo Add support to allow/deny algorithms to use this folder
-				string dir = XmlSafeAttribute(classifyNode,"dir");
-				
-				if( !AddClassificationDir( dir ) )
-					Warning("A non-existent directory ("+ dir +
-					        ") wasn't added to the processing queue.");
-			}
 		}
+        
+        //::::::::::::::::::::::::::::::::::::::://
+        
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="classify"></param>
+        private
+        void HandleNode_Classify(XmlNode node_classify)
+        {
+            /// @todo Add support to allow/deny algorithms to use this folder
+            string dir = XmlSafeAttribute(node_classify, "dir");
+
+            if (!AddClassificationDir(dir))
+                Warning("A non-existent directory (" + dir +
+                        ") wasn't added to the processing queue.");
+        }
 
 		//::::::::::::::::::::::::::::::::::::::://
 		
 		/// <summary>
 		/// 
 		/// </summary>
-		/// <param name="cfgFile">
-		/// A <see cref="XmlDocument"/>
-		/// </param>
-		public void BuildAlgorithmList(XmlDocument cfgFile)
+		/// <param name="node_algorithm"></param>
+		public void HandleNode_Algorithm(XmlNode node_algorithm)
 		{
-			foreach (XmlNode n in cfgFile.GetElementsByTagName("MusiC-Algorithm"))
-			{
-				IAlgorithm algorithm = New.Algorithm();
-				String className;
+			IAlgorithm algorithm = New.Algorithm();
+			String className;
 
-				foreach (XmlNode child in n.ChildNodes)
+			foreach (XmlNode child in node_algorithm.ChildNodes)
+			{
+				if( child.Name == "MusiC-Extension" )
 				{
-					if( child.Name == "MusiC-Extension" )
+					className = XmlSafeAttribute(child, "class");
+				}
+				else
+				{
+					if(!_tagCache.TryGetValue(child.Name, out className))
 					{
-						className = XmlSafeAttribute(child, "class");
-					}
-					else
-					{
-						if(!_tagCache.TryGetValue(child.Name, out className))
-						{
-							Warning("Cant find tag "+child.Name);
-							break;
-						}
-					}
-					
-					IParamList paramList = New.ParamList();
-					
-					foreach(XmlNode param in child.ChildNodes)
-					{
-						if(param.Name != "Param")
-							continue;
-						
-						paramList.AddParam(
-						                   XmlSafeAttribute(param, "name"),
-						                   XmlSafeAttribute(param, "class"),
-						                   XmlSafeAttribute(param, "value", true));
-					}
-					
-					try
-					{
-						if( !algorithm.Add( className, paramList ) )
-							break;
-					} catch (MissingExtensionException e)
-					{
-						Error("Error while loading an algorithm .... Skipping");
-						Error(e);
+						Warning("Cant find tag "+child.Name);
 						break;
 					}
 				}
 				
-				AddAlgorithm(algorithm);
+				IParamList paramList = New.ParamList();
+				
+				foreach(XmlNode param in child.ChildNodes)
+				{
+					if(param.Name != "Param")
+						continue;
+					
+					paramList.AddParam(
+					                   XmlSafeAttribute(param, "name"),
+					                   XmlSafeAttribute(param, "class"),
+					                   XmlSafeAttribute(param, "value", true));
+				}
+				
+				try
+				{
+					if( !algorithm.Add( className, paramList ) )
+						break;
+				} catch (MissingExtensionException e)
+				{
+					Error("Error while loading an algorithm .... Skipping");
+					Error(e);
+					break;
+				}
 			}
+			
+			AddAlgorithm(algorithm);
 		}
 		
 		#endregion
