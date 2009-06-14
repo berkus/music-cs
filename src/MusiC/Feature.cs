@@ -123,22 +123,6 @@ namespace MusiC
 			}
 			
 			//::::::::::::::::::::::::::::::::::::::://
-				
-			/// <summary>
-			/// 
-			/// </summary>
-			/// <returns>
-			/// A <see cref="System.String"/>
-			/// </returns>
-			/// <remarks>Any aditional parameter the feature takes should be added here. This string is used
-			/// to know if the stored feature is the same as the one we want to extract.</remarks>
-			virtual
-			public string GetID()
-			{
-				return this.GetType().FullName;
-			}
-			
-			//::::::::::::::::::::::::::::::::::::::://
 			
 			/// <summary>
 			/// 

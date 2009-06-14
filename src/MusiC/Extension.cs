@@ -28,6 +28,39 @@ namespace MusiC
 	abstract 
 	public class Extension : MusiCObject
 	{
+        string _id;
+        
+        //::::::::::::::::::::::::::::::::::::::://
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <returns>
+        /// A <see cref="System.String"/>
+        /// </returns>
+        /// <remarks>Any aditional parameter the feature takes should be added here. This string is used
+        /// to know if the stored feature is the same as the one we want to extract.</remarks>
+        virtual
+        public string GetID()
+        {
+            return _id;
+        }
+        
+        //::::::::::::::::::::::::::::::::::::::://
+        
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="pList"></param>
+        public void BuildID(ParamList pList)
+        {
+            _id = this.GetType().FullName;
+
+            foreach (Instantiable i in pList.GetParamList())
+            {
+                _id += ":" + i.StrValue;
+            }
+        }
 	}
 }
 

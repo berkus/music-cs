@@ -148,22 +148,6 @@ namespace MusiC
 		/// <summary>
 		/// 
 		/// </summary>
-		/// <returns>
-		/// A <see cref="System.String"/>
-		/// </returns>
-		/// <remarks>Any aditional parameter the window takes should be added here. This string is used
-		/// to know if the stored window-feature combination is the same as the one we want to extract.</remarks>
-		virtual
-		public string GetID()
-		{
-			return this.GetType().FullName + ":" + _size + ":" + _overlap;
-		}
-		
-		//::::::::::::::::::::::::::::::::::::::://
-		
-		/// <summary>
-		/// 
-		/// </summary>
 		/// <param name="windowPos">
 		/// A <see cref="System.Int32"/>
 		/// </param>

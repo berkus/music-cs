@@ -44,6 +44,8 @@ namespace MusiC
 	internal class Algorithm : MusiCObject, IAlgorithm
 	{
 		private Pipeline _pipe = new Pipeline();
+
+        //::::::::::::::::::::::::::::::::::::::://
 		
 		/// <summary>
 		/// Add an extension to the algorithm.
@@ -81,6 +83,8 @@ namespace MusiC
 				return false;
 			
 			Extension ext = info.Instantiate(pList);
+            ext.BuildID(pList);
+
 			return _pipe.Add(ext, info);
 		}
 		
