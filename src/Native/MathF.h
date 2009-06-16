@@ -42,14 +42,14 @@ namespace MusiC
 				MusiC::Native::MemoryManager mgr;
 
 				float * _sintbl;
-				float * cplx;
-				int maxfftsize;
+				float * _cplx;
+				int _maxfftsize;
 
 				int checkm (int m);
 
 			public:
 
-                Math() : _sintbl(NULL), cplx(NULL), maxfftsize(0)
+                Math() : _sintbl(NULL), _cplx(NULL), _maxfftsize(0)
                 {}
 
 				int fft (float *x, float *y, const int m);

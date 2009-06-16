@@ -64,7 +64,7 @@ int MusiC::Native::Math::fft (float *x, float *y, const int m)
 	* SIN table generation *
 	***********************/
 
-	if ( (_sintbl == 0) || (maxfftsize < m) )
+	if ( (_sintbl == 0) || (_maxfftsize < m) )
 	{
 		tblsize = m - m / 4 + 1;
 		arg = PI / m * 2;
@@ -75,10 +75,10 @@ int MusiC::Native::Math::fft (float *x, float *y, const int m)
 		for (j = 1; j < tblsize; j++)
 			*sinp++ = sin (arg * (float) j);
 		_sintbl[m/2] = 0;
-		maxfftsize = m;
+		_maxfftsize = m;
 	}
 
-	lf = maxfftsize / m;
+	lf = _maxfftsize / m;
 	lmx = m;
 
 	for (;;)
@@ -87,7 +87,7 @@ int MusiC::Native::Math::fft (float *x, float *y, const int m)
 		lmx /= 2;
 		if (lmx <= 1) break;
 		sinp = _sintbl;
-		cosp = _sintbl + maxfftsize / 4;
+		cosp = _sintbl + _maxfftsize / 4;
 		for (j = 0; j < lmx; j++)
 		{
 			xp = &x[j];
@@ -156,16 +156,16 @@ int MusiC::Native::Math::fft (float *x, float *y, const int m)
 
 int MusiC::Native::Math::fftr (float* x, int m)
 {
-	if (m > maxfftsize || cplx == NULL)
+	if (m > _maxfftsize || _cplx == NULL)
 	{
-		if (cplx != NULL)
-			mgr.Dealloc (cplx);
+		if (_cplx != NULL)
+			mgr.Dealloc (_cplx);
 
-		cplx = mgr.Allocator<float> (m);
+		_cplx = mgr.Allocator<float> (m);
 	}
 
-	memset (cplx, '\0', m * sizeof(int));
-	int ret = fft (x, cplx, m);
+	memset (_cplx, '\0', m * sizeof(int));
+	int ret = fft (x, _cplx, m);
 
 	return ret;
 }
@@ -175,7 +175,7 @@ int MusiC::Native::Math::fftr_mag (float * x, int m)
 	int r = fftr (x, m);
 
 	for (int i = 0; i < m; i++)
-		x[i] = sqrt ( x[i] * x[i] + cplx[i] * cplx[i] );
+		x[i] = sqrt ( x[i] * x[i] + _cplx[i] * _cplx[i] );
 
 	return r;
 }
@@ -183,7 +183,7 @@ int MusiC::Native::Math::fftr_mag (float * x, int m)
 MusiC::Native::Math::~Math()
 {
 	mgr.Dealloc (_sintbl);
-	mgr.Dealloc (cplx);
+	mgr.Dealloc (_cplx);
 }
 
 // END OF FILE
