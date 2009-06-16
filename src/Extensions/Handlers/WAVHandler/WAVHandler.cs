@@ -139,7 +139,9 @@ namespace MusiC.Extensions.Handlers
 			short i = 0;
 			long count = 0;
 			short c;
-			
+
+            float norm_factor = (float) Math.Pow(2, (8*_bytesInUse) - 1);
+            //float norm_factor = 1;
 			unsafe
 			{
 				float* pData = _data;
@@ -174,7 +176,7 @@ namespace MusiC.Extensions.Handlers
 							// long / int = int .... need to cast to float.
 							*pData += (float) temp / _channels;
 						}
-						
+						*pData /= norm_factor;
 						pData++;
 					}
 				}
