@@ -35,7 +35,7 @@ namespace MusiC.Extensions.Features
 			// squared-sum
 			float wss = 0.0f, ss = 0.0f, aux = 0.0f;
 			
-			for( int idx = 0; idx < wndSize; idx++ )
+			for( int idx = 0; idx < wndSize / 2; idx++ )
 			{
 				aux = _x[ idx ] * _x[ idx ];
 				ss += aux;
@@ -44,7 +44,7 @@ namespace MusiC.Extensions.Features
 
 			float centr = wss / ss, bw = 0.0f;
 
-			for( int idx = 0; idx < wndSize; idx++ )
+			for( int idx = 0; idx < wndSize / 2; idx++ )
 			{
 				aux = (centr - idx) *_x[ idx ];
 				bw += aux * aux;

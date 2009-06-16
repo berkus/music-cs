@@ -84,12 +84,12 @@ namespace MusiC.Extensions.Features
 			_temp = GetBuffer(wndSize);
 			NativeMethods.Math.FFTMagnitude(wndData, _temp, wndSize);
 			
-			for (int i = 0; i < wndSize; i++)
+			for (int i = 0; i < wndSize / 2; i++)
 				sum += *(_temp) * *(_temp++);
 			
 			cum = sum;
 			
-			for (sro = wndSize - 1; sro > 0; sro--)
+			for (sro = (wndSize / 2) - 1; sro > 0; sro--)
 			{
 				cum -= *(_temp) * *(_temp--);
 				

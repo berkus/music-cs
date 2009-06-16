@@ -31,6 +31,7 @@ namespace MusiC.Extensions.Features
 		~SpectralFlux()
 		{
 			NativeMethods.Pointer.free( lastframe );
+            NativeMethods.Pointer.free( aux );
 		}
 		
 		override unsafe
@@ -52,7 +53,7 @@ namespace MusiC.Extensions.Features
 			float ret = 0.0f, dif = 0.0f;
 			NativeMethods.Math.FFTMagnitude( wndData, aux, wndSize );
 			
-			for( int idx = 0; idx < wndSize; idx++ )
+			for( int idx = 0; idx < wndSize / 2; idx++ )
 			{
 				dif = (float) ( Math.Log10( (double) aux[ idx ] ) - Math.Log10( ( double ) lastframe[ idx ] ) );
 				ret += dif * dif;

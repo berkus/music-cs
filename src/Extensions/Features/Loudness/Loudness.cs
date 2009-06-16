@@ -50,25 +50,25 @@ namespace MusiC.Extensions.Features
 					NativeMethods.Pointer.free( _w );
 					NativeMethods.Pointer.free( _x );
 					
-					_w = NativeMethods.Pointer.fgetmem( wndSize );
+					_w = NativeMethods.Pointer.fgetmem( wndSize / 2 );
 					_x = NativeMethods.Pointer.fgetmem( wndSize );
 				}
 				
-				for( int idx = 0; idx < wndSize; idx++ )
+				for( int idx = 0; idx < wndSize / 2; idx++ )
 				{
-					float f = idx * d;
-					_w[ idx ] = (float) (-0.6 * 3.64 * Math.Pow(f, -0.8) - 6.5 * Math.Pow(Math.E, (f-3.3) * (f-3.3) ) + 0.001 * Math.Pow(f, 3.6));
+					float f = (idx + 1) * d;
+					_w[ idx ] = (float) (-0.6 * 3.64 * Math.Pow(f, -0.8) - 6.5 * Math.Pow(Math.E, -0.6 * (f-3.3) * (f-3.3) ) + 0.001 * Math.Pow(f, 3.6));
 				}
 			}
 			
 			float ld = 0.0f;
 			
 			NativeMethods.Math.FFTMagnitude( wndData, _x, wndSize );
-			for( int idx = 0; idx < wndSize; idx++ )
+			for( int idx = 0; idx < wndSize / 2; idx++ )
 			{
 				ld += (float) ( _x[ idx ] * _x[ idx ] * Math.Pow(10, _w[ idx ] / 20 ) );
 			}
-			
+
 			return ld;
 		}
 
