@@ -110,5 +110,24 @@ namespace MusiC
 			
 			return returnValue;
 		}
+
+        //::::::::::::::::::::::::::::::::::::::://
+
+        public Label GetLabel(int n)
+        {
+            int count = -1;
+
+            foreach (Label l in _trainList)
+            {
+                count++;
+
+                if (count == n)
+                    return l;
+                else
+                    continue;
+            }
+
+            return null;
+        }
 	}
 }
