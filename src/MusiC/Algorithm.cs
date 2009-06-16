@@ -523,33 +523,40 @@ namespace MusiC
 		/// A <see cref="Config"/>
 		/// </param>
 		/// @todo Create a handler cache and pass it here.
-		unsafe
-		public void Execute(Config conf)
-		{
-			IEnumerable<Label> tLabel = conf.LabelList;
-			
-			Message("Extracting . . .");
-			Data.Unmanaged.DataCollection * dtCol = Extract(tLabel);
-			
-            // Report what we have after extractor
-			Summarize(dtCol);
+        unsafe
+        public void Execute(Config conf)
+        {
+            IEnumerable<Label> tLabel = conf.LabelList;
 
             if (_classifier != null)
             {
-                Message("Beginning Training");
+                if (_classifier.NeedTraining(tLabel))
+                {
+                    Message("Beginning Training");
 
-                Message("Filtering . . .");
-                Data.Unmanaged.DataCollection* filteredData = _classifier.ExtractionFilter(dtCol);
+                    Message("Extracting . . .");
+                    Data.Unmanaged.DataCollection* dtCol = Extract(tLabel);
 
-                // Training data returned by the classifier
-                void * tData;
+                    // Report what we have after extractor
+                    Summarize(dtCol);
 
-                Message("Training . . .");
+                    Message("Filtering . . .");
+                    Data.Unmanaged.DataCollection* filteredData = _classifier.ExtractionFilter(dtCol);
 
-                if (filteredData == null)
-                    tData = _classifier.Train(dtCol);
-                else
-                    tData = _classifier.Train(filteredData);
+                    Message("Training . . .");
+
+                    if (filteredData == null)
+                        _classifier.Train(dtCol);
+                    else
+                        _classifier.Train(filteredData);
+
+                    Message("Freeing Extracted Data");
+                    Data.Unmanaged.DataHandler.DestroyCollection(dtCol);
+
+                    Message("Freeing Filtered Data");
+                    //if (filteredData != null)
+                    //    Data.Unmanaged.DataHandler.DestroyCollection(filteredData);
+                }
 
                 Message("Begining Classification . . .");
 
@@ -557,37 +564,33 @@ namespace MusiC
                 {
                     Message("Classifying: " + file);
 
-                    Data.Unmanaged.FileData * f = Extract(file);
-                    Data.Unmanaged.FileData * filteredFile = _classifier.ClassificationFilter(f, dtCol->nFeatures);
+                    Data.Unmanaged.FileData* f = Extract(file);
+                    Data.Unmanaged.FileData* filteredFile = _classifier.ClassificationFilter(f, (uint) this._featureList.Count);
 
-                    int result;
+                    if (filteredFile == null)
+                        filteredFile = f;
+                        
+                    int result = _classifier.Classify(filteredFile);
 
-                    if( filteredFile == null )
-                        result = _classifier.Classify(f, tData);
-                    else
-                        result = _classifier.Classify(filteredFile, tData);
+                    // Destroy classified file
+                    //Data.Unmanaged.DataHandler.
 
-                    Message("RESULT: " + result );
+                    Message("RESULT: " + conf.GetLabel(result).Name);
                 }
-
-                Message("Freeing Extracted Data");
-                Data.Unmanaged.DataHandler.DestroyCollection(dtCol);
-
-                Message("Freeing Filtered Data");
-                if (filteredData != null)
-                    Data.Unmanaged.DataHandler.DestroyCollection(filteredData);
             }
             else
             {
+                Message("Extracting . . .");
+                Data.Unmanaged.DataCollection* dtCol = Extract(tLabel);
                 Message("Freeing Extracted Data");
                 Data.Unmanaged.DataHandler.DestroyCollection(dtCol);
             }
 
-			Message( "All Tasks Done" );
-		}
-		
-		//::::::::::::::::::::::::::::::::::::::://
-		
+            Message("All Tasks Done");
+        }
+
+        //::::::::::::::::::::::::::::::::::::::://
+
 		/// <summary>
 		/// 
 		/// </summary>
