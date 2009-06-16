@@ -45,7 +45,6 @@ namespace MusiC
 		private String _extensionsDir = ".";
 		
 		private ExtensionCache _cache = new ExtensionCache();
-		private Configurator _cfg;
 		#endregion
 
 		//::::::::::::::::::::::::::::::::::::::://
@@ -55,7 +54,6 @@ namespace MusiC
 		/// The directory where we are looking for extensions.
 		/// 
 		/// If the assigned path doesn't exists it keeps unchanged.
-		/// In case it is not null the path of the executable that called the library is assigned.
 		/// </summary>
 		public String ExtensionsDir
 		{
@@ -63,14 +61,12 @@ namespace MusiC
 
 			set
 			{
-				if(!Directory.Exists(value))
+				if(Directory.Exists(value))
 				{
-					if(_extensionsDir == null)
-						_extensionsDir=Path.GetDirectoryName(Assembly.GetEntryAssembly().Location);
-					
-					return;
+                    _extensionsDir = value;
+                    //_extensionsDir = Path.GetDirectoryName(Assembly.GetEntryAssembly().Location);
 				}
-				_extensionsDir=value;
+				
 			}
 		}
 
@@ -80,21 +76,17 @@ namespace MusiC
 		/// Library config file.
 		/// 
 		/// If the assigned path doesn't exists it keeps unchanged.
-		/// In case it is not null ExtensionsDir\config.xml is assigned.
 		/// </summary>
 		public String ConfigFile
 		{
 			get {return _configFile;}
-			set {
-				if(!File.Exists(value))
+			set 
+            {
+				if(File.Exists(value))
 				{
-					if(_configFile == null)
-						_configFile = Path.Combine(ExtensionsDir, "config.xml");
-					
-					return;
-				}
-				
-				_configFile=value;
+                    _configFile = value;
+					//_configFile = Path.Combine(ExtensionsDir, "config.xml");
+				}	
 			}
 		}
 		#endregion
@@ -118,35 +110,6 @@ namespace MusiC
 				_cache.Say();
 				
 				EndReportSection(true);
-			}
-			catch(MCException mce)
-			{
-				mce.Report();
-			}
-			catch(Exception e)
-			{
-				Error(e);
-			}
-		}
-		
-		//::::::::::::::::::::::::::::::::::::::://
-		
-		/// <summary>
-		/// 
-		/// </summary>
-		public void Run()
-		{
-			try
-			{
-				_cfg = _cache.GetConfigurator(ConfigFile);
-				Config conf = _cfg.LoadConfig(ConfigFile);
-				
-				Message(_configFile + " ... [LOADED]");
-				
-				foreach(Algorithm a in conf.AlgorithmList)
-				{
-					a.Execute(conf);
-				}
 			}
 			catch(MCException mce)
 			{
@@ -211,6 +174,34 @@ namespace MusiC
 		//::::::::::::::::::::::::::::::::::::::://
 		
 		#region Algorithm Execution
+
+        /// <summary>
+        /// 
+        /// </summary>
+        public void Run()
+        {
+            try
+            {
+                Configurator cfg = _cache.GetConfigurator(ConfigFile);
+                Config conf = cfg.LoadConfig(ConfigFile);
+
+                Message(_configFile + " ... [LOADED]");
+
+                foreach (Algorithm a in conf.AlgorithmList)
+                {
+                    a.Execute(conf);
+                }
+            }
+            catch (MCException mce)
+            {
+                mce.Report();
+            }
+            catch (Exception e)
+            {
+                Error(e);
+            }
+        }
+		
 		#endregion
 	}
 }
@@ -218,7 +209,7 @@ namespace MusiC
 /// @mainpage
 /// System Basic Information:
 ///
-/// @author Marcos Josï¿½ Sant'Anna Magalhï¿½es
+/// @author Marcos José Sant'Anna Magalhães
 /// @version 0.9.1
 /// @date 21.01.09
 ///
