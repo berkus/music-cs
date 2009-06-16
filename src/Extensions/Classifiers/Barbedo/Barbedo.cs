@@ -29,8 +29,9 @@ namespace MusiC.Extensions.Classifiers
 	/// <summary>
 	/// 
 	/// </summary>
-	public class Barbedo : Unmanaged.Classifier
+	public unsafe class Barbedo : Unmanaged.Classifier
 	{
+        void * data;
 		/// <summary>
 		/// 
 		/// </summary>
@@ -40,7 +41,8 @@ namespace MusiC.Extensions.Classifiers
 		override unsafe 
 		public void * Train( DataCollection* dtCol )
 		{
-			return uTrain( ref ( *dtCol ) );
+            data = uTrain( ref ( *dtCol ) );
+            return data;
 		}
 		
 		//::::::::::::::::::::::::::::::::::::::://
@@ -89,9 +91,10 @@ namespace MusiC.Extensions.Classifiers
 		/// A <see cref="System.Int32"/>
 		/// </returns>
 		override unsafe 
-		public int Classify( FileData * f, void * dataIn )
+		//public int Classify( FileData * f, void * dataIn )
+        public int Classify(FileData* f)
 		{
-			return uClassify( ref *f, dataIn );
+			return uClassify( ref *f, data );
 		}
 		
 		//::::::::::::::::::::::::::::::::::::::://
