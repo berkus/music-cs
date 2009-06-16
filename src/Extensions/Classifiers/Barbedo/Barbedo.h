@@ -57,11 +57,12 @@ namespace MusiC
 
         private:
 
-            RefVecIndex * createCombination (ClassData * classA, ClassData * classB);
+            VectorCombinationData * createCombination (ClassData * classA, ClassData * classB);
             ClassData * filterCandidates (ClassData * cl);
-            int combine (RefVecIndex * ref);
+            int combine (VectorCombinationData * ref);
             float dist (float * src, float * ref, int size);
             float * seq_access (ClassData * cl, Int64 idx);
+			unsigned int Evaluate( FrameData * pCurrent,  FrameData ** a, FrameData ** b, unsigned int nFeat );
 
             //::::::::::::::::::::::::::::::::::::::://
 
@@ -84,7 +85,7 @@ namespace MusiC
             DataCollection * Filter (DataCollection * extractedData);
             FileData * Filter ( FileData * file, unsigned int nFeat );
             void * Train (DataCollection * extractedData);
-            int Classify(FrameData * pCurrent, FrameData ** a, FrameData ** b, unsigned int nFeat);
+            int Classify (FrameData * pCurrent, FrameData ** a, FrameData ** b, unsigned int nFeat);
         };
     }
 }

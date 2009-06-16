@@ -47,7 +47,7 @@ const int MusiC::Native::Barbedo::FRAME_COUNT =
 /// <param name="szB">
 /// A <see cref="std::int"/>
 /// </param>
-RefVecIndex * Barbedo::createCombination( ClassData * classA, ClassData * classB )
+VectorCombinationData * Barbedo::createCombination( ClassData * classA, ClassData * classB )
 {
 	LOG_IN();
 
@@ -59,7 +59,7 @@ RefVecIndex * Barbedo::createCombination( ClassData * classA, ClassData * classB
         return NULL;
     }
 
-	RefVecIndex * r = new RefVecIndex(classA, classB);
+	VectorCombinationData * r = new VectorCombinationData(classA, classB);
 
 	LOG_OUT();
 	return r;
@@ -131,8 +131,8 @@ ClassData * Barbedo::filterCandidates( ClassData * cl )
 		if ( var[ idx ] < 0.0001f * mean[ idx ] )
 			var[ idx ] = 0.0001f * mean[ idx ];
 
-		high_bound[ idx ] = mean[ idx ] + 1.5f * sqrt( var[ idx ] );
-		low_bound[ idx ] = mean[ idx ] - 1.5f * sqrt( var[ idx ] );
+		high_bound[ idx ] = mean[ idx ] + 1.0f * sqrt( var[ idx ] );
+		low_bound[ idx ] = mean[ idx ] - 1.0f * sqrt( var[ idx ] );
 
 		log << "feature: " << idx <<
 		" mean: " << mean[ idx ] <<
@@ -240,7 +240,7 @@ ClassData * Barbedo::filterCandidates( ClassData * cl )
 /// <param name="ref">
 /// A <see cref="::RefVecIndex"/>
 /// </param>
-int Barbedo::combine( RefVecIndex * ref )
+int Barbedo::combine( VectorCombinationData * ref )
 {
 	LOG_IN();
 
@@ -617,7 +617,7 @@ void * Barbedo::Train( DataCollection * extractedData )
 		score_max = winner = 0;
 
 		// Create combination control structure
-		RefVecIndex * refVecsIndex = createCombination( fClassA, fClassB );
+		VectorCombinationData * refVecsIndex = createCombination( fClassA, fClassB );
 
 		if ( refVecsIndex == NULL )
 		{
@@ -638,7 +638,7 @@ void * Barbedo::Train( DataCollection * extractedData )
 
 			for( UInt64 idx = 0; idx < fClassA->nFrames; idx++ )
 			{
-				if( Classify(refVec, refVecsIndex->a->frames, refVecsIndex->b->frames, tdata->nFeat) == 0 )
+				if( Evaluate(refVec, refVecsIndex->a->frames, refVecsIndex->b->frames, tdata->nFeat) == 0 )
 					score_a++;
 
                 // Get Next Frame
@@ -650,7 +650,7 @@ void * Barbedo::Train( DataCollection * extractedData )
 
 			for( UInt64 idx = 0; idx < fClassB->nFrames; idx++ )
 			{
-				if( Classify(refVec, refVecsIndex->a->frames, refVecsIndex->b->frames, tdata->nFeat) == 1 )
+				if( Evaluate(refVec, refVecsIndex->a->frames, refVecsIndex->b->frames, tdata->nFeat) == 1 )
 					score_b++;
 
                 refVec = refVec->pNextFrame;
@@ -661,7 +661,7 @@ void * Barbedo::Train( DataCollection * extractedData )
 			{
 				score_max = score_a + score_b;
 				winner = potentialsCombinationIndex;
-				tdata->setPair(genreCombinationIndex, selectedGenres, refVecsIndex);
+				tdata->setPairWinner(genreCombinationIndex, selectedGenres, refVecsIndex);
 
 				/// @todo Grab vectors.s
 
@@ -706,13 +706,20 @@ void * Barbedo::Train( DataCollection * extractedData )
 
 int Barbedo::Classify( FrameData * pCurrent,  FrameData ** a, FrameData ** b, unsigned int nFeat )
 {
+	return Evaluate(pCurrent, a, b, nFeat);
+}
+
+//::::::::::::::::::::::::::::::::::::::://
+
+unsigned int Barbedo::Evaluate( FrameData * pCurrent,  FrameData ** a, FrameData ** b, unsigned int nFeat )
+{
 	LOG_IN();
 
     float dist_loop_min = INFINITY;
 	float tmp_dist;
     unsigned int loop_min;
 
-    for ( int vec = 0; vec < 3; vec++ )
+    for ( unsigned int vec = 0; vec < 3; vec++ )
     {
         float * pTarget = a[ vec ]->pData;
         tmp_dist = dist( pCurrent->pData, pTarget, nFeat );
@@ -724,7 +731,7 @@ int Barbedo::Classify( FrameData * pCurrent,  FrameData ** a, FrameData ** b, un
         }
     }
 
-    for ( int vec = 0; vec < 3; vec++ )
+    for ( unsigned int vec = 0; vec < 3; vec++ )
     {
         float * pTarget = b[ vec ]->pData;
         tmp_dist = dist( pCurrent->pData, pTarget, nFeat );
@@ -745,6 +752,7 @@ int Barbedo::Classify( FrameData * pCurrent,  FrameData ** a, FrameData ** b, un
     LOG_OUT();
 	return 1;
 }
+
 
 
 #if defined( MUSIC_TEST )

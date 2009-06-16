@@ -48,7 +48,7 @@
             {
                 unsigned int base = 3;
 
-                raw = gsl_combination_calloc( (size_t) a->nFrames, 3 );
+                raw = gsl_combination_calloc( (size_t) a->nFrames, base );
                 data = a;
                 frames = new FrameData * [base];
                 idx = new unsigned int[base];
@@ -75,7 +75,6 @@
                     idx[ i ] = i;
                 }
             }
-
 
             void update()
             {
@@ -136,31 +135,31 @@
             }
         };
 
-        ///
-        ///
-        ///
-        class RefVecIndex
+        
+        class VectorCombinationData
         {
         public:
 
             CombinationData * a;
             CombinationData * b;
 
-            RefVecIndex(ClassData * class_a, ClassData * class_b)
+            VectorCombinationData(ClassData * class_a, ClassData * class_b)
             {
                 a = new CombinationData(class_a);
                 b = new CombinationData(class_b);
             }
 
-            ~RefVecIndex()
+            ~VectorCombinationData()
             {
                 delete a;
                 delete b;
             }
         };
 
-        class GenrePairData
+        class GenreCombinationData
         {
+			FrameData * _frames_a;
+			FrameData * _frames_b;
 
         public:
 
@@ -170,18 +169,43 @@
             int genre_b;
             FrameData ** frames_b;
 
-            GenrePairData()
+            GenreCombinationData()
             {
-                frames_a = new FrameData * [3];
-                frames_b = new FrameData * [3];
+                _frames_a = new FrameData [3];
+                _frames_b = new FrameData [3];
+
+				frames_a = new FrameData * [3];
+				frames_b = new FrameData * [3];
+
+				for( unsigned int idx = 0; idx < 3; idx++)
+				{
+					frames_a[ idx ] = &_frames_a[ idx ];
+					_frames_a[ idx ].pData = NULL;
+
+					frames_b[ idx ] = &_frames_b[ idx ];
+					_frames_b[ idx ].pData = NULL;
+				}
             }
 
-            void setData( unsigned int a, unsigned int b, RefVecIndex * ref )
+            void setData( unsigned int a, unsigned int b, VectorCombinationData * ref , unsigned int size)
             {
                 genre_a = a;
                 genre_b = b;
-                memcpy( frames_a, ref->a->frames, 3 * sizeof(size_t) );
-                memcpy( frames_b, ref->b->frames, 3 * sizeof(size_t) );
+
+				for( unsigned int idx = 0; idx < 3; idx++)
+				{
+					if( !_frames_a[ idx ].pData ) _frames_a[ idx ].pData = new float [size];
+					if( !_frames_b[ idx ].pData ) _frames_b[ idx ].pData = new float [size];
+
+					for( unsigned szIdx = 0; szIdx < size; szIdx++)
+					{
+						_frames_a[ idx ].pData[ szIdx ] = ref->a->frames[ idx ]->pData[ szIdx ];
+						_frames_b[ idx ].pData[ szIdx ] = ref->b->frames[ idx ]->pData[ szIdx ];
+					}
+				}
+
+                //memcpy( frames_a, ref->a->frames, 3 * sizeof(size_t) );
+                //memcpy( frames_b, ref->b->frames, 3 * sizeof(size_t) );
             }
         };
 
@@ -189,7 +213,7 @@
         {
         public:
 
-            GenrePairData * data;
+            GenreCombinationData * data;
             unsigned int nFeat;
             unsigned int genreCombinationCount;
             unsigned int genreCount;
@@ -202,7 +226,7 @@
                 if( count < std::numeric_limits<int>::max() )
                 {
                     genreCombinationCount = (unsigned int) count;
-                    data = new GenrePairData[genreCombinationCount];
+                    data = new GenreCombinationData[genreCombinationCount];
                 }
                 else
                 {
@@ -211,12 +235,13 @@
                 }
             }
 
-            void setPair( UInt64 idx, gsl_combination * genres, RefVecIndex * ref )
+            void setPairWinner( UInt64 idx, gsl_combination * genres, VectorCombinationData * ref )
             {
                 data[ idx ].setData(
                     gsl_combination_get(genres, 0),
                     gsl_combination_get(genres, 1),
-                    ref);
+                    ref,
+					nFeat);
             }
         };
 
