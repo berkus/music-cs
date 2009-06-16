@@ -31,6 +31,7 @@ namespace MusiC
 	/// </summary>
 	public interface IClassifier
 	{
+        bool NeedTraining(IEnumerable<Label> lbl);
 	}
 	
 	//---------------------------------------//
@@ -40,6 +41,10 @@ namespace MusiC
 	/// </summary>
 	public class BaseClassifier : Extension, IClassifier
 	{
+        public bool NeedTraining(IEnumerable<Label> lbl)
+        {
+            return true;
+        }
 	}
 	
 	//---------------------------------------//
@@ -144,7 +149,7 @@ namespace MusiC
 			//::::::::::::::::::::::::::::::::::::::://
 
 			abstract unsafe
-			public int Classify( Data.Unmanaged.FileData * fd, void * data );
+			public int Classify( Data.Unmanaged.FileData * fd );
 		}
 	}
 }
