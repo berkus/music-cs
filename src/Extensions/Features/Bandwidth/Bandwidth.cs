@@ -26,27 +26,27 @@ namespace MusiC.Extensions.Features
 	public class Bandwidth : Unmanaged.Feature
 	{
 		override unsafe
-		public float Extract (float * wndData, int wndSize)
+		public float Extract( Unmanaged.Frame frame )
 		{
-			float * _x = GetBuffer( wndSize );
-			NativeMethods.Math.FFTMagnitude(wndData, _x, wndSize );
+            int wndSize = frame.Size;
+            float * spectrum = frame.RequestFFTMagnitude();
 
 			// weighted-squared-sum
 			// squared-sum
 			float wss = 0.0f, ss = 0.0f, aux = 0.0f;
 			
-			for( int idx = 0; idx < wndSize / 2; idx++ )
+			for( uint idx = 0; idx < wndSize / 2; idx++ )
 			{
-				aux = _x[ idx ] * _x[ idx ];
+                aux = spectrum[ idx ] * spectrum[ idx ];
 				ss += aux;
 				wss += idx * aux;
 			}
 
 			float centr = wss / ss, bw = 0.0f;
 
-			for( int idx = 0; idx < wndSize / 2; idx++ )
+			for( uint idx = 0; idx < wndSize / 2; idx++ )
 			{
-				aux = (centr - idx) *_x[ idx ];
+                aux = (centr - idx) * spectrum[idx];
 				bw += aux * aux;
 			}
 

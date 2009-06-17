@@ -59,10 +59,6 @@ namespace MusiC.Extensions.Features
 	unsafe
 	public class SpecRollOffU : Unmanaged.Feature
 	{	
-		private float * _temp;
-		
-		//::::::::::::::::::::::::::::::::::::::://
-		
 		/// <summary>
 		/// 
 		/// </summary>
@@ -76,25 +72,25 @@ namespace MusiC.Extensions.Features
 		/// A <see cref="Single"/>
 		/// </returns>
 		override unsafe
-		public Single Extract(Single * wndData, int wndSize)
+		public Single Extract( Unmanaged.Frame frame )
 		{
 			double sum = 0, cum = 0;
 			int sro = 0;
-			
-			_temp = GetBuffer(wndSize);
-			NativeMethods.Math.FFTMagnitude(wndData, _temp, wndSize);
+
+            int wndSize = frame.Size;
+            float * spectrum = frame.RequestFFTMagnitude();
 			
 			for (int i = 0; i < wndSize / 2; i++)
-				sum += *(_temp) * *(_temp++);
+				sum += spectrum[ i ] * spectrum[ i ];
 			
 			cum = sum;
 			
 			for (sro = (wndSize / 2) - 1; sro > 0; sro--)
 			{
-				cum -= *(_temp) * *(_temp--);
-				
-				if (cum < (0.95 * sum))
-					break;
+                if (cum < (0.95 * sum))
+                    break;
+
+				cum -= spectrum[ sro ] * spectrum[ sro ];
 			}
 			
 			return sro;

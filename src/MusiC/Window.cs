@@ -162,18 +162,85 @@ namespace MusiC
 	
 	namespace Unmanaged
 	{
+        [CLSCompliant(false)]
+        public unsafe
+        class Frame
+        {
+            // External Buffer.
+            float* _buffer = null;
+            int _size = 0;
+
+            // Internal FFT Buffer.
+            bool _hasFFT = false;
+            float *_fftBuffer = null;
+            int _fftSize = 0;
+
+            public int Size
+            {
+                get { return _size; }
+            }
+
+            ~Frame()
+            {
+                if (_fftSize != 0)
+                    NativeMethods.Pointer.free(_fftBuffer);
+            }
+
+            void Clear()
+            {
+                _hasFFT = false;
+            }
+
+            public void AttachBuffer(float * buffer, int size)
+            {
+                Clear();
+
+                _buffer = buffer;
+                _size = size;
+            }
+
+            public bool IsValid()
+            {
+                return !(_buffer == null);
+            }
+
+            public float * RequestFFTMagnitude()
+            {
+                if (!_hasFFT)
+                {
+                    if (!IsValid())
+                        return null;
+
+                    if (_size > _fftSize)
+                    {
+                        if(_fftSize != 0)
+                            NativeMethods.Pointer.free( _fftBuffer );
+
+                        NativeMethods.Pointer.fgetmem( _size );
+                        _fftSize = _size;
+                    }
+
+                    NativeMethods.Math.FFTMagnitude( _buffer, _fftBuffer, _size );
+                }
+
+                return _fftBuffer;
+            }
+        }
+
 		[CLSCompliant(false)]
 		abstract unsafe
 		public class Window : BaseWindow
 		{
-			/// Window Values
-			private float * _wndData = null;
-		
-			/// File Handler Buffer
-			private float * _rawStream = null;
+            /// External. Handler buffer if audio data.
+            private float* _rawStream = null;
 
-            /// Windowed Data
+			/// Buffer window data.
+			private float * _wndData = null;
+
+            /// Windowed Data. This is the _rawStream after processing.
             private float * _dataStream = null;
+
+            private Frame _frame = new Frame();
 			
 			//::::::::::::::::::::::::::::::::::::::://
 			
@@ -254,20 +321,24 @@ namespace MusiC
 			/// A <see cref="float"/>
 			/// </returns>
 			unsafe
-			public float * GetWindow(int windowPos)
+			//public float * GetWindow(int windowPos)
+            public Frame GetWindow( int windowPos )
 			{
-				_rawStream = FileHandler.Read(windowPos * (WindowSize - WindowOverlap), WindowSize);
+				_rawStream = FileHandler.Read( windowPos * (WindowSize - WindowOverlap), WindowSize );
+
+                _frame.AttachBuffer( _rawStream, WindowSize );
 
                 if (_rawStream == null)
-                    return _rawStream;
+                    return _frame;
 
 				float * ptrRawStream = _rawStream;
                 float * ptrDataStream = _dataStream;
 				float * ptrWnd = _wndData;
 				
-				Calculate(ptrWnd, ptrRawStream, ptrDataStream);
+				Calculate( ptrWnd, ptrRawStream, ptrDataStream );
 				
-				return _dataStream;
+				//return _dataStream;
+                return _frame;
 			}
 		}
 	}

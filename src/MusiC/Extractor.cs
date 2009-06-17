@@ -97,10 +97,11 @@ namespace MusiC
 			/// A <see cref="Data.Unmanaged.FileData"/>
 			/// </param>
 			static unsafe 
-			public void Extract(Window wnd, IEnumerable<Feature> featList, Data.Unmanaged.FileData * dataStg)
+			public void Extract( Window wnd, IEnumerable<Feature> featList, Data.Unmanaged.FileData * dataStg )
 			{
 				int fIdx;
-                float * windowBuffer;
+                //float * windowBuffer;
+                Frame dataFrame;
 				
 				BaseHandler bdb = wnd.HandlerInterface as BaseHandler;
 				DBHandler db = bdb.GetDBHandler();
@@ -114,41 +115,39 @@ namespace MusiC
 				{
 					FeatureHelper fh = new FeatureHelper();
 					fh.feat = f;
-					fh.feat.Clear();
-					fh.data = NativeMethods.Pointer.fgetmem(wnd.WindowCount);
+					fh.feat.Clear(); // restarts feature
+					fh.data = NativeMethods.Pointer.fgetmem( wnd.WindowCount );
 					
 					// fh.data is null if the window/feature combination is not available
-					reporter.AddMessage("Searching File DB");
-					int read = db.GetFeature(wnd.GetID(), f.GetID(), fh.data);
+					reporter.AddMessage( "Searching File DB" );
+					int read = db.GetFeature( wnd.GetID(), f.GetID(), fh.data );
 					
 					if( read == 0 )
 					{
-						reporter.AddMessage("Feature Not Found");
+						reporter.AddMessage( "Feature Not Found" );
 						fh.extracted = false;
 					}
 					else
 					{
-						reporter.AddMessage("Feature Found - Bytes Read: " + read);
+						reporter.AddMessage( "Feature Found - Bytes Read: " + read );
 						fh.extracted = true;
 					}
 
 					featCount++;
-					parsedList.AddLast(fh);
+					parsedList.AddLast( fh );
 				}
 
 				for( int i = 0; i < wnd.WindowCount; i++ )
 				{
-					windowBuffer = wnd.GetWindow(i);
+					dataFrame = wnd.GetWindow(i);
 					
-					if (windowBuffer == null)
-                    {
+					if( dataFrame.IsValid() )
 						continue;
-					}
 					
 					Data.Unmanaged.FrameData* frame = 
-						Data.Unmanaged.DataHandler.BuildFrameData(featCount);
+						Data.Unmanaged.DataHandler.BuildFrameData( featCount );
 
-					Data.Unmanaged.DataHandler.AddFrameData(frame, dataStg);
+					Data.Unmanaged.DataHandler.AddFrameData( frame, dataStg );
 					
                     fIdx = 0;
                     foreach( FeatureHelper fh in parsedList )
@@ -168,7 +167,7 @@ namespace MusiC
 							//*(fh.data + i) = *(frame->pData + fIdx) = fh.feat.Extract(windowBuffer, wnd.WindowSize);
 
 							// FIX: Mono Bad IL Instructions Generated
-							float val = fh.feat.Extract(windowBuffer, wnd.WindowSize);
+							float val = fh.feat.Extract(dataFrame);
 							*(frame->pData + fIdx) = val;
 							*(fh.data + i) = val;
 						}
@@ -181,7 +180,8 @@ namespace MusiC
 				foreach( FeatureHelper fh in parsedList )
 				{
 					if( !fh.extracted )
-						db.AddFeature(wnd.GetID(), fh.feat.GetID(), fh.data, wnd.WindowCount);
+						db.AddFeature( wnd.GetID(), fh.feat.GetID(), fh.data, wnd.WindowCount );
+
 					NativeMethods.Pointer.free( fh.data );
 				}
 

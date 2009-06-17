@@ -39,7 +39,7 @@ namespace MusiC
 		abstract public class Feature : BaseFeature
 		{
 			virtual
-			protected Single[] OuterExtract(Managed.Window window)
+			protected Single[] OuterExtract( Managed.Window window )
 			{
 				return Extract(window);
 			}
@@ -47,7 +47,7 @@ namespace MusiC
 			//::::::::::::::::::::::::::::::::::::::://
 			
 			virtual
-			public Single[] Extract(Managed.Window window)
+			public Single[] Extract( Managed.Window window )
 			{
 				return null;
 			}
@@ -62,58 +62,6 @@ namespace MusiC
 		abstract unsafe
 		public class Feature : BaseFeature
 		{
-			private float * _buf;
-			private int _sz;
-
-			//::::::::::::::::::::::::::::::::::::::://
-			
-			/// <summary>
-			/// 
-			/// </summary>
-			~Feature()
-			{
-				ReleaseBuffer();
-			}
-			
-			//::::::::::::::::::::::::::::::::::::::://
-			
-			/// <summary>
-			/// 
-			/// </summary>
-			/// <param name="sz">
-			/// A <see cref="System.Int32"/>
-			/// </param>
-			/// <returns>
-			/// A <see cref="Single"/>
-			/// </returns>
-			protected Single * GetBuffer( int sz )
-			{
-				if(sz <= _sz)
-				{
-					return _buf;
-				}
-				
-				if(_buf == null)
-					NativeMethods.Pointer.free( _buf );
-				
-				_buf = NativeMethods.Pointer.fgetmem( sz );
-				_sz = sz;
-				
-				return _buf;
-			}
-			
-			//::::::::::::::::::::::::::::::::::::::://
-			
-			/// <summary>
-			/// 
-			/// </summary>
-			private void ReleaseBuffer()
-			{
-				NativeMethods.Pointer.free( _buf );
-			}
-			
-			//::::::::::::::::::::::::::::::::::::::://
-			
 			/// <summary>
 			/// 
 			/// </summary>
@@ -138,7 +86,7 @@ namespace MusiC
 			/// </returns>
 			/// <remarks>All frame data must be consecutive.</remarks>
 			abstract
-			public Single Extract(Single * wndData, Int32 wndSize);
+			public Single Extract( Frame dataFrame );
 		}
 	}
 }
