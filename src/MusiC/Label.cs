@@ -23,6 +23,8 @@ using System.IO;
 using System.Collections;
 using System.Collections.Generic;
 
+using System.Text.RegularExpressions;
+
 using System.Text;
 using System.Security.Cryptography;
 
@@ -180,11 +182,17 @@ namespace MusiC
 			if( ret = Directory.Exists( dir ) )
 			{
 				SearchOption opt = recursive ? SearchOption.AllDirectories : SearchOption.TopDirectoryOnly;
-				filter = ( filter == null ) ? "*" : filter;
+				filter = ( filter == null ) ? "" : filter;
 
-				foreach( string file in Directory.GetFiles( dir, filter, opt ) )
+				string[] files = Directory.GetFiles( dir, "*", opt );
+
+				Regex def = new Regex( "(.db$)", RegexOptions.ECMAScript );
+				Regex filter_based = new Regex( filter, RegexOptions.ECMAScript );
+
+				foreach( string file in files )
 				{
-					_inputList.AddLast( new FileEntry( FileSource.Dir, file ) );
+					if( filter_based.Match( file ).Success && !def.Match( file ).Success )
+						_inputList.AddLast( new FileEntry( FileSource.Dir, file ) );
 				}
 			}
 
