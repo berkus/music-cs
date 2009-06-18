@@ -31,7 +31,7 @@ namespace MusiC
 		//// <value>
 		/// 
 		/// </value>
-		string Name 
+		string Name
 		{
 			get;
 			set;
@@ -42,25 +42,32 @@ namespace MusiC
 		//// <value>
 		/// 
 		/// </value>
-		string OutputDir 
+		string OutputDir
 		{
 			get;
 			set;
 		}
 
 		//::::::::::::::::::::::::::::::::::::::://
-		
+
 		/// <summary>
 		/// 
 		/// </summary>
-		/// <param name="dir">
-		/// A <see cref="System.String"/>
-		/// </param>
-		/// <returns>
-		/// A <see cref="System.Boolean"/>
-		/// </returns>
-		bool AddInputDir(string dir);
-		
+		/// <param name="dir"></param>
+		/// <param name="recursive"></param>
+		/// <param name="filter"></param>
+		/// <returns></returns>
+		bool AddInputDir( string dir, bool recursive, string filter );
+
+		//::::::::::::::::::::::::::::::::::::::://
+
+		/// <summary>
+		/// 
+		/// </summary>
+		/// <param name="path"></param>
+		/// <returns></returns>
+		bool AddInputFile( string path );
+
 		//::::::::::::::::::::::::::::::::::::::://
 
 		/// <summary>

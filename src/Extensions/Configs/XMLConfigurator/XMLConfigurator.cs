@@ -22,6 +22,7 @@
 using System;
 using System.IO;
 using System.Xml;
+using System.Reflection;
 using System.Collections.Generic;
 
 using MusiC;
@@ -45,9 +46,9 @@ namespace MusiC.Extensions.Configs
 	{
 		/// store class alias. Tag(key) <=> classname(value).
 		private Dictionary<String, String> _tagCache = new Dictionary<String, String>();
-		
+
 		//::::::::::::::::::::::::::::::::::::::://
-		
+
 		/// <summary>
 		/// 
 		/// </summary>
@@ -55,39 +56,39 @@ namespace MusiC.Extensions.Configs
 		/// XML file with library configuration.
 		/// </param>
 		override
-		protected void Load(String cfgPath)
+		protected void Load( String cfgPath )
 		{
 			XmlDocument cfgFile = new XmlDocument();
-			cfgFile.Load(cfgPath);
+			cfgFile.Load( cfgPath );
 
-            XmlNodeList rootCandidates = cfgFile.GetElementsByTagName("MusiC");
+			XmlNodeList rootCandidates = cfgFile.GetElementsByTagName( "MusiC" );
 
-            if (rootCandidates.Count != 1)
-            {
-                Error("It is allowed and required to have just 1 MusiC node.");
-                return;
-            }
+			if( rootCandidates.Count != 1 )
+			{
+				new MCException( "It is allowed and required to have just 1 MusiC node." );
+				return;
+			}
 
-            XmlNode root = rootCandidates[0];
+			XmlNode root = rootCandidates[ 0 ];
 
-            foreach (XmlNode node in root.ChildNodes)
-            {
-                switch (node.Name)
-                {
-                    case "MusiC-Alias":
-                        _tagCache.Add(XmlSafeAttribute(node, "name"), XmlSafeAttribute(node, "class"));
-                        break;
-                    case "MusiC-Train":
-                        HandleNode_Train(node);
-                        break;
-                    case "MusiC-Classify":
-                        HandleNode_Classify(node);
-                        break;
-                    case "MusiC-Algorithm":
-                        HandleNode_Algorithm(node);
-                        break;
-                }
-            }
+			foreach( XmlNode node in root.ChildNodes )
+			{
+				switch( node.Name )
+				{
+					case "MusiC-Alias":
+						_tagCache.Add( XmlSafeAttribute( node, "name" ), XmlSafeAttribute( node, "class" ) );
+						break;
+					case "MusiC-Train":
+						HandleNode_Train( node );
+						break;
+					case "MusiC-Classify":
+						HandleNode_Classify( node );
+						break;
+					case "MusiC-Algorithm":
+						HandleNode_Algorithm( node );
+						break;
+				}
+			}
 		}
 
 		//::::::::::::::::::::::::::::::::::::::://
@@ -102,14 +103,14 @@ namespace MusiC.Extensions.Configs
 		/// A <see cref="System.Boolean"/>
 		/// </returns>
 		override
-		public bool CanHandle(string file)
+		public bool CanHandle( string file )
 		{
 			///@todo check version.
-			return Path.GetExtension(file).ToUpper() == ".XML";
+			return Path.GetExtension( file ).ToUpper() == ".XML";
 		}
-		
+
 		//::::::::::::::::::::::::::::::::::::::://
-		
+
 		#region XMLAttribute Handling
 		/// <summary> Get attributes from a xml node. </summary>
 		/// <description> 
@@ -121,25 +122,25 @@ namespace MusiC.Extensions.Configs
 		/// <param name="attName">The System.Attribute name</param>
 		/// <param name="isOptional">Is it optional ?</param>
 		/// <returns>The attribute value</returns>
-		private String XmlSafeAttribute(XmlNode n, String attName, bool isOptional)
+		private String XmlSafeAttribute( XmlNode n, String attName, bool isOptional )
 		{
-			if(n == null)
-				throw new MCException("XmlNode submited is null");
-			
-			XmlAttribute att = n.Attributes[attName];
+			if( n == null )
+				throw new MCException( "XmlNode submited is null" );
 
-			if(att == null)
+			XmlAttribute att = n.Attributes[ attName ];
+
+			if( att == null )
 			{
-				if (!isOptional)
-					throw new MissingAttributeException(attName);
+				if( !isOptional )
+					throw new MissingAttributeException( attName );
 				return null;
 			}
-			
+
 			return att.Value;
 		}
 
 		//::::::::::::::::::::::::::::::::::::::://
-		
+
 		/// <summary>
 		/// Get attributes from a xml node. 
 		/// </summary>
@@ -147,12 +148,12 @@ namespace MusiC.Extensions.Configs
 		/// <param name="attName">The System.Attribute name</param>
 		/// <returns>The attribute value</returns>
 		/// @details This form sets the isOptional to false.
-		private String XmlSafeAttribute(XmlNode n, String attName)
+		private String XmlSafeAttribute( XmlNode n, String attName )
 		{
-			return XmlSafeAttribute(n, attName, false);
+			return XmlSafeAttribute( n, attName, false );
 		}
 		#endregion
-		
+
 		//::::::::::::::::::::::::::::::::::::::://
 
 		#region Parsing Methods
@@ -163,108 +164,156 @@ namespace MusiC.Extensions.Configs
 		/// <param name="train">
 		/// A <see cref="XmlNode"/>
 		/// </param>
-		private void HandleNode_Train(XmlNode node_train)
+		private void HandleNode_Train( XmlNode node_train )
 		{
-			String baseDir = XmlSafeAttribute(node_train, "dir", true);
-			
-			XmlNodeList nList = node_train.ChildNodes;
-			foreach(XmlNode xmlLabelNode in nList)
+			string baseDir = XmlSafeAttribute( node_train, "dir", true );
+			if( baseDir == null ) { baseDir = Path.GetDirectoryName( Assembly.GetEntryAssembly().Location ); }
+
+			foreach( XmlNode node_label in node_train.ChildNodes )
 			{
-				if(xmlLabelNode.Name == "Label")
+				string path;
+
+				Label l = new Label();
+				l.Name = XmlSafeAttribute( node_label, "name" );
+
+				if( node_label.Name == "Label" )
 				{
-					ILabel l = New.Label();
-					l.Name = XmlSafeAttribute(xmlLabelNode,"name");
-					
-					/// @todo Add support to multiple input dirs
-					string iDir = XmlSafeAttribute(xmlLabelNode,"input", true);
-					if( iDir == null )
+					foreach( XmlNode node_path in node_label )
 					{
-						/// @todo Check return
-						iDir = System.IO.Path.Combine(baseDir, l.Name);
-						l.AddInputDir(iDir);
+						switch( node_path.Name )
+						{
+							case "Dir":
+								path = XmlSafeAttribute( node_path, "path", true );
+								if( path == null ) { path = System.IO.Path.Combine( baseDir, l.Name ); }
+
+								string recursive_text = XmlSafeAttribute( node_path, "recursive", true );
+								string filter = XmlSafeAttribute( node_path, "filter", true );
+
+								bool recursive = false;
+
+								try
+								{ recursive = ( recursive_text == null ) ? false : bool.Parse( recursive_text ); }
+								catch( Exception e )
+								{ throw new MCException( e, "recursive values: True or False (case INSENSITIVE)" ); }
+
+								l.AddInputDir( path, recursive, filter );
+								break;
+
+							case "File":
+								path = XmlSafeAttribute( node_path, "path" );
+								l.AddInputFile( path );
+								break;
+						}
 					}
-					
-					l.OutputDir = XmlSafeAttribute(xmlLabelNode,"output", true);
-					
-					if(l.OutputDir == null)
-						l.OutputDir=iDir;
-					
-					AddTrainLabel(l);
+				}
+
+				AddTrainLabel( l );
+			}
+
+
+			//l.OutputDir = XmlSafeAttribute(xmlLabelNode,"output", true);
+			//if(l.OutputDir == null)
+			//	l.OutputDir=iDir;
+		}
+
+		//::::::::::::::::::::::::::::::::::::::://
+
+		/// <summary>
+		/// 
+		/// </summary>
+		/// <param name="classify"></param>
+		private
+		void HandleNode_Classify( XmlNode node_classify )
+		{
+			foreach( XmlNode node in node_classify.ChildNodes )
+			{
+				string path;
+
+				switch( node.Name )
+				{
+					case "Dir":
+						path = XmlSafeAttribute( node, "path" );
+						string recursive_text = XmlSafeAttribute( node, "recursive", true );
+						string filter = XmlSafeAttribute( node, "filter", true );
+
+						bool recursive = false;
+
+						try
+						{ recursive = ( recursive_text == null ) ? false : bool.Parse( recursive_text ); }
+						catch( Exception e )
+						{ new MCException( e, "recursive values: Yes or No (case INSENSITIVE)" ); }
+
+						AddClassificationDir( path, recursive, filter );
+						break;
+
+					case "File":
+						path = XmlSafeAttribute( node, "path" );
+						AddClassificationDir( path );
+						break;
 				}
 			}
 		}
-        
-        //::::::::::::::::::::::::::::::::::::::://
-        
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="classify"></param>
-        private
-        void HandleNode_Classify(XmlNode node_classify)
-        {
-            /// @todo Add support to allow/deny algorithms to use this folder
-            string dir = XmlSafeAttribute(node_classify, "dir");
-
-            if (!AddClassificationDir(dir))
-                Warning("A non-existent directory (" + dir +
-                        ") wasn't added to the processing queue.");
-        }
 
 		//::::::::::::::::::::::::::::::::::::::://
-		
+
 		/// <summary>
 		/// 
 		/// </summary>
 		/// <param name="node_algorithm"></param>
-		public void HandleNode_Algorithm(XmlNode node_algorithm)
+		public void HandleNode_Algorithm( XmlNode node_algorithm )
 		{
-			IAlgorithm algorithm = New.Algorithm();
+			string algName = XmlSafeAttribute( node_algorithm, "name", true );
+
+			if( algName == null )
+				algName = "Algorithm_" + GetAlgorithmCount();
+
+			Algorithm algorithm = new Algorithm( algName );
 			String className;
 
-			foreach (XmlNode child in node_algorithm.ChildNodes)
+			foreach( XmlNode child in node_algorithm.ChildNodes )
 			{
 				if( child.Name == "MusiC-Extension" )
 				{
-					className = XmlSafeAttribute(child, "class");
+					className = XmlSafeAttribute( child, "class" );
 				}
 				else
 				{
-					if(!_tagCache.TryGetValue(child.Name, out className))
+					if( !_tagCache.TryGetValue( child.Name, out className ) )
 					{
-						Warning("Cant find tag "+child.Name);
+						Warning( "Cant find tag " + child.Name );
 						break;
 					}
 				}
-				
-				IParamList paramList = New.ParamList();
-				
-				foreach(XmlNode param in child.ChildNodes)
+
+				ParamList paramList = new ParamList();
+
+				foreach( XmlNode param in child.ChildNodes )
 				{
-					if(param.Name != "Param")
+					if( param.Name != "Param" )
 						continue;
-					
+
 					paramList.AddParam(
-					                   XmlSafeAttribute(param, "name"),
-					                   XmlSafeAttribute(param, "class"),
-					                   XmlSafeAttribute(param, "value", true));
+									   XmlSafeAttribute( param, "name" ),
+									   XmlSafeAttribute( param, "class" ),
+									   XmlSafeAttribute( param, "value", true ) );
 				}
-				
+
 				try
 				{
 					if( !algorithm.Add( className, paramList ) )
 						break;
-				} catch (MissingExtensionException e)
+				}
+				catch( MissingExtensionException e )
 				{
-					Error("Error while loading an algorithm .... Skipping");
-					Error(e);
+					Error( "Error while loading an algorithm .... Skipping" );
+					Error( e );
 					break;
 				}
 			}
-			
-			AddAlgorithm(algorithm);
+
+			AddAlgorithm( algorithm );
 		}
-		
+
 		#endregion
 	}
 }

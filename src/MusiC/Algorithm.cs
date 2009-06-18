@@ -41,12 +41,19 @@ namespace MusiC
 	/// <see cref="MusiC.Classifier"/>
 	/// 	
 	/// @todo Give algorithms a name.
-	internal class Algorithm : MusiCObject, IAlgorithm
+	public class Algorithm : MusiCObject, IAlgorithm
 	{
 		private Pipeline _pipe = new Pipeline();
 
-        //::::::::::::::::::::::::::::::::::::::://
-		
+		private string _name;
+
+		public Algorithm( string name )
+		{
+			_name = name;
+		}
+
+		//::::::::::::::::::::::::::::::::::::::://
+
 		/// <summary>
 		/// Add an extension to the algorithm.
 		///
@@ -57,60 +64,60 @@ namespace MusiC
 		/// <param name="extensionClass">The name of the class that should be added</param>
 		/// <param name="args">The arguments to the constructor call. It must be in the correct order.</param>
 		/// <returns>Success</returns>
-		public bool Add(string extensionClass, IParamList args)
+		public bool Add( string extensionClass, IParamList args )
 		{
-			Message("Appended: " + extensionClass );
-			
-			ExtensionInfo info = ExtensionCache.GetInfo(extensionClass);
-			
-			if (info == null) throw new Exceptions.MissingExtensionException(extensionClass + " wasn't found.");
-			
-			if (info.Kind == ExtensionKind.Error)
-			{
-				Error(extensionClass + ": Can't recognize this Extension. This may happen when an extension inherits directly from MusiC.Extension");
-				return false;
-			}
-			
-			if (info.Model == MemoryModel.Error)
-			{
-				Error(extensionClass + ": Can't recognize if this is a Managed or Unmanaged implementation. Classifiers/Features/Windows must inherit from their subclasses.");
-				return false;
-			}
-			
-			ParamList pList = args as ParamList;
-			
-			if (pList == null)
-				return false;
-			
-			Extension ext = info.Instantiate(pList);
-            ext.BuildID(pList);
+			Message( "Appended: " + extensionClass );
 
-			return _pipe.Add(ext, info);
+			ExtensionInfo info = ExtensionCache.GetInfo( extensionClass );
+
+			if( info == null ) throw new Exceptions.MissingExtensionException( extensionClass + " wasn't found." );
+
+			if( info.Kind == ExtensionKind.Error )
+			{
+				Error( extensionClass + ": Can't recognize this Extension. This may happen when an extension inherits directly from MusiC.Extension" );
+				return false;
+			}
+
+			if( info.Model == MemoryModel.Error )
+			{
+				Error( extensionClass + ": Can't recognize if this is a Managed or Unmanaged implementation. Classifiers/Features/Windows must inherit from their subclasses." );
+				return false;
+			}
+
+			ParamList pList = args as ParamList;
+
+			if( pList == null )
+				return false;
+
+			Extension ext = info.Instantiate( pList );
+			ext.BuildID( pList );
+
+			return _pipe.Add( ext, info );
 		}
-		
+
 		//::::::::::::::::::::::::::::::::::::::://
-		
+
 		/// <summary>
 		/// 
 		/// </summary>
 		/// <param name="conf">
 		/// A <see cref="Config"/>
 		/// </param>
-		public void Execute(Config conf)
+		public void Execute( Config conf )
 		{
 			MemoryModel status = _pipe.Check();
-			
-			if (status == MemoryModel.NotSet || status == MemoryModel.Error)
+
+			if( status == MemoryModel.NotSet || status == MemoryModel.Error )
 			{
-				Error("An error has ocurred. Status = " + status.ToString());
+				Error( "An error has ocurred. Status = " + status.ToString() );
 				Say();
 			}
-			
-			_pipe.Execute(conf);
+
+			_pipe.Execute( conf );
 		}
-		
+
 		//::::::::::::::::::::::::::::::::::::::://
-		
+
 		/// <summary>
 		/// 
 		/// </summary>
@@ -119,11 +126,11 @@ namespace MusiC
 			_pipe.Say();
 		}
 	}
-	
+
 	//---------------------------------------//
-	
+
 	#region Pipeline Classes
-	
+
 	/// <summary>
 	/// 
 	/// </summary>
@@ -131,11 +138,11 @@ namespace MusiC
 	{
 		private mPipeline _mPipe = new mPipeline();
 		private uPipeline _uPipe = new uPipeline();
-		
+
 		private MemoryModel _status = MemoryModel.NotSet;
-		
+
 		//::::::::::::::::::::::::::::::::::::::://
-		
+
 		/// <summary>
 		/// 
 		/// </summary>
@@ -148,60 +155,60 @@ namespace MusiC
 		/// <returns>
 		/// A <see cref="System.Boolean"/>
 		/// </returns>
-		public bool Add(Extension ext, ExtensionInfo info)
+		public bool Add( Extension ext, ExtensionInfo info )
 		{
-			switch (info.Model)
+			switch( info.Model )
 			{
 				case MemoryModel.Managed:
-					switch (info.Kind)
+					switch( info.Kind )
 					{
 						case ExtensionKind.Window:
-							_mPipe.AddWindow(ext as Managed.Window);
+							_mPipe.AddWindow( ext as Managed.Window );
 							break;
-						
+
 						case ExtensionKind.Classifier:
-							_mPipe.AddClassifier(ext as Managed.Classifier);
+							_mPipe.AddClassifier( ext as Managed.Classifier );
 							break;
-						
+
 						case ExtensionKind.Feature:
-							_mPipe.AddFeature(ext as Managed.Feature);
+							_mPipe.AddFeature( ext as Managed.Feature );
 							break;
-						
+
 						default:
 							return false;
 					}
 					break;
-				
+
 				case MemoryModel.Unmanaged:
-					switch (info.Kind)
+					switch( info.Kind )
 					{
 						case ExtensionKind.Window:
-							_uPipe.AddWindow(ext as Unmanaged.Window);
+							_uPipe.AddWindow( ext as Unmanaged.Window );
 							break;
-						
+
 						case ExtensionKind.Classifier:
-							_uPipe.AddClassifier(ext as Unmanaged.Classifier);
+							_uPipe.AddClassifier( ext as Unmanaged.Classifier );
 							break;
-						
+
 						case ExtensionKind.Feature:
-							_uPipe.AddFeature(ext as Unmanaged.Feature);
+							_uPipe.AddFeature( ext as Unmanaged.Feature );
 							break;
-						
+
 						default:
 							return false;
 					}
-					
+
 					break;
-				
+
 				default:
 					return false;
 			}
-			
+
 			return true;
 		}
-		
+
 		//::::::::::::::::::::::::::::::::::::::://
-		
+
 		/// <summary>
 		/// 
 		/// </summary>
@@ -212,81 +219,81 @@ namespace MusiC
 		{
 			bool mStatus = _mPipe.Check();
 			bool uStatus = _uPipe.Check();
-			
-			if (uStatus && mStatus)
+
+			if( uStatus && mStatus )
 			{
 				_status = MemoryModel.Error;
 				return MemoryModel.Error;
 			}
-			
-			if (!(uStatus || mStatus))
+
+			if( !( uStatus || mStatus ) )
 			{
 				_status = MemoryModel.Error;
 				return MemoryModel.NotSet;
 			}
-			
-			if (uStatus)
+
+			if( uStatus )
 			{
 				_status = MemoryModel.Unmanaged;
 				return MemoryModel.Unmanaged;
 			}
-			
-			if (mStatus)
+
+			if( mStatus )
 			{
 				_status = MemoryModel.Managed;
 				return MemoryModel.Managed;
 			}
-			
+
 			// this shouldn't be reached.
 			// conforming to compiler: not all code paths return a value (CS0161)
 			return MemoryModel.NotSet;
 		}
-		
+
 		//::::::::::::::::::::::::::::::::::::::://
-		
+
 		/// <summary>
 		/// 
 		/// </summary>
 		/// <param name="conf">
 		/// A <see cref="Config"/>
 		/// </param>
-		public void Execute(Config conf)
+		public void Execute( Config conf )
 		{
-			if (_status == MemoryModel.Managed)
+			if( _status == MemoryModel.Managed )
 			{
-				_mPipe.Execute(conf);
+				_mPipe.Execute( conf );
 				return;
 			}
-			
-			if (_status == MemoryModel.Unmanaged)
+
+			if( _status == MemoryModel.Unmanaged )
 			{
-				_uPipe.Execute(conf);
+				_uPipe.Execute( conf );
 				return;
 			}
-			
-			Error("No pipeline can be executed.");
+
+			Error( "No pipeline can be executed." );
 			Say();
 		}
-		
+
 		//::::::::::::::::::::::::::::::::::::::://
-		
+
 		/// <summary>
 		/// 
 		/// </summary>
 		public void Say()
 		{
-			BeginReportSection("Managed Pipeline");
+			BeginReportSection( "Managed Pipeline" );
 			_mPipe.Say();
-			EndReportSection(false);
-			
-			BeginReportSection("Unmanaged Pipeline");
+			EndReportSection( false );
+
+			BeginReportSection( "Unmanaged Pipeline" );
 			_uPipe.Say();
-			EndReportSection(true);
+			EndReportSection( true );
 		}
 	}
-	
+
 	//---------------------------------------//
-	
+
 	/// <summary>
 	/// 
 	/// </summary>
@@ -295,42 +302,42 @@ namespace MusiC
 		private Managed.Window _window;
 		private Managed.Classifier _classifier;
 		private LinkedList<Managed.Feature> _featureList = new LinkedList<Managed.Feature>();
-		
+
 		//::::::::::::::::::::::::::::::::::::::://
-		
+
 		/// <summary>
 		/// 
 		/// </summary>
 		/// <param name="classifier">
 		/// A <see cref="Managed.Classifier"/>
 		/// </param>
-		public void AddClassifier(Managed.Classifier classifier)
+		public void AddClassifier( Managed.Classifier classifier )
 		{
 			_classifier = classifier;
 		}
-		
+
 		//::::::::::::::::::::::::::::::::::::::://
-		
-		public void AddWindow(Managed.Window window)
+
+		public void AddWindow( Managed.Window window )
 		{
 			_window = window;
 		}
-		
+
 		//::::::::::::::::::::::::::::::::::::::://
-		
+
 		/// <summary>
 		/// 
 		/// </summary>
 		/// <param name="feature">
 		/// A <see cref="Managed.Feature"/>
 		/// </param>
-		public void AddFeature(Managed.Feature feature)
+		public void AddFeature( Managed.Feature feature )
 		{
-			_featureList.AddLast(feature);
+			_featureList.AddLast( feature );
 		}
-		
+
 		//::::::::::::::::::::::::::::::::::::::://
-		
+
 		/// <summary>
 		/// 
 		/// </summary>
@@ -339,46 +346,46 @@ namespace MusiC
 		/// </returns>
 		public bool Check()
 		{
-			if (_window == null) return false;
-			
-			if (_featureList.Count == 0) return false;
-			
+			if( _window == null ) return false;
+
+			if( _featureList.Count == 0 ) return false;
+
 			return true;
 		}
-		
+
 		//::::::::::::::::::::::::::::::::::::::://
-		
+
 		/// <summary>
 		/// 
 		/// </summary>
 		/// <param name="conf">
 		/// A <see cref="Config"/>
 		/// </param>
-		public void Execute(Config conf)
+		public void Execute( Config conf )
 		{
 		}
-		
+
 		//::::::::::::::::::::::::::::::::::::::://
-		
+
 		/// <summary>
 		/// 
 		/// </summary>
 		public void Say()
 		{
-			Message("Window: " + ((_window != null) ? _window.GetType().FullName : "((NULL))"));
-			Message("Classifier: " + ((_classifier != null) ? _classifier.GetType().FullName : "((NULL))"));
-			
-			BeginReportSection("Feature List");
-			
-			foreach (Managed.Feature f in _featureList)
-				Message((f != null) ? f.GetType().FullName : "((NULL))");
-			
-			EndReportSection(true);
+			Message( "Window: " + ( ( _window != null ) ? _window.GetType().FullName : "((NULL))" ) );
+			Message( "Classifier: " + ( ( _classifier != null ) ? _classifier.GetType().FullName : "((NULL))" ) );
+
+			BeginReportSection( "Feature List" );
+
+			foreach( Managed.Feature f in _featureList )
+				Message( ( f != null ) ? f.GetType().FullName : "((NULL))" );
+
+			EndReportSection( true );
 		}
 	}
-	
+
 	//---------------------------------------//
-	
+
 	/// <summary>
 	/// 
 	/// </summary>
@@ -387,7 +394,7 @@ namespace MusiC
 		private Unmanaged.Window _window;
 		private Unmanaged.Classifier _classifier;
 		private LinkedList<Unmanaged.Feature> _featureList = new LinkedList<Unmanaged.Feature>();
-		
+
 		//::::::::::::::::::::::::::::::::::::::://
 
 		/// <summary>
@@ -400,26 +407,26 @@ namespace MusiC
 		/// A <see cref="Data.Unmanaged.FileData"/>
 		/// </returns>
 		unsafe
-		private Data.Unmanaged.FileData * Extract(string file)
+		private Data.Unmanaged.FileData* Extract( string file )
 		{
-			BeginReportSection(file);
-					
-			Unmanaged.Handler h = ExtensionCache.GetUnmanagedHandler(file);
+			BeginReportSection( file );
+
+			Unmanaged.Handler h = ExtensionCache.GetUnmanagedHandler( file );
 			if( h == null )
 			{
-				Warning(file + ": No handler supports this file");
+				Warning( file + ": No handler supports this file" );
 				return null;
 			}
-			
-			h.Attach(file);
-			_window.Attach(h);
-			
-			Data.Unmanaged.FileData * currentFile = Data.Unmanaged.DataHandler.BuildFileData( );
+
+			h.Attach( file );
+			_window.Attach( h );
+
+			Data.Unmanaged.FileData* currentFile = Data.Unmanaged.DataHandler.BuildFileData();
 			Unmanaged.Extractor.Extract( _window, _featureList, currentFile );
-			
+
 			h.Detach();
 
-			EndReportSection(true);
+			EndReportSection( true );
 
 			return currentFile;
 		}
@@ -436,69 +443,69 @@ namespace MusiC
 		/// A <see cref="Data.Unmanaged.DataCollection"/>
 		/// </returns>
 		unsafe
-		private Data.Unmanaged.DataCollection * Extract(IEnumerable<Label> tLabel)
+		private Data.Unmanaged.DataCollection* Extract( IEnumerable<Label> tLabel )
 		{
-			Data.Unmanaged.DataCollection* dtCol = Data.Unmanaged.DataHandler.BuildCollection( (uint) _featureList.Count);
-			
-			foreach (Label label in tLabel)
+			Data.Unmanaged.DataCollection* dtCol = Data.Unmanaged.DataHandler.BuildCollection( ( uint ) _featureList.Count );
+
+			foreach( Label label in tLabel )
 			{
-				Data.Unmanaged.ClassData* currentClass = Data.Unmanaged.DataHandler.BuildClassData(dtCol);	
-				BeginReportSection("Processing Label: " + label.Name);
-				
+				Data.Unmanaged.ClassData* currentClass = Data.Unmanaged.DataHandler.BuildClassData( dtCol );
+				BeginReportSection( "Processing Label: " + label.Name );
+
 				//foreach (string file in Directory.GetFiles(label.InputDir, "*.wav"))
-				foreach (string file in label)
+				foreach( string file in label )
 				{
-					Data.Unmanaged.FileData * currentFile = Extract(file);
-					Data.Unmanaged.DataHandler.AddFileData(currentFile, currentClass);
+					Data.Unmanaged.FileData* currentFile = Extract( file );
+					Data.Unmanaged.DataHandler.AddFileData( currentFile, currentClass );
 				}
 
-				EndReportSection(true);
+				EndReportSection( true );
 			}
 
 			return dtCol;
 		}
-		
+
 		//::::::::::::::::::::::::::::::::::::::://
-		
+
 		/// <summary>
 		/// 
 		/// </summary>
 		/// <param name="classifier">
 		/// A <see cref="Unmanaged.Classifier"/>
 		/// </param>
-		public void AddClassifier(Unmanaged.Classifier classifier)
+		public void AddClassifier( Unmanaged.Classifier classifier )
 		{
 			_classifier = classifier;
 		}
-		
+
 		//::::::::::::::::::::::::::::::::::::::://
-		
+
 		/// <summary>
 		/// 
 		/// </summary>
 		/// <param name="window">
 		/// A <see cref="Unmanaged.Window"/>
 		/// </param>
-		public void AddWindow(Unmanaged.Window window)
+		public void AddWindow( Unmanaged.Window window )
 		{
 			_window = window;
 		}
-		
+
 		//::::::::::::::::::::::::::::::::::::::://
-		
+
 		/// <summary>
 		/// 
 		/// </summary>
 		/// <param name="feature">
 		/// A <see cref="Unmanaged.Feature"/>
 		/// </param>
-		public void AddFeature(Unmanaged.Feature feature)
+		public void AddFeature( Unmanaged.Feature feature )
 		{
-			_featureList.AddLast(feature);
+			_featureList.AddLast( feature );
 		}
-		
+
 		//::::::::::::::::::::::::::::::::::::::://
-		
+
 		/// <summary>
 		/// 
 		/// </summary>
@@ -507,15 +514,15 @@ namespace MusiC
 		/// </returns>
 		public bool Check()
 		{
-			if (_window == null) return false;
-			
-			if (_featureList.Count == 0) return false;
-			
+			if( _window == null ) return false;
+
+			if( _featureList.Count == 0 ) return false;
+
 			return true;
 		}
-		
+
 		//::::::::::::::::::::::::::::::::::::::://
-		
+
 		/// <summary>
 		/// 
 		/// </summary>
@@ -523,73 +530,73 @@ namespace MusiC
 		/// A <see cref="Config"/>
 		/// </param>
 		/// @todo Create a handler cache and pass it here.
-        unsafe
-        public void Execute(Config conf)
-        {
-            IEnumerable<Label> tLabel = conf.LabelList;
+		unsafe
+		public void Execute( Config conf )
+		{
+			IEnumerable<Label> tLabel = conf.LabelList;
 
-            if (_classifier != null)
-            {
-                if (_classifier.NeedTraining(tLabel))
-                {
-                    Message("Beginning Training");
+			if( _classifier != null )
+			{
+				if( _classifier.NeedTraining( tLabel ) )
+				{
+					Message( "Beginning Training" );
 
-                    Message("Extracting . . .");
-                    Data.Unmanaged.DataCollection* dtCol = Extract(tLabel);
+					Message( "Extracting . . ." );
+					Data.Unmanaged.DataCollection* dtCol = Extract( tLabel );
 
-                    // Report what we have after extractor
-                    Summarize(dtCol);
+					// Report what we have after extractor
+					Summarize( dtCol );
 
-                    Message("Filtering . . .");
-                    Data.Unmanaged.DataCollection* filteredData = _classifier.ExtractionFilter(dtCol);
+					Message( "Filtering . . ." );
+					Data.Unmanaged.DataCollection* filteredData = _classifier.ExtractionFilter( dtCol );
 
-                    Message("Training . . .");
+					Message( "Training . . ." );
 
-                    if (filteredData == null)
-                        _classifier.Train(dtCol);
-                    else
-                        _classifier.Train(filteredData);
+					if( filteredData == null )
+						_classifier.Train( dtCol );
+					else
+						_classifier.Train( filteredData );
 
-                    Message("Freeing Extracted Data");
-                    Data.Unmanaged.DataHandler.DestroyCollection(dtCol);
+					Message( "Freeing Extracted Data" );
+					Data.Unmanaged.DataHandler.DestroyCollection( dtCol );
 
-                    Message("Freeing Filtered Data");
-                    //if (filteredData != null)
-                    //    Data.Unmanaged.DataHandler.DestroyCollection(filteredData);
-                }
+					Message( "Freeing Filtered Data" );
+					//if (filteredData != null)
+					//    Data.Unmanaged.DataHandler.DestroyCollection(filteredData);
+				}
 
-                Message("Begining Classification . . .");
+				Message( "Begining Classification . . ." );
 
-                foreach (string file in conf.Classify)
-                {
-                    Message("Classifying: " + file);
+				foreach( string file in conf.Classify )
+				{
+					Message( "Classifying: " + file );
 
-                    Data.Unmanaged.FileData* f = Extract(file);
-                    Data.Unmanaged.FileData* filteredFile = _classifier.ClassificationFilter(f, (uint) this._featureList.Count);
+					Data.Unmanaged.FileData* f = Extract( file );
+					Data.Unmanaged.FileData* filteredFile = _classifier.ClassificationFilter( f, ( uint ) this._featureList.Count );
 
-                    if (filteredFile == null)
-                        filteredFile = f;
-                        
-                    int result = _classifier.Classify(filteredFile);
+					if( filteredFile == null )
+						filteredFile = f;
 
-                    // Destroy classified file
-                    //Data.Unmanaged.DataHandler.
+					int result = _classifier.Classify( filteredFile );
 
-                    Message("RESULT: " + conf.GetLabel(result).Name);
-                }
-            }
-            else
-            {
-                Message("Extracting . . .");
-                Data.Unmanaged.DataCollection* dtCol = Extract(tLabel);
-                Message("Freeing Extracted Data");
-                Data.Unmanaged.DataHandler.DestroyCollection(dtCol);
-            }
+					// Destroy classified file
+					//Data.Unmanaged.DataHandler.
 
-            Message("All Tasks Done");
-        }
+					Message( "RESULT: " + conf.GetLabel( result ).Name );
+				}
+			}
+			else
+			{
+				Message( "Extracting . . ." );
+				Data.Unmanaged.DataCollection* dtCol = Extract( tLabel );
+				Message( "Freeing Extracted Data" );
+				Data.Unmanaged.DataHandler.DestroyCollection( dtCol );
+			}
 
-        //::::::::::::::::::::::::::::::::::::::://
+			Message( "All Tasks Done" );
+		}
+
+		//::::::::::::::::::::::::::::::::::::::://
 
 		/// <summary>
 		/// 
@@ -598,41 +605,41 @@ namespace MusiC
 		/// A <see cref="Data.Unmanaged.DataCollection"/>
 		/// </param>
 		unsafe
-		public void Summarize(Data.Unmanaged.DataCollection* dtCol)
+		public void Summarize( Data.Unmanaged.DataCollection* dtCol )
 		{
-			BeginReportSection("Extraction Report");
-			Message("Classes Found: " + dtCol->nClasses);
-			Message("Features Found: " + dtCol->nFeatures);
-			
+			BeginReportSection( "Extraction Report" );
+			Message( "Classes Found: " + dtCol->nClasses );
+			Message( "Features Found: " + dtCol->nFeatures );
+
 			Data.Unmanaged.ClassData* c = dtCol->pFirstClass;
-			
+
 			int i = 1;
-			while (c != null)
+			while( c != null )
 			{
-				Message("Class " + i + " has " + c->nFiles + " files with " + c->nFrames + " frames.");
+				Message( "Class " + i + " has " + c->nFiles + " files with " + c->nFrames + " frames." );
 				c = c->pNextClass;
 				i++;
 			}
-			
-			EndReportSection(true);
+
+			EndReportSection( true );
 		}
-		
+
 		//::::::::::::::::::::::::::::::::::::::://
-		
+
 		/// <summary>
 		/// 
 		/// </summary>
 		public void Say()
 		{
-			Message("Window: " + ((_window != null) ? _window.GetType().FullName : "((NULL))"));
-			Message("Classifier: " + ((_classifier != null) ? _classifier.GetType().FullName : "((NULL))"));
-			
-			BeginReportSection("Feature List");
-			
-			foreach (Unmanaged.Feature f in _featureList)
-				Message((f != null) ? f.GetType().FullName : "((NULL))");
-			
-			EndReportSection(true);
+			Message( "Window: " + ( ( _window != null ) ? _window.GetType().FullName : "((NULL))" ) );
+			Message( "Classifier: " + ( ( _classifier != null ) ? _classifier.GetType().FullName : "((NULL))" ) );
+
+			BeginReportSection( "Feature List" );
+
+			foreach( Unmanaged.Feature f in _featureList )
+				Message( ( f != null ) ? f.GetType().FullName : "((NULL))" );
+
+			EndReportSection( true );
 		}
 	}
 	#endregion

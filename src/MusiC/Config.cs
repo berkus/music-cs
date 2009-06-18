@@ -24,11 +24,11 @@ using System.Collections.Generic;
 
 namespace MusiC
 {
-	
+
 	/// <summary>
 	/// 
 	/// </summary>
-	internal class Config
+	public class Config
 	{
 		private LinkedList<IAlgorithm> _algList = new LinkedList<IAlgorithm>();
 		private LinkedList<Label> _trainList = new LinkedList<Label>();
@@ -43,9 +43,9 @@ namespace MusiC
 		{
 			get { return _algList; }
 		}
-		
+
 		//::::::::::::::::::::::::::::::::::::::://
-		
+
 		/// <value>
 		/// 
 		/// </value>
@@ -54,7 +54,7 @@ namespace MusiC
 			get { return _trainList; }
 		}
 		//::::::::::::::::::::::::::::::::::::::://
-		
+
 		//// <value>
 		/// 
 		/// </value>
@@ -62,72 +62,77 @@ namespace MusiC
 		{
 			get { return _classify; }
 		}
-		
+
 		//::::::::::::::::::::::::::::::::::::::://
-		
+
 		/// <summary>
 		/// 
 		/// </summary>
 		/// <param name="algorithm">
 		/// A <see cref="IAlgorithm"/>
 		/// </param>
-		public void AddAlgorithm(IAlgorithm algorithm)
+		public void AddAlgorithm( IAlgorithm algorithm )
 		{
-			_algList.AddLast(algorithm);
+			_algList.AddLast( algorithm );
 		}
-		
+
 		//::::::::::::::::::::::::::::::::::::::://
-		
+
 		/// <summary>
 		/// 
 		/// </summary>
 		/// <param name="label">
 		/// A <see cref="ILabel"/>
 		/// </param>
-		public void AddTrainLabel(Label label)
+		public void AddTrainLabel( Label label )
 		{
 			if( label.Validate() )
-				_trainList.AddLast(label);
+				_trainList.AddLast( label );
 		}
-		
+
 		//::::::::::::::::::::::::::::::::::::::://
-		
+
 		/// <summary>
 		/// 
 		/// </summary>
-		/// <param name="dir">
-		/// A <see cref="String"/>
-		/// </param>
-		/// <returns>
-		/// A <see cref="System.Boolean"/>
-		/// </returns>
-		public bool AddClassificationDir(String dir)
+		/// <param name="dir"></param>
+		/// <param name="recursive"></param>
+		/// <param name="filter"></param>
+		/// <returns></returns>
+		public bool AddClassificationDir( string dir, bool recursive, string filter )
 		{
-			bool returnValue;
-			
-			if(returnValue = Directory.Exists(dir))
-				_classify.AddInputDir( dir );
-			
-			return returnValue;
+			return _classify.AddInputDir( dir, recursive, filter );
 		}
 
-        //::::::::::::::::::::::::::::::::::::::://
+		//::::::::::::::::::::::::::::::::::::::://
 
-        public Label GetLabel(int n)
-        {
-            int count = -1;
+		/// <summary>
+		/// 
+		/// </summary>
+		/// <param name="path"></param>
+		/// <returns></returns>
+		public bool AddClassificationFile( string file )
+		{
+			return _classify.AddInputFile( file );
+		}
 
-            foreach (Label l in _trainList)
-            {
-                count++;
+		//::::::::::::::::::::::::::::::::::::::://
 
-                if (count == n)
-                    return l;
-                else
-                    continue;
-            }
+		public Label GetLabel( int n )
+		{
+			int count = -1;
 
-            return null;
-        }
+			foreach( Label l in _trainList )
+			{
+				count++;
+
+				if( count == n )
+					return l;
+				else
+					continue;
+			}
+
+			return null;
+		}
 	}
 }

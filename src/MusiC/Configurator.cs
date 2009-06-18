@@ -31,88 +31,49 @@ namespace MusiC
 	/// 
 	/// </summary>
 	/// <see cref="MusiC.Algorithms"/>
-	abstract 
+	abstract
 	public class Configurator : Extension
-	{	
-		/// <value>
-		/// 
-		/// </value>
-		protected class Intantiator
-		{
-			/// <value>
-			/// 
-			/// </value>
-			public IAlgorithm Algorithm()
-			{
-				return new Algorithm();
-			}
-
-			//::::::::::::::::::::::::::::::::::::::://
-			
-			/// <value>
-			/// 
-			/// </value>
-			public ILabel Label()
-			{
-				return new Label();
-			}
-
-			//::::::::::::::::::::::::::::::::::::::://
-			
-			/// <value>
-			/// 
-			/// </value>
-			public IParamList ParamList()
-			{
-				return new ParamList();
-			}
-		}
-
-		//---------------------------------------//
-
-		static readonly 
-		protected Intantiator New = new Intantiator();
-
+	{
 		private Config _currentConf;
-		
+
 		//::::::::::::::::::::::::::::::::::::::://
-		
+
 		/// <summary>
 		/// 
 		/// </summary>
 		protected Configurator()
 		{
-			Message(this.GetType().FullName + " ... [LOADED]");
+			Message( this.GetType().FullName + " ... [LOADED]" );
 		}
-		
+
 		//::::::::::::::::::::::::::::::::::::::://
-		
+
 		/// <summary>
 		/// 
 		/// </summary>
 		/// <param name="algorithm">
 		/// A <see cref="IAlgorithm"/>
 		/// </param>
-		protected void AddAlgorithm(IAlgorithm algorithm)
+		protected void AddAlgorithm( IAlgorithm algorithm )
 		{
-			_currentConf.AddAlgorithm(algorithm);
+			_currentConf.AddAlgorithm( algorithm );
 		}
-		
+
 		//::::::::::::::::::::::::::::::::::::::://
-		
+
 		/// <summary>
 		/// 
 		/// </summary>
 		/// <param name="label">
 		/// A <see cref="ILabel"/>
 		/// </param>
-		protected void AddTrainLabel(ILabel label)
+		protected void AddTrainLabel( ILabel label )
 		{
-			_currentConf.AddTrainLabel(label as Label);
+			_currentConf.AddTrainLabel( label as Label );
 		}
-		
+
 		//::::::::::::::::::::::::::::::::::::::://
-		
+
 		/// <summary>
 		/// 
 		/// </summary>
@@ -122,9 +83,31 @@ namespace MusiC
 		/// <returns>
 		/// A <see cref="System.Boolean"/>
 		/// </returns>
-		protected bool AddClassificationDir(string dir)
+		protected void AddClassificationDir( string dir, bool recursive, string filter )
 		{
-			return _currentConf.AddClassificationDir(dir);
+			if( !_currentConf.AddClassificationDir( dir, recursive, filter ) )
+			{
+				Warning( "A non-existent directory (" + dir + ") wasn't added to the processing queue." );
+			}
+		}
+
+		//::::::::::::::::::::::::::::::::::::::://
+
+		/// <summary>
+		/// 
+		/// </summary>
+		/// <param name="dir">
+		/// A <see cref="String"/>
+		/// </param>
+		/// <returns>
+		/// A <see cref="System.Boolean"/>
+		/// </returns>
+		protected void AddClassificationDir( string file )
+		{
+			if( !_currentConf.AddClassificationFile( file ) )
+			{
+				Warning( "A non-existent file (" + file + ") wasn't added to the processing queue." );
+			}
 		}
 
 		//::::::::::::::::::::::::::::::::::::::://
@@ -138,28 +121,39 @@ namespace MusiC
 		/// <returns>
 		/// A <see cref="Config"/>
 		/// </returns>
-		internal Config LoadConfig(string file)
+		public Config LoadConfig( string file )
 		{
 			Config conf = new Config();
 			_currentConf = conf;
 
-			Load(file);
+			Load( file );
 
 			_currentConf = null;
 
 			return conf;
 		}
-		
+
 		//::::::::::::::::::::::::::::::::::::::://
-		
+
+		/// <summary>
+		/// 
+		/// </summary>
+		/// <returns></returns>
+		protected int GetAlgorithmCount()
+		{
+			return _currentConf.AlgorithmList.Count;
+		}
+
+		//::::::::::::::::::::::::::::::::::::::://
+
 		/// <summary>
 		/// 
 		/// </summary>
 		/// <param name="file">
 		/// A <see cref="String"/>
 		/// </param>
-		abstract 
-		protected void Load(string file);
+		abstract
+		protected void Load( string file );
 
 		//::::::::::::::::::::::::::::::::::::::://
 
@@ -172,7 +166,7 @@ namespace MusiC
 		/// <returns>
 		/// A <see cref="System.Boolean"/>
 		/// </returns>
-		abstract 
-		public bool CanHandle(string file);
+		abstract
+		public bool CanHandle( string file );
 	}
 }

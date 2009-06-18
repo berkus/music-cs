@@ -28,205 +28,210 @@ using System.Security.Cryptography;
 
 namespace MusiC
 {
-    /// <summary>
-    /// 
-    /// </summary>
-    public class Label : MusiCObject, ILabel, IEnumerable<string>
-    {
-        class FileEnumerator : IEnumerator<string>
-        {
-            IEnumerator<FileEntry> _enumF;
+	/// <summary>
+	/// 
+	/// </summary>
+	public class Label : MusiCObject, ILabel, IEnumerable<string>
+	{
+		class FileEnumerator : IEnumerator<string>
+		{
+			IEnumerator<FileEntry> _enumF;
 
-            //::::::::::::::::::::::::::::::::::::::://
+			//::::::::::::::::::::::::::::::::::::::://
 
-            /// <value>
-            /// 
-            /// </value>
-            string IEnumerator<string>.Current
-            {
-                get { return _enumF.Current.File; }
-            }
+			/// <value>
+			/// 
+			/// </value>
+			string IEnumerator<string>.Current
+			{
+				get { return _enumF.Current.File; }
+			}
 
-            object IEnumerator.Current
-            {
-                get { return _enumF.Current.File; }
-            }
+			object IEnumerator.Current
+			{
+				get { return _enumF.Current.File; }
+			}
 
-            //::::::::::::::::::::::::::::::::::::::://
+			//::::::::::::::::::::::::::::::::::::::://
 
-            public FileEnumerator(LinkedList<FileEntry> source)
-            {
-                _enumF = source.GetEnumerator();
-            }
+			public FileEnumerator( LinkedList<FileEntry> source )
+			{
+				_enumF = source.GetEnumerator();
+			}
 
-            //::::::::::::::::::::::::::::::::::::::://
+			//::::::::::::::::::::::::::::::::::::::://
 
-            /// <summary>
-            /// 
-            /// </summary>
-            public void Reset()
-            {
-                _enumF.Reset();
-            }
+			/// <summary>
+			/// 
+			/// </summary>
+			public void Reset()
+			{
+				_enumF.Reset();
+			}
 
-            //::::::::::::::::::::::::::::::::::::::://
+			//::::::::::::::::::::::::::::::::::::::://
 
-            /// <summary>
-            /// 
-            /// </summary>
-            /// <returns>
-            /// A <see cref="System.Boolean"/>
-            /// </returns>
-            public bool MoveNext()
-            {
-                return _enumF.MoveNext();
-            }
+			/// <summary>
+			/// 
+			/// </summary>
+			/// <returns>
+			/// A <see cref="System.Boolean"/>
+			/// </returns>
+			public bool MoveNext()
+			{
+				return _enumF.MoveNext();
+			}
 
-            //::::::::::::::::::::::::::::::::::::::://
+			//::::::::::::::::::::::::::::::::::::::://
 
-            /// <summary>
-            /// 
-            /// </summary>
-            public void Dispose()
-            {
-                if (_enumF != null)
-                    _enumF.Dispose();
-            }
-        }
+			/// <summary>
+			/// 
+			/// </summary>
+			public void Dispose()
+			{
+				if( _enumF != null )
+					_enumF.Dispose();
+			}
+		}
 
-        //---------------------------------------//
+		//---------------------------------------//
 
-        /// <summary>
-        /// 
-        /// </summary>
-        class FileEntry
-        {
-            FileSource _src;
-            string _path;
+		/// <summary>
+		/// 
+		/// </summary>
+		class FileEntry
+		{
+			FileSource _src;
+			string _path;
 
-            //::::::::::::::::::::::::::::::::::::::://
+			//::::::::::::::::::::::::::::::::::::::://
 
-            public string File
-            {
-                get{ return _path; }
-            }
+			public string File
+			{
+				get { return _path; }
+			}
 
-            //::::::::::::::::::::::::::::::::::::::://
+			//::::::::::::::::::::::::::::::::::::::://
 
-            public FileSource Source
-            {
-                get { return _src; }
-            }
+			public FileSource Source
+			{
+				get { return _src; }
+			}
 
-            //::::::::::::::::::::::::::::::::::::::://
+			//::::::::::::::::::::::::::::::::::::::://
 
-            public FileEntry(FileSource src, string path)
-            {
-                _src = src;
-                _path = path;
-            }
-        }
-        
-        //---------------------------------------//
+			public FileEntry( FileSource src, string path )
+			{
+				_src = src;
+				_path = path;
+			}
+		}
 
-        enum FileSource
-        {
-            Dir,
-            File
-        }
+		//---------------------------------------//
 
-        //---------------------------------------//
+		enum FileSource
+		{
+			Dir,
+			File
+		}
 
-        private string _label;
-        private string _outDir;
+		//---------------------------------------//
 
-        private LinkedList<FileEntry> _inputList = new LinkedList<FileEntry>();
+		private string _label;
+		private string _outDir;
 
-        //::::::::::::::::::::::::::::::::::::::://
+		private LinkedList<FileEntry> _inputList = new LinkedList<FileEntry>();
 
-        /// <value>
-        /// 
-        /// </value>
-        public string Name
-        {
-            get { return _label; }
-            set { _label = value; }
-        }
+		//::::::::::::::::::::::::::::::::::::::://
 
-        //::::::::::::::::::::::::::::::::::::::://
+		/// <value>
+		/// 
+		/// </value>
+		public string Name
+		{
+			get { return _label; }
+			set { _label = value; }
+		}
 
-        /// <value>
-        /// 
-        /// </value>
-        public string OutputDir
-        {
-            get { return _outDir; }
-            set { _outDir = value; }
-        }
+		//::::::::::::::::::::::::::::::::::::::://
 
-        //::::::::::::::::::::::::::::::::::::::://
+		/// <value>
+		/// 
+		/// </value>
+		public string OutputDir
+		{
+			get { return _outDir; }
+			set { _outDir = value; }
+		}
 
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="dir"></param>
-        /// <returns></returns>
-        public bool AddInputDir(string dir)
-        {
-            bool ret = false;
+		//::::::::::::::::::::::::::::::::::::::://
 
-            if (ret = Directory.Exists(dir))
-            {
-                foreach (string file in Directory.GetFiles(dir, "*.wav", SearchOption.AllDirectories))
-                {
-                    _inputList.AddLast(new FileEntry(FileSource.Dir, file));
-                }
-            }
+		/// <summary>
+		/// 
+		/// </summary>
+		/// <param name="dir"></param>
+		/// <param name="recursive"></param>
+		/// <param name="filter"></param>
+		/// <returns></returns>
+		public bool AddInputDir( string dir, bool recursive, string filter )
+		{
+			bool ret = false;
 
-            return ret;
-        }
+			if( ret = Directory.Exists( dir ) )
+			{
+				SearchOption opt = recursive ? SearchOption.AllDirectories : SearchOption.TopDirectoryOnly;
+				filter = ( filter == null ) ? "*" : filter;
 
-        //::::::::::::::::::::::::::::::::::::::://
+				foreach( string file in Directory.GetFiles( dir, filter, opt ) )
+				{
+					_inputList.AddLast( new FileEntry( FileSource.Dir, file ) );
+				}
+			}
 
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="file"></param>
-        /// <returns></returns>
-        public bool AddInputFile(string file)
-        {
-            bool ret = false;
-            if( ret = File.Exists(file) )
-                _inputList.AddLast(new FileEntry(FileSource.File, file));
+			return ret;
+		}
 
-            return ret;
-        }
+		//::::::::::::::::::::::::::::::::::::::://
 
-        //::::::::::::::::::::::::::::::::::::::://
+		/// <summary>
+		/// 
+		/// </summary>
+		/// <param name="file"></param>
+		/// <returns></returns>
+		public bool AddInputFile( string file )
+		{
+			bool ret = false;
+			if( ret = File.Exists( file ) )
+				_inputList.AddLast( new FileEntry( FileSource.File, file ) );
 
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <returns>
-        /// A <see cref="System.Boolean"/>
-        /// </returns>
-        public bool Validate()
-        {
-            return true;
-        }
+			return ret;
+		}
 
-        //::::::::::::::::::::::::::::::::::::::://
+		//::::::::::::::::::::::::::::::::::::::://
 
-        IEnumerator<string> IEnumerable<string>.GetEnumerator()
-        {
-            return new FileEnumerator(this._inputList);
-        }
+		/// <summary>
+		/// 
+		/// </summary>
+		/// <returns>
+		/// A <see cref="System.Boolean"/>
+		/// </returns>
+		public bool Validate()
+		{
+			return true;
+		}
 
-        //::::::::::::::::::::::::::::::::::::::://
+		//::::::::::::::::::::::::::::::::::::::://
 
-        IEnumerator IEnumerable.GetEnumerator()
-        {
-            return new FileEnumerator(this._inputList);
-        }
-    }
+		IEnumerator<string> IEnumerable<string>.GetEnumerator()
+		{
+			return new FileEnumerator( this._inputList );
+		}
+
+		//::::::::::::::::::::::::::::::::::::::://
+
+		IEnumerator IEnumerable.GetEnumerator()
+		{
+			return new FileEnumerator( this._inputList );
+		}
+	}
 }
