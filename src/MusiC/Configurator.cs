@@ -102,7 +102,7 @@ namespace MusiC
 		/// <returns>
 		/// A <see cref="System.Boolean"/>
 		/// </returns>
-		protected void AddClassificationDir( string file )
+		protected void AddClassificationFile( string file )
 		{
 			if( !_currentConf.AddClassificationFile( file ) )
 			{

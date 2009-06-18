@@ -248,7 +248,7 @@ namespace MusiC.Extensions.Configs
 
 					case "File":
 						path = XmlSafeAttribute( node, "path" );
-						AddClassificationDir( path );
+						AddClassificationFile( path );
 						break;
 				}
 			}
