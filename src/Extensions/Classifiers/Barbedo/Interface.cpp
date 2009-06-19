@@ -56,11 +56,6 @@ MUSIC_EXPORT int Barbedo_Classify( FileData * fd, void * data )
     BarbedoTData * tdata = reinterpret_cast< BarbedoTData * >( data );
     Barbedo b;
 
-    cout << "info" << endl;
-    cout << tdata->nFeat << endl;
-    cout << tdata->genreCount << endl;
-    cout << tdata->genreCombinationCount << endl;
-
     FrameData * frame = fd->pFirstFrame;
     unsigned int * votes = new unsigned int[ tdata->genreCount ];
 
@@ -74,7 +69,7 @@ MUSIC_EXPORT int Barbedo_Classify( FileData * fd, void * data )
         for ( unsigned int idx = 0; idx < tdata->genreCombinationCount; idx++)
         {
             // returns 0 or 1 representing class a or b.
-            int res = b.Classify( frame, tdata->data[ idx ].frames_a, tdata->data[ idx ].frames_a, tdata->nFeat );
+            int res = b.Classify( frame, tdata->data[ idx ].frames_a, tdata->data[ idx ].frames_b, tdata->nFeat );
             if( res == 0 )
             {
                 votes[ tdata->data[ idx ].genre_a ]++;
@@ -91,6 +86,8 @@ MUSIC_EXPORT int Barbedo_Classify( FileData * fd, void * data )
 
     for(unsigned int idx = 0; idx < tdata->genreCount; idx++)
     {
+		cout << idx << ": " << votes[ idx ] << std::endl;
+		
         if( votes[ idx ] > score )
         {
             score = votes[ idx ];

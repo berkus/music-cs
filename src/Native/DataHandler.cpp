@@ -22,22 +22,23 @@
 
 using namespace MusiC::Native;
 
-DataHandler::DataHandler() : _data(NULL), _curClass(NULL)
+DataHandler::DataHandler() : _data( NULL ), _curClass( NULL )
 {}
 
-void DataHandler::Attach(DataCollection * dtCol)
+void DataHandler::Attach( DataCollection * dtCol )
 {
     _data = dtCol;
+    _curClass = NULL;
 }
 
-ClassData * DataHandler::getClass(unsigned int idx)
+ClassData * DataHandler::GetClass( unsigned int idx )
 {
-    if (idx > _data->nClasses - 1)
+    if( idx > _data->nClasses - 1 )
         return NULL;
 
     ClassData * c = _data->pFirstClass;
 
-    while (idx)
+    while( idx )
     {
         c = c->pNextClass;
         idx--;
@@ -46,10 +47,52 @@ ClassData * DataHandler::getClass(unsigned int idx)
     return c;
 }
 
-ClassData * DataHandler::getNextClass()
+ClassData * DataHandler::GetNextClass()
 {
-    if (!_curClass)
-        return _data->pFirstClass;
+    if( !_curClass )
+    {
+		return _curClass = _data->pFirstClass;
+    }
 
     return _curClass = _curClass->pNextClass;
+}
+
+FileData * DataHandler::GetNextLocalFile()
+{
+    return NULL;
+}
+
+FrameData * DataHandler::GetNextLocalFrame()
+{
+    return NULL;
+}
+
+FileData * DataHandler::GetNextGlobalFile()
+{
+    if (!_curFile)
+    {
+		if( !_curClass )
+			GetNextClass();
+		
+		return _curFile = _curClass->pFirstFile;
+    }
+    
+    _curFile = _curFile->pNextFile;
+    
+    if( !_curFile )
+    {
+		GetNextClass();
+				
+		if( !_curClass )
+			return NULL;
+		
+		_curFile = _curClass->pFirstFile;
+    }
+    
+    return _curFile;
+}
+
+FrameData * DataHandler::GetNextGlobalFrame()
+{
+    return NULL;
 }

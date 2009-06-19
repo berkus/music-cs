@@ -31,30 +31,130 @@ namespace MusiC
 	{
 		class DataHandler
 		{
-			private:
+		
+		private:
+		
+			DataCollection * _data;
+			ClassData * _curClass;
+			FileData * _curFile;
+			FrameData * _curFrame;
+			
+		public:
+		
+			DataHandler();
+			
+			void Attach( DataCollection * );
+			
+			unsigned int GetNumClasses()
+			{
+				return _data->nClasses;
+			}
+			
+			unsigned int GetNumFeatures()
+			{
+				return _data->nFeatures;
+			}
 
-				DataCollection * _data;
-				ClassData * _curClass;
+			ClassData * GetClass( unsigned int idx );
+			ClassData * GetNextClass();
 
-			public:
-				DataHandler();
+			FileData * GetNextLocalFile();
+			FrameData * GetNextLocalFrame();
 
-				void Attach (DataCollection *);
+			FileData * GetNextGlobalFile();
+			FrameData * GetNextGlobalFrame();
 
-				unsigned int getNumClasses()
+			static DataCollection * BuildDataCollection( unsigned int nfeat )
+			{
+				DataCollection * d = new DataCollection();
+
+				d->nClasses = 0;
+				d->nFeatures = nfeat;
+
+				d->pFirstClass = d->pLastClass = NULL;
+
+				return d;
+			}
+
+			static ClassData * BuildClassData( DataCollection * dataCol )
+			{
+				ClassData * d = new ClassData();
+
+				d->nFiles = 0;
+				d->nFrames = 0;
+				d->pCollection = dataCol;
+				d->pFirstFile = NULL;
+				d->pLastFile = NULL;
+				d->pNextClass = NULL;
+
+				if( dataCol->pLastClass )
+					dataCol->pLastClass->pNextClass = d;
+
+				if( !dataCol->pFirstClass )
+					dataCol->pFirstClass = d;
+
+				dataCol->pLastClass = d;
+				dataCol->nClasses++;
+
+				return d;
+			}
+
+			static FileData * BuildFileData( ClassData * class_data )
+			{
+				FileData * d = new FileData();
+
+				d->nFrames = 0;
+				d->pClass = class_data;
+				d->pFirstFrame = d->pFirstFrame = NULL;
+				d->pNextFile = d->pPrevFile = NULL;
+				d->pFiltered = NULL;
+
+				if( !class_data->pFirstFile )
+					class_data->pFirstFile = d;
+
+				if( class_data->pLastFile )
+					class_data->pLastFile->pNextFile = d;
+
+				d->pPrevFile = class_data->pLastFile;
+				class_data->pLastFile = d;
+
+				class_data->nFiles++;
+
+				return d;
+			}
+
+			static FrameData * BuildFrameData( FileData * currentFile )
+			{
+				FrameData * newFrame = new FrameData();
+				newFrame->pData = new float [ currentFile->pClass->pCollection->nFeatures ];
+
+				currentFile->nFrames++;
+
+				if( currentFile->pClass != NULL )
+					currentFile->pClass->nFrames++;
+
+				if( currentFile->pLastFrame != NULL )
 				{
-					return _data->nClasses;
+					currentFile->pLastFrame->pNextFrame = newFrame;
+					currentFile->pLastFrame = newFrame;
 				}
-				unsigned int getNumFeatures()
+				else
 				{
-					return _data->nFeatures;
+					// First frame of the file links the last frame of the previous file.
+					currentFile->pFirstFrame = newFrame;
+					currentFile->pLastFrame = newFrame;
+
+					if( currentFile->pNextFile != NULL )
+						newFrame->pNextFrame = currentFile->pNextFile->pFirstFrame;
+
+					if( currentFile->pPrevFile != NULL )
+						currentFile->pPrevFile->pLastFrame->pNextFrame = newFrame;
 				}
 
-				ClassData * getClass (unsigned int idx);
-				ClassData * getNextClass();
+				return newFrame;
+			}
 		};
 	}
 }
 
 #endif
-

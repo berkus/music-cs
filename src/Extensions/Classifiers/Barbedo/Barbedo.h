@@ -35,14 +35,14 @@
 
 namespace MusiC
 {
-    namespace Native
-    {
-        class Barbedo
-        {
+	namespace Native
+	{
+		class Barbedo
+		{
 
-        private:
+		private:
 
-			// filterCandidates constants.
+			// FilterCandidates constants.
 			// 25C3 * 25C3 = 5,300,000. Doesn't take soooo long.
 			static const int MAX_CANDIDATES;
 
@@ -55,39 +55,38 @@ namespace MusiC
 
 			//::::::::::::::::::::::::::::::::::::::://
 
-        private:
+		private:
 
-            VectorCombinationData * createCombination (ClassData * classA, ClassData * classB);
-            ClassData * filterCandidates (ClassData * cl);
-            int combine (VectorCombinationData * ref);
-            float dist (float * src, float * ref, int size);
-            float * seq_access (ClassData * cl, Int64 idx);
+			VectorCombinationData * CreateCombination( ClassData * classA, ClassData * classB );
+			DataCollection * FilterCandidates( DataCollection * dtCol );
+			int Combine( VectorCombinationData * ref );
+			float EuclideanDistance( float * src, float * ref, int size );
 			unsigned int Evaluate( FrameData * pCurrent,  FrameData ** a, FrameData ** b, unsigned int nFeat );
 
-            //::::::::::::::::::::::::::::::::::::::://
+			//::::::::::::::::::::::::::::::::::::::://
 
-        public:
+		public:
 
-            Barbedo()
-            {
-                log.open("Barbedo.txt",  std::ios_base::app );
-            }
+			Barbedo()
+			{
+				log.open( "Barbedo.txt", std::ios_base::app );
+			}
 
-            ~Barbedo()
-            {
-                log.close();
-            }
+			~Barbedo()
+			{
+				log.close();
+			}
 
-            //::::::::::::::::::::::::::::::::::::::://
+			//::::::::::::::::::::::::::::::::::::::://
 
-        public:
+		public:
 
-            DataCollection * Filter (DataCollection * extractedData);
-            FileData * Filter ( FileData * file, unsigned int nFeat );
-            void * Train (DataCollection * extractedData);
-            int Classify (FrameData * pCurrent, FrameData ** a, FrameData ** b, unsigned int nFeat);
-        };
-    }
+			DataCollection * Filter( DataCollection * extractedData );
+			FileData * Filter( FileData * file, unsigned int nFeat );
+			void * Train( DataCollection * extractedData );
+			int Classify( FrameData * pCurrent, FrameData ** a, FrameData ** b, unsigned int nFeat );
+		};
+	}
 }
 
 #endif
