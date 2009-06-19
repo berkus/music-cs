@@ -17,7 +17,7 @@
 // LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 // THE SOFTWARE.
- 
+
 using System;
 using System.Runtime.InteropServices;
 
@@ -31,22 +31,21 @@ namespace MusiC.Extensions.Classifiers
 	/// </summary>
 	public unsafe class Barbedo : Unmanaged.Classifier
 	{
-        void * data;
+		void* data;
 		/// <summary>
 		/// 
 		/// </summary>
 		/// <param name="dtCol">
 		/// A <see cref="DataCollection"/>
 		/// </param>
-		override unsafe 
-		public void * Train( DataCollection* dtCol )
+		override unsafe
+		public void Train( DataCollection* dtCol )
 		{
-            data = uTrain( ref ( *dtCol ) );
-            return data;
+			data = uTrain( ref ( *dtCol ) );
 		}
-		
+
 		//::::::::::::::::::::::::::::::::::::::://
-		
+
 		/// <summary>
 		/// 
 		/// </summary>
@@ -56,14 +55,14 @@ namespace MusiC.Extensions.Classifiers
 		/// <returns>
 		/// A <see cref="Data.Unmanaged.DataCollection"/>
 		/// </returns>
-		override unsafe 
-		public Data.Unmanaged.FileData * ClassificationFilter( FileData * dataIn, uint nfeat )
+		override unsafe
+		public Data.Unmanaged.FileData* ClassificationFilter( FileData* dataIn, uint nfeat )
 		{
 			return uCFilter( ref *dataIn, nfeat );
 		}
-		
+
 		//::::::::::::::::::::::::::::::::::::::://
-		
+
 		/// <summary>
 		/// 
 		/// </summary>
@@ -74,13 +73,13 @@ namespace MusiC.Extensions.Classifiers
 		/// A <see cref="DataCollection"/>
 		/// </returns>
 		override unsafe
-		public DataCollection * ExtractionFilter( DataCollection * dtCol )
+		public DataCollection* ExtractionFilter( DataCollection* dtCol )
 		{
 			return uEFilter( ref *dtCol );
 		}
-		
+
 		//::::::::::::::::::::::::::::::::::::::://
-		
+
 		/// <summary>
 		/// 
 		/// </summary>
@@ -90,15 +89,15 @@ namespace MusiC.Extensions.Classifiers
 		/// <returns>
 		/// A <see cref="System.Int32"/>
 		/// </returns>
-		override unsafe 
-		//public int Classify( FileData * f, void * dataIn )
-        public int Classify(FileData* f)
+		override unsafe
+			//public int Classify( FileData * f, void * dataIn )
+		public int Classify( FileData* f )
 		{
 			return uClassify( ref *f, data );
 		}
-		
+
 		//::::::::::::::::::::::::::::::::::::::://
-		
+
 		/// <summary>
 		/// 
 		/// </summary>
@@ -111,24 +110,24 @@ namespace MusiC.Extensions.Classifiers
 		/// <returns>
 		/// A <see cref="System.Int32"/>
 		/// </returns>
-		[DllImport("MusiC.Extensions.Classifiers.uBarbedo.dll", EntryPoint="Barbedo_Classify")]
+		[DllImport( "MusiC.Extensions.Classifiers.uBarbedo.dll", EntryPoint = "Barbedo_Classify" )]
 		static extern unsafe
-		public int uClassify( ref FileData f, void * data );
-		
+		public int uClassify( ref FileData f, void* data );
+
 		//::::::::::::::::::::::::::::::::::::::://
-		
+
 		/// <summary>
 		/// 
 		/// </summary>
 		/// <param name="dtCol">
 		/// A <see cref="DataCollection"/>
 		/// </param>
-		[DllImport("MusiC.Extensions.Classifiers.uBarbedo.dll", EntryPoint="Barbedo_Train")]
+		[DllImport( "MusiC.Extensions.Classifiers.uBarbedo.dll", EntryPoint = "Barbedo_Train" )]
 		static extern unsafe
-		public void * uTrain(ref DataCollection dtCol);
-		
+		public void* uTrain( ref DataCollection dtCol );
+
 		//::::::::::::::::::::::::::::::::::::::://
-		
+
 		/// <summary>
 		/// 
 		/// </summary>
@@ -141,12 +140,12 @@ namespace MusiC.Extensions.Classifiers
 		/// <returns>
 		/// A <see cref="FileData"/>
 		/// </returns>
-		[DllImport("MusiC.Extensions.Classifiers.uBarbedo.dll", EntryPoint="Barbedo_CFilter")]
-		static extern unsafe 
-		public FileData * uCFilter( ref FileData f, uint nfeat );
-		
+		[DllImport( "MusiC.Extensions.Classifiers.uBarbedo.dll", EntryPoint = "Barbedo_CFilter" )]
+		static extern unsafe
+		public FileData* uCFilter( ref FileData f, uint nfeat );
+
 		//::::::::::::::::::::::::::::::::::::::://
-		
+
 		/// <summary>
 		/// 
 		/// </summary>
@@ -156,8 +155,8 @@ namespace MusiC.Extensions.Classifiers
 		/// <returns>
 		/// A <see cref="DataCollection"/>
 		/// </returns>
-		[DllImport("MusiC.Extensions.Classifiers.uBarbedo.dll", EntryPoint="Barbedo_EFilter")]
-		static extern unsafe 
-		public DataCollection * uEFilter( ref DataCollection dtCol );
-    }
+		[DllImport( "MusiC.Extensions.Classifiers.uBarbedo.dll", EntryPoint = "Barbedo_EFilter" )]
+		static extern unsafe
+		public DataCollection* uEFilter( ref DataCollection dtCol );
+	}
 }

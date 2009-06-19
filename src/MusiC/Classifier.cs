@@ -31,24 +31,24 @@ namespace MusiC
 	/// </summary>
 	public interface IClassifier
 	{
-        bool NeedTraining(IEnumerable<Label> lbl);
+		bool NeedTraining( IEnumerable<Label> lbl );
 	}
-	
+
 	//---------------------------------------//
-	
+
 	/// <summary>
 	/// 
 	/// </summary>
 	public class BaseClassifier : Extension, IClassifier
 	{
-        public bool NeedTraining(IEnumerable<Label> lbl)
-        {
-            return true;
-        }
+		public bool NeedTraining( IEnumerable<Label> lbl )
+		{
+			return true;
+		}
 	}
-	
+
 	//---------------------------------------//
-	
+
 	namespace Managed
 	{
 		/// <summary>
@@ -65,9 +65,9 @@ namespace MusiC
 			{
 				throw new NotImplementedException();
 			}
-			
+
 			//::::::::::::::::::::::::::::::::::::::://
-			
+
 			/// <summary>
 			/// 
 			/// </summary>
@@ -76,9 +76,9 @@ namespace MusiC
 			{
 				throw new NotImplementedException();
 			}
-			
+
 			//::::::::::::::::::::::::::::::::::::::://
-			
+
 			/// <summary>
 			/// 
 			/// </summary>
@@ -87,9 +87,9 @@ namespace MusiC
 			{
 				throw new NotImplementedException();
 			}
-			
+
 			//::::::::::::::::::::::::::::::::::::::://
-			
+
 			/// <summary>
 			/// 
 			/// </summary>
@@ -100,15 +100,15 @@ namespace MusiC
 			}
 		}
 	}
-	
+
 	//---------------------------------------//
-	
+
 	namespace Unmanaged
 	{
 		/// <summary>
 		/// 
 		/// </summary>
-		[CLSCompliant(false)]
+		[CLSCompliant( false )]
 		abstract
 		public class Classifier : BaseClassifier
 		{
@@ -122,21 +122,21 @@ namespace MusiC
 			/// A <see cref="Data.Unmanaged.DataCollection"/>
 			/// </returns>
 			virtual unsafe
-			public Data.Unmanaged.DataCollection * ExtractionFilter( Data.Unmanaged.DataCollection * dtCol )
+			public Data.Unmanaged.DataCollection* ExtractionFilter( Data.Unmanaged.DataCollection* dtCol )
 			{
 				return null;
 			}
-			
+
 			//::::::::::::::::::::::::::::::::::::::://
-			
+
 			virtual unsafe
-			public Data.Unmanaged.FileData * ClassificationFilter( Data.Unmanaged.FileData * fileDt, uint nfeat )
+			public Data.Unmanaged.FileData* ClassificationFilter( Data.Unmanaged.FileData* fileDt, uint nfeat )
 			{
 				return null;
 			}
-			
+
 			//::::::::::::::::::::::::::::::::::::::://
-			
+
 			/// <summary>
 			/// 
 			/// </summary>
@@ -144,12 +144,12 @@ namespace MusiC
 			/// A <see cref="Data.Unmanaged.DataCollection"/>
 			/// </param>
 			abstract unsafe
-			public void * Train(Data.Unmanaged.DataCollection* dtCol);
+			public void Train( Data.Unmanaged.DataCollection* dtCol );
 
 			//::::::::::::::::::::::::::::::::::::::://
 
 			abstract unsafe
-			public int Classify( Data.Unmanaged.FileData * fd );
+			public int Classify( Data.Unmanaged.FileData* fd );
 		}
 	}
 }
