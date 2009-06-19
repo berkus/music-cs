@@ -36,16 +36,16 @@ namespace MusiC
 		/// <param name="hnd">
 		/// A <see cref="IHandler"/>
 		/// </param>
-		void Attach(IHandler hnd);
+		void Attach( IHandler hnd );
 
 		/// <summary>
 		/// 
 		/// </summary>
 		void Detach();
 	}
-	
+
 	//---------------------------------------//
-	
+
 	/// <summary>
 	/// Base class of Windows extensions implementation.
 	/// </summary>
@@ -56,11 +56,11 @@ namespace MusiC
 		private int _nWnd = -1;
 		private int _size;
 		private int _overlap;
-		
+
 		private IHandler _hnd;
-		
+
 		//::::::::::::::::::::::::::::::::::::::://
-		
+
 		/// <value>
 		/// 
 		/// </value>
@@ -68,9 +68,9 @@ namespace MusiC
 		{
 			get { return _nWnd; }
 		}
-		
+
 		//::::::::::::::::::::::::::::::::::::::://
-		
+
 		/// <value>
 		/// 
 		/// </value>
@@ -78,9 +78,9 @@ namespace MusiC
 		{
 			get { return _size; }
 		}
-		
+
 		//::::::::::::::::::::::::::::::::::::::://
-		
+
 		/// <value>
 		/// 
 		/// </value>
@@ -88,9 +88,9 @@ namespace MusiC
 		{
 			get { return _overlap; }
 		}
-		
+
 		//::::::::::::::::::::::::::::::::::::::://
-		
+
 		/// <value>
 		/// 
 		/// </value>
@@ -98,9 +98,9 @@ namespace MusiC
 		{
 			get { return _hnd; }
 		}
-		
+
 		//::::::::::::::::::::::::::::::::::::::://
-		
+
 		/// <summary>
 		/// 
 		/// </summary>
@@ -110,14 +110,14 @@ namespace MusiC
 		/// <param name="overlap">
 		/// A <see cref="System.Int32"/>
 		/// </param>
-		protected BaseWindow(int size, int overlap)
+		protected BaseWindow( int size, int overlap )
 		{
 			_size = size;
 			_overlap = overlap;
 		}
-		
+
 		//::::::::::::::::::::::::::::::::::::::://
-		
+
 		/// <summary>
 		/// 
 		/// </summary>
@@ -125,14 +125,14 @@ namespace MusiC
 		/// A <see cref="IHandler"/>
 		/// </param>
 		virtual
-		public void Attach(IHandler file)
+		public void Attach( IHandler file )
 		{
 			_hnd = file;
-			_nWnd = (int) Math.Floor( (double) (_hnd.GetStreamSize() / _size) );
+			_nWnd = ( int ) Math.Floor( ( double ) ( _hnd.GetStreamSize() / _size ) );
 		}
-		
+
 		//::::::::::::::::::::::::::::::::::::::://
-		
+
 		/// <summary>
 		/// 
 		/// </summary>
@@ -142,9 +142,9 @@ namespace MusiC
 			_hnd = null;
 			_nWnd = -1;
 		}
-		
+
 		//::::::::::::::::::::::::::::::::::::::://
-		
+
 		/// <summary>
 		/// 
 		/// </summary>
@@ -155,102 +155,102 @@ namespace MusiC
 		/// A <see cref="System.Single"/>
 		/// </returns>
 		abstract
-		public float Factory(int windowPos);
+		public float Factory( int windowPos );
 	}
-	
+
 	//---------------------------------------//
-	
+
 	namespace Unmanaged
 	{
-        [CLSCompliant(false)]
-        public unsafe
-        class Frame
-        {
-            // External Buffer.
-            float* _buffer = null;
-            int _size = 0;
+		[CLSCompliant( false )]
+		public unsafe
+		class Frame
+		{
+			// External Buffer.
+			float* _buffer = null;
+			int _size = 0;
 
-            // Internal FFT Buffer.
-            bool _hasFFT = false;
-            float *_fftBuffer = null;
-            int _fftSize = 0;
+			// Internal FFT Buffer.
+			bool _hasFFT = false;
+			float* _fftBuffer = null;
+			int _fftSize = 0;
 
-            public int Size
-            {
-                get { return _size; }
-            }
+			public int Size
+			{
+				get { return _size; }
+			}
 
-            ~Frame()
-            {
-                if (_fftSize != 0)
-                    NativeMethods.Pointer.free(_fftBuffer);
-            }
+			~Frame()
+			{
+				if( _fftSize != 0 )
+					NativeMethods.Pointer.free( _fftBuffer );
+			}
 
-            void Clear()
-            {
-                _hasFFT = false;
-            }
+			void Clear()
+			{
+				_hasFFT = false;
+			}
 
-            public void AttachBuffer(float * buffer, int size)
-            {
-                Clear();
+			public void AttachBuffer( float* buffer, int size )
+			{
+				Clear();
 
-                _buffer = buffer;
-                _size = size;
-            }
+				_buffer = buffer;
+				_size = size;
+			}
 
-            public bool IsValid()
-            {
-                return !(_buffer == null);
-            }
+			public bool IsValid()
+			{
+				return !( _buffer == null );
+			}
 
-            public float * RequestFFTMagnitude()
-            {
-                if (!_hasFFT)
-                {
-                    if (!IsValid())
-                        return null;
+			public float* RequestFFTMagnitude()
+			{
+				if( !_hasFFT )
+				{
+					if( !IsValid() )
+						return null;
 
-                    if (_size > _fftSize)
-                    {
-                        if(_fftSize != 0)
-                            NativeMethods.Pointer.free( _fftBuffer );
+					if( _size > _fftSize )
+					{
+						if( _fftSize != 0 )
+							NativeMethods.Pointer.free( _fftBuffer );
 
-                        NativeMethods.Pointer.fgetmem( _size );
-                        _fftSize = _size;
-                    }
+						_fftBuffer = NativeMethods.Pointer.fgetmem( _size );
+						_fftSize = _size;
+					}
 
-                    NativeMethods.Math.FFTMagnitude( _buffer, _fftBuffer, _size );
-                }
+					NativeMethods.Math.FFTMagnitude( _buffer, _fftBuffer, _size );
+				}
 
-                return _fftBuffer;
-            }
-        }
+				return _fftBuffer;
+			}
+		}
 
-		[CLSCompliant(false)]
+		[CLSCompliant( false )]
 		abstract unsafe
 		public class Window : BaseWindow
 		{
-            /// External. Handler buffer if audio data.
-            private float* _rawStream = null;
+			/// External. Handler buffer if audio data.
+			private float* _rawStream = null;
 
 			/// Buffer window data.
-			private float * _wndData = null;
+			private float* _wndData = null;
 
-            /// Windowed Data. This is the _rawStream after processing.
-            private float * _dataStream = null;
+			/// Windowed Data. This is the _rawStream after processing.
+			private float* _dataStream = null;
 
-            private Frame _frame = new Frame();
-			
+			private Frame _frame = new Frame();
+
 			//::::::::::::::::::::::::::::::::::::::://
-			
+
 			protected Handler FileHandler
 			{
 				get { return HandlerInterface as Unmanaged.Handler; }
 			}
-			
+
 			//::::::::::::::::::::::::::::::::::::::://
-			
+
 			/// <summary>
 			/// 
 			/// </summary>
@@ -260,28 +260,29 @@ namespace MusiC
 			/// <param name="overlap">
 			/// A <see cref="System.Int32"/>
 			/// </param>
-			protected Window(int size, int overlap) : base(size, overlap)
+			protected Window( int size, int overlap )
+				: base( size, overlap )
 			{
-				_wndData = NativeMethods.Pointer.fgetmem(size);
-                _dataStream = NativeMethods.Pointer.fgetmem(size);
+				_wndData = NativeMethods.Pointer.fgetmem( size );
+				_dataStream = NativeMethods.Pointer.fgetmem( size );
 
-				for (int i = 0; i < WindowSize; i++)
-					_wndData[i] = Factory(i);
+				for( int i = 0; i < WindowSize; i++ )
+					_wndData[ i ] = Factory( i );
 			}
-			
+
 			//::::::::::::::::::::::::::::::::::::::://
-			
+
 			~Window()
 			{
-				if(_wndData != null)
-					NativeMethods.Pointer.free(_wndData);
+				if( _wndData != null )
+					NativeMethods.Pointer.free( _wndData );
 
-                if (_dataStream != null)
-                    NativeMethods.Pointer.free(_dataStream);
+				if( _dataStream != null )
+					NativeMethods.Pointer.free( _dataStream );
 			}
-			
+
 			//::::::::::::::::::::::::::::::::::::::://
-			
+
 			/// <summary>
 			/// Calculates interaction between window data and file data.
 			/// 
@@ -302,15 +303,15 @@ namespace MusiC
 			/// <param name="result">
 			/// A float-pointer to hold the result.
 			/// </param>
-			virtual 
-			protected void Calculate(float * wndData, float * fileData, float * result)
+			virtual
+			protected void Calculate( float* wndData, float* fileData, float* result )
 			{
-				for(int i = 0; i < WindowSize; i++)
-					*(result++) = *(fileData++) * *(wndData++);
+				for( int i = 0; i < WindowSize; i++ )
+					*( result++ ) = *( fileData++ ) * *( wndData++ );
 			}
-			
+
 			//::::::::::::::::::::::::::::::::::::::://
-			
+
 			/// <summary>
 			/// 
 			/// </summary>
@@ -321,30 +322,30 @@ namespace MusiC
 			/// A <see cref="float"/>
 			/// </returns>
 			unsafe
-			//public float * GetWindow(int windowPos)
-            public Frame GetWindow( int windowPos )
+				//public float * GetWindow(int windowPos)
+			public Frame GetWindow( int windowPos )
 			{
-				_rawStream = FileHandler.Read( windowPos * (WindowSize - WindowOverlap), WindowSize );
+				_rawStream = FileHandler.Read( windowPos * ( WindowSize - WindowOverlap ), WindowSize );
 
-                _frame.AttachBuffer( _rawStream, WindowSize );
+				_frame.AttachBuffer( _rawStream, WindowSize );
 
-                if (_rawStream == null)
-                    return _frame;
+				if( _rawStream == null )
+					return _frame;
 
-				float * ptrRawStream = _rawStream;
-                float * ptrDataStream = _dataStream;
-				float * ptrWnd = _wndData;
-				
+				float* ptrRawStream = _rawStream;
+				float* ptrDataStream = _dataStream;
+				float* ptrWnd = _wndData;
+
 				Calculate( ptrWnd, ptrRawStream, ptrDataStream );
-				
+
 				//return _dataStream;
-                return _frame;
+				return _frame;
 			}
 		}
 	}
-	
+
 	//---------------------------------------//
-	
+
 	namespace Managed
 	{
 		abstract
@@ -352,12 +353,12 @@ namespace MusiC
 		{
 			/// Window Coeficients
 			private float[] _wndData;
-		
+
 			/// Windowed Data
 			//private float[] _dataStream;
-			
+
 			//::::::::::::::::::::::::::::::::::::::://
-			
+
 			/// <summary>
 			/// 
 			/// </summary>
@@ -367,16 +368,17 @@ namespace MusiC
 			/// <param name="overlap">
 			/// A <see cref="System.Int32"/>
 			/// </param>
-			protected Window(int size, int overlap) : base(size, overlap)
+			protected Window( int size, int overlap )
+				: base( size, overlap )
 			{
-				_wndData = new float[size];
-				
-				for (int i = 0; i < WindowSize; i++)
-					_wndData[i] = Factory(i);
+				_wndData = new float[ size ];
+
+				for( int i = 0; i < WindowSize; i++ )
+					_wndData[ i ] = Factory( i );
 			}
-			
+
 			//::::::::::::::::::::::::::::::::::::::://
-			
+
 			/// <summary>
 			/// 
 			/// </summary>
@@ -386,7 +388,7 @@ namespace MusiC
 			/// <returns>
 			/// A <see cref="float"/>
 			/// </returns>
-			public float[] GetWindow(int windowPos)
+			public float[] GetWindow( int windowPos )
 			{
 				//return _dataStream;
 				return null;

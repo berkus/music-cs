@@ -157,7 +157,7 @@ namespace MusiC
 						{
 							dataFrame = wnd.GetWindow( i );
 
-							if( dataFrame.IsValid() )
+							if( !dataFrame.IsValid() )
 								continue;
 
 							// if it hasn't been extracted yet then extract it and prepare to store it.
