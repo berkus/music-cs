@@ -28,8 +28,8 @@ namespace MusiC
 	/// </summary>
 	static
 	public class NativeMethods
-	{	
-		[CLSCompliant(false)]
+	{
+		[CLSCompliant( false )]
 		static
 		public class Math
 		{
@@ -48,14 +48,14 @@ namespace MusiC
 			/// <returns>
 			/// A <see cref="Int32"/>
 			/// </returns>
-			[DllImport("MusiC.Native.Core.dll", EntryPoint="fftr_mag")]
+			[DllImport( "MusiC.Native.Core.dll", EntryPoint = "fftr_mag" )]
 			extern static unsafe
-			public Int32 FFTMagnitude(Single * sequence, Single * magnitude, Int32 size);
+			public Int32 FFTMagnitude( Single* sequence, Single* magnitude, Int32 size );
 		}
-		
+
 		//---------------------------------------//
-		
-		[CLSCompliant(false)]
+
+		[CLSCompliant( false )]
 		static
 		public class Pointer
 		{
@@ -69,14 +69,16 @@ namespace MusiC
 			/// A <see cref="System.Single"/>
 			/// </returns>
 			static unsafe
-			public float * fgetmem( int size )
+			public float* fgetmem( int size )
 			{
-				IntPtr ptr = Marshal.AllocHGlobal(size * sizeof(float));
-				return (float *) ptr.ToPointer();
+				if( size < 0 )
+					return null;
+
+				return ( float* ) uMalloc( size * sizeof( float ) );
 			}
-			
+
 			//::::::::::::::::::::::::::::::::::::::://
-			
+
 			/// <summary>
 			/// 
 			/// </summary>
@@ -84,15 +86,35 @@ namespace MusiC
 			/// A <see cref="System.Void"/>
 			/// </param>
 			static unsafe
-			public void free(void * p)
+			public void free( void* p )
 			{
-				if (p != null)
+				if( p != null )
 				{
-					IntPtr ptr = new IntPtr(p);
-					Marshal.FreeHGlobal(ptr);
+					//IntPtr ptr = new IntPtr( p );
+					//Marshal.FreeHGlobal( ptr );
+					uFree( p );
 					p = null;
 				}
 			}
+
+			//::::::::::::::::::::::::::::::::::::::://
+
+			static unsafe
+			public void* malloc( int size )
+			{
+				if( size < 0 )
+					return null;
+
+				return uMalloc( size );
+			}
+
+			[DllImport( "MusiC.Native.Core.dll", EntryPoint = "alloc" )]
+			extern static unsafe
+			private void* uMalloc( int bytes );
+
+			[DllImport( "MusiC.Native.Core.dll", EntryPoint = "dealloc" )]
+			extern static unsafe
+			private void uFree( void* ptr );
 		}
 	}
 }

@@ -50,7 +50,7 @@ namespace MusiC
 		/// 
 		/// </summary>
 		virtual
-		public bool CanHandle(string file)
+		public bool CanHandle( string file )
 		{
 			return false;
 		}
@@ -61,9 +61,9 @@ namespace MusiC
 		/// 
 		/// </summary>
 		virtual
-		public void Attach(string file)
+		public void Attach( string file )
 		{
-			if( System.IO.File.Exists(file) )
+			if( System.IO.File.Exists( file ) )
 			{
 				_file = file;
 			}
@@ -78,8 +78,9 @@ namespace MusiC
 		/// </summary>
 		public DBHandler GetDBHandler()
 		{
-			return new DBHandler(_file);
+			return new DBHandler( _file );
 		}
+
 		//::::::::::::::::::::::::::::::::::::::://
 
 		/// <summary>
@@ -91,12 +92,14 @@ namespace MusiC
 			_file = null;
 		}
 
+		//::::::::::::::::::::::::::::::::::::::://
+
 		abstract
 		public int GetStreamSize();
 	}
-	
+
 	//---------------------------------------//
-	
+
 	namespace Managed
 	{
 		/// <summary>
@@ -109,18 +112,18 @@ namespace MusiC
 	}
 
 	//---------------------------------------//
-	
+
 	namespace Unmanaged
 	{
 		/// <summary>
 		/// 
 		/// </summary>
-		[CLSCompliant(false)]
+		[CLSCompliant( false )]
 		abstract
 		public class Handler : BaseHandler
 		{
 			abstract unsafe
-			public Single * Read(long windowPos, int windowSize);
+			public Single* Read( long windowPos, int windowSize );
 		}
 	}
 }

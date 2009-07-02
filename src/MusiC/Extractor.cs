@@ -97,7 +97,7 @@ namespace MusiC
 			/// A <see cref="Data.Unmanaged.FileData"/>
 			/// </param>
 			static unsafe
-			public void Extract( Window wnd, IEnumerable<Feature> featList, Data.Unmanaged.FileData* dataStg )
+			public Data.Unmanaged.FileData* Extract( Window wnd, IEnumerable<Feature> featList, Config cfg )
 			{
 				int fIdx;
 				//float * windowBuffer;
@@ -106,6 +106,8 @@ namespace MusiC
 				BaseHandler bdb = wnd.HandlerInterface as BaseHandler;
 				DBHandler db = bdb.GetDBHandler();
 				int featCount = 0;
+
+				//reporter.AddMessage( "Number of Frames: " + wnd.WindowCount );
 
 				LinkedList<FeatureHelper> parsedList = new LinkedList<FeatureHelper>();
 
@@ -137,7 +139,18 @@ namespace MusiC
 					parsedList.AddLast( fh );
 				}
 
-				for( int i = 0; i < wnd.WindowCount; i++ )
+				uint newWndCount = 2944;
+				uint samples = ( uint ) ( newWndCount * ( wnd.WindowSize - wnd.WindowOverlap ) + wnd.WindowOverlap );
+				uint start = ( uint ) Math.Floor( ( float ) ( wnd.HandlerInterface.GetStreamSize() - ( samples ) ) / 2 );
+				bool extract = false;
+				bool save = true;
+
+				if( newWndCount > wnd.WindowCount )
+					return null;
+
+				Data.Unmanaged.FileData* dataStg = Data.Unmanaged.DataHandler.BuildFileData();
+
+				for( uint i = 0; i < newWndCount; i++ )
 				{
 					Data.Unmanaged.FrameData* frame =
 						Data.Unmanaged.DataHandler.BuildFrameData( featCount );
@@ -147,7 +160,7 @@ namespace MusiC
 					fIdx = 0;
 					foreach( FeatureHelper fh in parsedList )
 					{
-						if( fh.extracted )
+						if( fh.extracted && !extract )
 						{
 							// If the data has been extracted already get the value correspondent
 							// to the current window.
@@ -155,7 +168,7 @@ namespace MusiC
 						}
 						else
 						{
-							dataFrame = wnd.GetWindow( i );
+							dataFrame = wnd.GetWindow( i, start );
 
 							if( !dataFrame.IsValid() )
 								continue;
@@ -178,13 +191,14 @@ namespace MusiC
 				// storing unextracted data.
 				foreach( FeatureHelper fh in parsedList )
 				{
-					if( !fh.extracted )
+					if( !fh.extracted && save )
 						db.AddFeature( wnd.GetID(), fh.feat.GetID(), fh.data, wnd.WindowCount );
 
 					NativeMethods.Pointer.free( fh.data );
 				}
 
 				db.Terminate();
+				return dataStg;
 			}
 		}
 	}

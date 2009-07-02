@@ -31,7 +31,9 @@ namespace MusiC
 	/// </summary>
 	public interface IClassifier
 	{
-		bool NeedTraining( IEnumerable<Label> lbl );
+		bool NeedTraining( Config cfg );
+		void LoadTraining();
+		void SaveTraining();
 	}
 
 	//---------------------------------------//
@@ -39,12 +41,20 @@ namespace MusiC
 	/// <summary>
 	/// 
 	/// </summary>
+	abstract
 	public class BaseClassifier : Extension, IClassifier
 	{
-		public bool NeedTraining( IEnumerable<Label> lbl )
+		virtual
+		public bool NeedTraining( Config cfg )
 		{
 			return true;
 		}
+
+		abstract
+		public void LoadTraining();
+
+		abstract
+		public void SaveTraining();
 	}
 
 	//---------------------------------------//
@@ -122,7 +132,7 @@ namespace MusiC
 			/// A <see cref="Data.Unmanaged.DataCollection"/>
 			/// </returns>
 			virtual unsafe
-			public Data.Unmanaged.DataCollection* ExtractionFilter( Data.Unmanaged.DataCollection* dtCol )
+			public Data.Unmanaged.DataCollection* TrainingFilter( Data.Unmanaged.DataCollection* dtCol )
 			{
 				return null;
 			}

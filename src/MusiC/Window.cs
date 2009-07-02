@@ -22,6 +22,7 @@ using System;
 using System.Collections.Generic;
 
 using MusiC.Data;
+using MusiC.Exceptions;
 
 namespace MusiC
 {
@@ -128,7 +129,10 @@ namespace MusiC
 		public void Attach( IHandler file )
 		{
 			_hnd = file;
-			_nWnd = ( int ) Math.Floor( ( double ) ( _hnd.GetStreamSize() / _size ) );
+			_nWnd = ( int ) Math.Floor( ( double ) ( ( _hnd.GetStreamSize() - _overlap ) / ( _size - _overlap ) ) );
+
+			if( _nWnd <= 0 )
+				throw new MCException( "Not enough file data for a window." );
 		}
 
 		//::::::::::::::::::::::::::::::::::::::://
@@ -315,17 +319,12 @@ namespace MusiC
 			/// <summary>
 			/// 
 			/// </summary>
-			/// <param name="windowPos">
-			/// A <see cref="System.Int32"/>
-			/// </param>
-			/// <returns>
-			/// A <see cref="float"/>
-			/// </returns>
-			unsafe
-				//public float * GetWindow(int windowPos)
-			public Frame GetWindow( int windowPos )
+			/// <param name="windowPos">A <see cref="System.UInt32"/> giving the position of the window. Zero-based.</param>
+			/// <param name="displacement">A <see cref="System.UInt32"/> giving the number of samples to skip.</param>
+			/// <returns>A <see cref="MusiC.Unmanaged.Frame"/> with audio-data already windowed.</returns>
+			public Frame GetWindow( uint windowPos, uint displacement )
 			{
-				_rawStream = FileHandler.Read( windowPos * ( WindowSize - WindowOverlap ), WindowSize );
+				_rawStream = FileHandler.Read( ( windowPos * ( WindowSize - WindowOverlap ) ) + displacement, WindowSize );
 
 				_frame.AttachBuffer( _rawStream, WindowSize );
 
@@ -340,6 +339,18 @@ namespace MusiC
 
 				//return _dataStream;
 				return _frame;
+			}
+
+			//::::::::::::::::::::::::::::::::::::::://
+
+			/// <summary>
+			/// Overloaded for convenience.
+			/// </summary>
+			/// <param name="windowPos"></param>
+			/// <returns></returns>
+			public Frame GetWindow( uint windowPos )
+			{
+				return GetWindow( windowPos, 0 );
 			}
 		}
 	}

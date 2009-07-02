@@ -71,6 +71,20 @@ extern "C"
 	{
 		hnd.CloseDB();
 	}
+
+	//::::::::::::::::::::::::::::::::::::::://
+
+	MUSIC_EXPORT void * alloc( int bytes )
+	{
+		return malloc( bytes );
+	}
+
+	//::::::::::::::::::::::::::::::::::::::://
+
+	MUSIC_EXPORT void dealloc( void * ptr )
+	{
+		if( ptr ) free( ptr );
+	}
 }
 
 // END OF FILE

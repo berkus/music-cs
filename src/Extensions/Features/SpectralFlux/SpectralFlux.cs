@@ -42,7 +42,7 @@ namespace MusiC.Extensions.Features
 			if( lastframe == null || wndSize > _size )
 			{
                 if( lastframe != null )
-                    NativeMethods.Pointer.free(lastframe);
+                    NativeMethods.Pointer.free( lastframe );
 
 				lastframe = NativeMethods.Pointer.fgetmem( wndSize );
                 _size = wndSize;
@@ -56,7 +56,7 @@ namespace MusiC.Extensions.Features
 
                 // Copy data from fft buffer before next frame overwrites.
                 for (int idx = 0; idx < wndSize / 2; idx++)
-                    lastframe[idx] = spectrum[idx];
+                    lastframe[ idx ] = spectrum[ idx ];
 
 				return 0.0f;
 			}
@@ -66,7 +66,7 @@ namespace MusiC.Extensions.Features
 			
 			for( int idx = 0; idx < wndSize / 2; idx++ )
 			{
-				dif = (float) ( Math.Log10( (double) spectrum[ idx ] ) - Math.Log10( ( double ) lastframe[ idx ] ) );
+				dif = (float) ( Math.Log10( spectrum[ idx ] ) - Math.Log10( lastframe[ idx ] ) );
 				ret += dif * dif;
 
                 lastframe[ idx ] = spectrum[ idx ];

@@ -18,24 +18,16 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 // THE SOFTWARE.
 
-#include "MemoryManager.h"
-#include "MathF.h"
+#include "Platform.h"
 
 #include <cstring>
+#include <cstdlib>
+
 using namespace std;
 
 extern "C"
 {
-	MusiC::Native::MemoryManager mgr;
-	MusiC::Native::Math math;
-
-	int fftr_mag(float* x, float* mag, int m)
-	{
-		memcpy(mag, x, m * sizeof(int));
-		int ret = math.fftr_mag(mag, m);
-
-		return ret;
-	}
+	
 }
 
 // END OF FILE

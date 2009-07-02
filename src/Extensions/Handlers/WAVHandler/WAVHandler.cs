@@ -21,6 +21,8 @@
 using System;
 using System.IO;
 
+using MusiC.Exceptions;
+
 namespace MusiC.Extensions.Handlers
 {
 	/// <summary>
@@ -28,23 +30,23 @@ namespace MusiC.Extensions.Handlers
 	/// </summary>
 	unsafe
 	public class WavHandler : Unmanaged.Handler
-	{	
-		private float * _data = null;
-		
+	{
+		private float* _data = null;
+
 		// total audio data, loaded audio data, bytes per sample, channels
-		private int _streamSz, _dataSz, _bytesInUse, _channels;
+		private int _streamSz, _dataSz, _bytesInUse, _channels, _samplesPerChannel;
 		private long _offset;
 		private BinaryReader rd;
-		
+
 		//::::::::::::::::::::::::::::::::::::::://
-		
+
 		~WavHandler()
 		{
-			NativeMethods.Pointer.free(_data);
+			NativeMethods.Pointer.free( _data );
 		}
-		
+
 		//::::::::::::::::::::::::::::::::::::::://
-		
+
 		/// <summary>
 		/// 
 		/// </summary>
@@ -55,27 +57,27 @@ namespace MusiC.Extensions.Handlers
 		/// A <see cref="System.Boolean"/>
 		/// </returns>
 		override
-		public bool CanHandle(string file)
+		public bool CanHandle( string file )
 		{
 			///@todo This should check if the file is uncompressed
-			return Path.GetExtension(file).ToUpper() == ".WAV";
+			return Path.GetExtension( file ).ToUpper() == ".WAV";
 		}
-		
+
 		//::::::::::::::::::::::::::::::::::::::://
-		
+
 		/// <summary>
 		/// Attaches the handler to an existing file.
 		/// </summary>
 		/// <param name="file"></param>
 		override
-		public void Attach(string file)
+		public void Attach( string file )
 		{
-			base.Attach(file);
+			base.Attach( file );
 			Load();
 		}
-		
+
 		//::::::::::::::::::::::::::::::::::::::://
-		
+
 		/// <summary>
 		/// Dettaches the handler from a file.
 		/// </summary>
@@ -84,12 +86,12 @@ namespace MusiC.Extensions.Handlers
 		{
 			rd.Close();
 			rd = null;
-			
+
 			base.Detach();
 		}
-		
+
 		//::::::::::::::::::::::::::::::::::::::://
-		
+
 		/// <summary>
 		/// 
 		/// </summary>
@@ -99,17 +101,17 @@ namespace MusiC.Extensions.Handlers
 		override
 		public int GetStreamSize()
 		{
-			return _streamSz;
+			return _samplesPerChannel;
 		}
-		
+
 		//::::::::::::::::::::::::::::::::::::::://
-		
+
 		/// <summary>
 		/// 
 		/// </summary>
 		/// <param name="firstSample">
 		/// A <see cref="System.Int64"/>
-		/// </param>
+		/// </param>d
 		/// <param name="windowSize">
 		/// A <see cref="System.Int32"/>
 		/// </param>
@@ -117,135 +119,138 @@ namespace MusiC.Extensions.Handlers
 		/// A <see cref="System.Single"/>
 		/// </returns>
 		override unsafe
-		public System.Single* Read(long firstSample, int windowSize)
+		public System.Single* Read( long firstSample, int windowSize )
 		{
-			long firstByte = _offset + (firstSample * _bytesInUse * _channels);
-			
-			rd.BaseStream.Seek( firstByte, SeekOrigin.Begin);
-			Byte[] raw_data = rd.ReadBytes(windowSize * _bytesInUse * _channels);
-			
-			if (_dataSz < windowSize)
+			long firstByte = _offset + ( firstSample * _bytesInUse * _channels );
+
+			rd.BaseStream.Seek( firstByte, SeekOrigin.Begin );
+			Byte[] raw_data = rd.ReadBytes( windowSize * _bytesInUse * _channels );
+
+			if( _dataSz < windowSize )
 			{
-				if(_data != null)
-					NativeMethods.Pointer.free(_data);
-				
-				_data = NativeMethods.Pointer.fgetmem(windowSize);
+				if( _data != null )
+					NativeMethods.Pointer.free( _data );
+
+				_data = NativeMethods.Pointer.fgetmem( windowSize );
 				_dataSz = windowSize;
 			}
-			
-			if (raw_data.Length < windowSize)
+
+			if( raw_data.Length < windowSize )
 				return null;
-			
+
 			short i = 0;
 			long count = 0;
 			short c;
 
-            float norm_factor = (float) Math.Pow(2, (8*_bytesInUse) - 1);
-            //float norm_factor = 1;
+			float norm_factor = ( float ) Math.Pow( 2, ( 8 * _bytesInUse ) - 1 );
+			//float norm_factor = 1;
 			unsafe
 			{
 				float* pData = _data;
 				long temp;
-				
-				fixed (Byte* pB = raw_data)
+
+				fixed( Byte* pB = raw_data )
 				{
 					Byte* bitPt = pB; //can't assign to pB
-					byte* m = (byte*)&temp;
-					
-					for (; count < windowSize; count++)
+					byte* m = ( byte* ) &temp;
+
+					for( ; count < windowSize; count++ )
 					{
-						*(pData) = 0;
-						
-						for (c = 0; c < _channels; c++)
+						*( pData ) = 0;
+
+						for( c = 0; c < _channels; c++ )
 						{
 							// if it is a negative sample set temp to -1
 							// to make the value correct.
 							// if MSB > 128 ---> [[LSB]...[MSB]], ..., [[LSB]...[MSB]]
 							//              bitPt ^
-							temp = (*(bitPt + _bytesInUse -1) > 128) ? -1 : 0;
-							
+							temp = ( *( bitPt + _bytesInUse - 1 ) > 128 ) ? -1 : 0;
+
 							// temp = current sample
-							for (i = 0; i < _bytesInUse; i++)
-								*(m + i) = *(bitPt + i);
-							
+							for( i = 0; i < _bytesInUse; i++ )
+								*( m + i ) = *( bitPt + i );
+
 							// next sample
 							bitPt += _bytesInUse;
-							
+
 							// Increases the number of divisions but avoid overflow problems
 							// Makes data mono
 							// long / int = int .... need to cast to float.
-							*pData += (float) temp / _channels;
+							*pData += ( float ) temp / _channels;
 						}
 						*pData /= norm_factor;
 						pData++;
 					}
 				}
 			}
-			
+
 			raw_data = null;
-			
+
 			return _data;
 		}
-		
+
 		//::::::::::::::::::::::::::::::::::::::://
-		
+
 		/// <summary>
 		/// 
 		/// </summary>
 		protected void Load()
 		{
-			rd = new BinaryReader(new FileStream(CurrentFile, FileMode.Open));
-			
+			rd = new BinaryReader( new FileStream( CurrentFile, FileMode.Open ) );
+
 			// RIFF
-			rd.ReadChars(4);
+			rd.ReadChars( 4 );
 			rd.ReadInt32();
-			
+
 			// WAVE
-			rd.ReadChars(4);
-			
+			rd.ReadChars( 4 );
+
 			// 'fmt	'
-			rd.ReadChars(4);
+			rd.ReadChars( 4 );
 			rd.ReadInt32();
-			
+
 			//m_info.Compression = rd.ReadInt16();
 			rd.ReadInt16();
-			
+
 			//Channels
 			rd.ReadInt16();
-			
+
 			//m_info.SampleRate = rd.ReadInt32();
 			rd.ReadInt32();
-			
+
 			//m_info.ByteRate = rd.ReadInt32();
 			rd.ReadInt32();
-			
+
 			//m_info.BlockSize = rd.ReadInt16();
 			int blockSize = rd.ReadInt16();
-			
+
 			//m_info.Depth = rd.ReadInt16();
 			int sampleSize = rd.ReadInt16();
-			
+
 			///	@todo Handle compressed wave
-			
+
 			// DATA
-			rd.ReadChars(4);
-			
+			rd.ReadChars( 4 );
+
 			_streamSz = rd.ReadInt32();
-			
+
 			// m_info.Samples = dataSz / m_info.BlockSize;
 			//int bytesInUse = m_info.DepthInBytes = Convert.ToInt16(m_info.Depth / 8);
-			
+
 			_bytesInUse = sampleSize / 8;
 			_channels = blockSize / _bytesInUse;
-			
+
 			//int samplesPerChannel = Convert.ToInt32(dataSz / (m_info.Channels * bytesInUse));
-			int samplesPerChannel = Convert.ToInt32(_streamSz / blockSize);
-			
+			_samplesPerChannel = Convert.ToInt32( _streamSz / blockSize );
+
 			_offset = rd.BaseStream.Position;
 
 			//Message(CurrentFile);
-			Message(_channels + " channels with " + samplesPerChannel + " samples.");
-			Message( "Each sample has " + sampleSize + " bits making " + _streamSz + " bytes");
+			Message( _channels + " channels with " + _samplesPerChannel + " samples." );
+			Message( "Each sample has " + sampleSize + " bits making " + _streamSz + " bytes" );
+
+			if( _samplesPerChannel <= 0 )
+				throw new MCException("File stream is null");
 		}
 	}
 }

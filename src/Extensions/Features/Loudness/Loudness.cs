@@ -26,7 +26,7 @@ namespace MusiC.Extensions.Features
 	public class Loudness : Unmanaged.Feature
 	{
 		// this will be replaced later.
-		float d = 0.046875f;
+		float d = 0.043066f;
 		uint sz = 0;
 		float * _w;
 		

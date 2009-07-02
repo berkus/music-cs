@@ -33,7 +33,7 @@ namespace MusiC.Extensions.Features
 
 			// weighted-squared-sum
 			// squared-sum
-			float wss = 0.0f, ss = 0.0f, aux = 0.0f;
+			double wss = 0.0, ss = 0.0, aux = 0.0;
 			
 			for( uint idx = 0; idx < wndSize / 2; idx++ )
 			{
@@ -42,12 +42,13 @@ namespace MusiC.Extensions.Features
 				wss += idx * aux;
 			}
 
-			float centr = wss / ss, bw = 0.0f;
+			float aux2;
+			float centr = (float) (wss / ss), bw = 0.0f;
 
 			for( uint idx = 0; idx < wndSize / 2; idx++ )
 			{
-                aux = (centr - idx) * spectrum[idx];
-				bw += aux * aux;
+				aux2 = ( centr - idx ) * spectrum[ idx ];
+				bw += aux2 * aux2;
 			}
 
 			bw = (float) Math.Sqrt( (float) (bw / ss) );
