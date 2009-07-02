@@ -18,81 +18,49 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 // THE SOFTWARE.
 
-#include "DataHandler.h"
+#include "music_object.h"
 
-using namespace MusiC::Native;
+log4cxx::Logger * music::base::music_object::logger = NULL;
 
-DataHandler::DataHandler() : _data( NULL ), _curClass( NULL )
-{}
-
-void DataHandler::Attach( DataCollection * dtCol )
+music::base::music_object::music_object()
 {
-    _data = dtCol;
-    _curClass = NULL;
+	if( !logger )
+	{
+		log4cxx::xml::DOMConfigurator::configure( L"MusiC.log.xml" );
+		logger = log4cxx::Logger::getRootLogger();
+	}
 }
 
-ClassData * DataHandler::GetClass( unsigned int idx )
+music::base::music_object::~music_object()
 {
-    if( idx > _data->nClasses - 1 )
-        return NULL;
-
-    ClassData * c = _data->pFirstClass;
-
-    while( idx )
-    {
-        c = c->pNextClass;
-        idx--;
-    }
-
-    return c;
+	//dtor
 }
 
-ClassData * DataHandler::GetNextClass()
+void music::base::music_object::info( std::wstring msg ) const
 {
-    if( !_curClass )
-    {
-		return _curClass = _data->pFirstClass;
-    }
-
-    return _curClass = _curClass->pNextClass;
+	logger->info( msg );
 }
 
-FileData * DataHandler::GetNextLocalFile()
+void music::base::music_object::debug( std::wstring msg ) const
 {
-    return NULL;
+	logger->debug( msg );
 }
 
-FrameData * DataHandler::GetNextLocalFrame()
+void music::base::music_object::error( std::wstring msg ) const
 {
-    return NULL;
+	logger->error( msg );
 }
 
-FileData * DataHandler::GetNextGlobalFile()
+void music::base::music_object::fatal( std::wstring msg ) const
 {
-    if (!_curFile)
-    {
-		if( !_curClass )
-			GetNextClass();
-		
-		return _curFile = _curClass->pFirstFile;
-    }
-    
-    _curFile = _curFile->pNextFile;
-    
-    if( !_curFile )
-    {
-		GetNextClass();
-				
-		if( !_curClass )
-			return NULL;
-		
-		_curFile = _curClass->pFirstFile;
-    }
-    
-    return _curFile;
+	logger->fatal( msg );
 }
 
-FrameData * DataHandler::GetNextGlobalFrame()
+void music::base::music_object::warning( std::wstring msg ) const
 {
-    return NULL;
+	logger->warn( msg );
+}
+
+void music::base::music_object::say()
+{
 }

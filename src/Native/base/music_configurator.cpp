@@ -18,20 +18,22 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 // THE SOFTWARE.
 
-#if !defined(_MUSIC_PLATFORM_H_)
-#define _MUSIC_PLATFORM_H_
+#include "music_configurator.h"
 
-#if defined(_MSC_VER)
+music::base::music_configurator::music_configurator()
+{
+}
 
-#define MUSIC_EXPORT __declspec(dllexport)
-typedef __int64 Int64;
-typedef unsigned __int64 UInt64;
+music::base::music_configurator::~music_configurator()
+{
+}
 
-#elif
+music::base::music_config * music::base::music_configurator::configure( std::wstring &file ) const
+{
+    return NULL;
+}
 
-#define MUSIC_EXPORT
-typedef long long Int64;
-typedef unsigned long long UInt64;
-#endif
-
-#endif
+bool music::base::music_configurator::can_handle( std::wstring &file ) const
+{
+    return false;
+}

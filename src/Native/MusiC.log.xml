@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE log4j:configuration>
+
+<configuration>
+	<appender name="ROLL" class="org.apache.log4j.rolling.RollingFileAppender">
+		<layout class="org.apache.log4j.PatternLayout">
+			<param name="ConversionPattern" value="c{1} - mn"/>
+		</layout>
+	</appender>
+	
+	<root>
+		<appender-ref ref="ROLL"/>
+	</root>
+</configuration>
+        

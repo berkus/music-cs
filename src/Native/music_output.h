@@ -18,39 +18,29 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 // THE SOFTWARE.
 
-#if !defined(_MUSIC_NATIVE_MEMORYMANAGER_H_)
-#define _MUSIC_NATIVE_MEMORYMANAGER_H_
+// Output System.
+// High Level class to output information to user.
 
-#include <list>
-#include <cstdlib>
+#ifndef __ioutput__
+#define __ioutput__
 
-namespace MusiC
+#include "base/music_object.h"
+#include "base/music_config.h"
+
+namespace music
 {
-	namespace Native
+	class music_output
 	{
-		class MemoryManager
-		{
-			private:
-				std::list<size_t> l;
-
-				void Dealloc();
-
-			public:
-				void Dealloc (void * p);
-				void DeallocOwned(void * p);
-
-				template<class T>
-				T* Allocator (int sz)
-				{
-				    T * ptr = (T*) calloc (sz, sizeof (T) );
-				    l.push_back(reinterpret_cast<size_t>(ptr));
-
-					return ptr;
-				}
-
-				~MemoryManager();
-		};
-	}
+		
+	protected:
+		
+		music_output();
+		
+	public:
+		
+		virtual bool initialize( base::music_config * cfg ) = 0;
+		virtual ~music_output();
+	};
 }
 
-#endif // MEMORYMANAGER_H_INCLUDED
+#endif
