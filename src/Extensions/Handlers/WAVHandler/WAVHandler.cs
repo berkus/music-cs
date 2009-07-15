@@ -149,10 +149,10 @@ namespace MusiC.Extensions.Handlers
 				float* pData = _data;
 				long temp;
 
-				fixed( Byte* pB = raw_data )
+				fixed( byte* pB = raw_data )
 				{
-					Byte* bitPt = pB; //can't assign to pB
-					byte* m = ( byte* ) &temp;
+					byte* bytePt = pB; //can't assign to pB
+					byte* sampleBytePtr = ( byte* ) &temp;
 
 					for( ; count < windowSize; count++ )
 					{
@@ -164,14 +164,14 @@ namespace MusiC.Extensions.Handlers
 							// to make the value correct.
 							// if MSB > 128 ---> [[LSB]...[MSB]], ..., [[LSB]...[MSB]]
 							//              bitPt ^
-							temp = ( *( bitPt + _bytesInUse - 1 ) > 128 ) ? -1 : 0;
+							temp = ( *( bytePt + _bytesInUse - 1 ) > 128 ) ? -1 : 0;
 
 							// temp = current sample
 							for( i = 0; i < _bytesInUse; i++ )
-								*( m + i ) = *( bitPt + i );
+								*( sampleBytePtr + i ) = *( bytePt + i );
 
 							// next sample
-							bitPt += _bytesInUse;
+							bytePt += _bytesInUse;
 
 							// Increases the number of divisions but avoid overflow problems
 							// Makes data mono
@@ -183,8 +183,6 @@ namespace MusiC.Extensions.Handlers
 					}
 				}
 			}
-
-			raw_data = null;
 
 			return _data;
 		}

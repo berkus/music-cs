@@ -121,6 +121,7 @@ MUSIC_EXPORT int Barbedo_Classify( FileData * fd, void * data )
     unsigned int * total_votes = new unsigned int[ tdata->GetGenreCount() ];
 	unsigned int * frame_votes = new unsigned int[ tdata->GetGenreCount() ];
 	unsigned int * music_votes = new unsigned int[ tdata->GetGenreCount() ];
+	unsigned int invalid_votes = 0;
 
     for ( unsigned int idx = 0; idx < tdata->GetGenreCount(); idx++)
 	{
@@ -169,6 +170,8 @@ MUSIC_EXPORT int Barbedo_Classify( FileData * fd, void * data )
 
 		if( winner != is_invalid )
 			music_votes[ winner ]++;
+		else
+			invalid_votes++;
 
         frame = frame->pNextFrame;
     }
@@ -195,7 +198,7 @@ MUSIC_EXPORT int Barbedo_Classify( FileData * fd, void * data )
 		}
     }
 
-	log << " | " << count << endl;
+	log << " | " << count << " " << invalid_votes << " | " << count + invalid_votes << endl;
 	log.close();
 
 	if( winner == is_invalid )

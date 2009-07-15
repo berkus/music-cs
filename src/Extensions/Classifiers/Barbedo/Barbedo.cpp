@@ -142,8 +142,8 @@ DataCollection * Barbedo::FilterCandidates( DataCollection * dtCol )
 			var[ idx ] = abs( var[ idx ] - mean[ idx ] * mean[ idx ] );
 
 			// 1% of the standard deviation
-			if( var[ idx ] < 0.0001f * mean[ idx ] )
-				var[ idx ] = 0.0001f * mean[ idx ];
+			if( var[ idx ] < 0.0001f * mean[ idx ] * mean[ idx ] )
+				var[ idx ] = 0.0001f * mean[ idx ] * mean[ idx ];
 
 			high_bound[ idx ] = mean[ idx ] + RADIUS * sqrt( var[ idx ] );
 			low_bound[ idx ] = mean[ idx ] - RADIUS * sqrt( var[ idx ] );
@@ -357,14 +357,21 @@ FileData * Barbedo::Filter( FileData * fileDt, unsigned int nFeat )
 			{
 				// NaN Test
 				if( currentFrame[ idx ] != currentFrame[ idx ] )
-					continue;
+					break;
 
 				// Inf Test
 				if( currentFrame[ idx ] > FLT_MAX || currentFrame[ idx ] < -FLT_MAX )
-					continue;
+					break;
+			}
 
-				cluster_size++;
+			// loop breaked
+			if( idx != nfeat )
+				continue;
 
+			cluster_size++;
+
+			for( idx = 0; idx < nfeat; idx++ )
+			{
 				mean[ idx ] += currentFrame[ idx ] / CLUSTER_SIZE;
 				var[ idx ] += currentFrame[ idx ] * currentFrame[ idx ] / CLUSTER_SIZE;
 
@@ -374,22 +381,28 @@ FileData * Barbedo::Filter( FileData * fileDt, unsigned int nFeat )
 			frameDt = frameDt->pNextFrame;
 		}
 
-		log << "cluster: " << cluster_counter << " - frames:" << cluster_size / nfeat << endl;
+		log << "cluster: " << cluster_counter << " - frames:" << cluster_size << endl;
 		for( idx = 0; idx < nfeat; idx++ )
 		{
 			var[ idx ] = abs( var[ idx ] - mean[ idx ] * mean[ idx ] );
 
-			// 1% of the standard deviation
-			if( var[ idx ] < 0.0001f * mean[ idx ] )
-				var[ idx ] = 0.0001f * mean[ idx ];
+			// standard deviation >= 1% of the mean
+			if( var[ idx ] < 0.0001f * mean[ idx ] * mean[ idx ] )
+				var[ idx ] = 0.0001f * mean[ idx ] * mean[ idx ];
 
 			nfd->pData[ 3 * idx ] = mean[ idx ];
 			nfd->pData[ 3 * idx + 1 ] = var[ idx ];
-			nfd->pData[ 3 * idx + 2 ] = max[ idx ] / mean[ idx ];
+			float ppp = max[ idx ] / mean[ idx ];
 
-			// NaN Test
-			if( nfd->pData[ 3 * idx + 2 ] != nfd->pData[ 3 * idx + 2 ] )
-				nfd->pData[ 3 * idx + 2 ] = 1.0f;
+			// NaN Test 0/0
+			if( ppp != ppp )
+				ppp = 1.0f;
+
+			// Inf or -Inf   +x/0 -x/0
+			if( ppp > FLT_MAX || ppp < -FLT_MAX )
+				ppp = max[ idx ] / std::numeric_limits<float>::epsilon();
+
+			nfd->pData[ 3 * idx + 2 ] = ppp;
 
 			float std_dev = sqrt( var[ idx ] );
 			log << "" << idx << ": " << mean[ idx ] << " | " << var[ idx ] << " | " << std_dev;
@@ -433,8 +446,6 @@ DataCollection * Barbedo::Filter( DataCollection * extractedData )
 	hnd.Attach( extractedData );
 
 	log << "============ Barbedo::Filter ============" << endl;
-	//log << "Address (target):" << reinterpret_cast<size_t>( extractedData ) << endl;
-	//log << "Address( pointer ):" << reinterpret_cast<size_t>( &extractedData ) << endl;
 	log << "Received " << hnd.GetNumClasses( ) << " Classes" << endl;
 	log << "Received " << hnd.GetNumFeatures( ) << " Features" << endl;
 	log << "========== Algorithm Constants ==========" << endl;
@@ -573,7 +584,8 @@ void * Barbedo::Train( DataCollection * extractedData )
 		log << "Frame Count: " << fClassA->nFrames << "/" << classA->nFrames << endl;
 		log << "Frame Count: " << fClassB->nFrames << "/" << classB->nFrames << endl << endl;
 
-		float genre_weight =  ((float) classA->nFrames / (float) classB->nFrames);
+		//float genre_weight =  ((float) classA->nFrames / (float) classB->nFrames);
+		float genre_weight = 1;
 
 		unsigned int nclusters_a = classA->nFrames;
 		unsigned int nclusters_b = genre_weight * classB->nFrames;
