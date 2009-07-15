@@ -441,7 +441,8 @@ namespace MusiC
 			if( h == null )
 			{
 				Warning( file + ": No handler supports this file" );
-				//return null;
+				EndReportSection( true );
+				return null;
 			}
 
 			try
@@ -453,12 +454,17 @@ namespace MusiC
 			{
 				Error( "File was NOT extracted." );
 				Error( e );
+
+				_window.Detach();
+				h.Detach();
+
 				EndReportSection( true );
-				//return null;
+				return null;
 			}
 
 			Data.Unmanaged.FileData* currentFile = Unmanaged.Extractor.Extract( _window, _featureList, cfg );
 
+			_window.Detach();
 			h.Detach();
 
 			EndReportSection( true );

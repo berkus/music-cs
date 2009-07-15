@@ -205,7 +205,18 @@ namespace MusiC
 
 			public bool IsValid()
 			{
-				return !( _buffer == null );
+				if( _buffer != null )
+				{
+					for( int i = 0; i < _size; i++ )
+					{
+						if( float.IsInfinity(_buffer[i]) || float.IsNaN(_buffer[i]) )
+							return false;
+					}
+
+					return true;
+				}
+				
+				return false;
 			}
 
 			public float* RequestFFTMagnitude()
