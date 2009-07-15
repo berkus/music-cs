@@ -51,7 +51,7 @@ namespace MusiC.Extensions.Features
 				for( int idx = 0; idx < wndSize / 2; idx++ )
 				{
 					float f = (idx + 1) * d;
-					_w[ idx ] = (float) (-0.6 * 3.64 * Math.Pow( f, -0.8 ) - 6.5 * Math.Pow( Math.E, -0.6 * (f-3.3) * (f-3.3) ) + 0.001 * Math.Pow( f, 3.6 ) );
+					_w[ idx ] = (float) Math.Pow(10, (-0.6 * 3.64 * Math.Pow( f, -0.8 ) - 6.5 * Math.Pow( Math.E, -0.6 * (f-3.3) * (f-3.3) ) + 0.001 * Math.Pow( f, 3.6 ) ) / 20);
 				}
 			}
 			
@@ -60,7 +60,7 @@ namespace MusiC.Extensions.Features
             float * spectrum = frame.RequestFFTMagnitude();
 			for( int idx = 0; idx < wndSize / 2; idx++ )
 			{
-                ld += (float)(spectrum[ idx ] * spectrum[ idx ] * Math.Pow(10, _w[ idx ] / 20));
+                ld += spectrum[ idx ] * spectrum[ idx ] * _w[ idx ];
 			}
 
 			return ld;

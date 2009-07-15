@@ -66,7 +66,7 @@ namespace MusiC.Extensions.Features
 			
 			for( int idx = 0; idx < wndSize / 2; idx++ )
 			{
-				dif = (float) ( Math.Log10( spectrum[ idx ] ) - Math.Log10( lastframe[ idx ] ) );
+				dif = ( float ) ( Math.Log10( spectrum[ idx ] != 0.0f ? spectrum[ idx ] : float.Epsilon ) - Math.Log10( lastframe[ idx ] != 0.0f ? lastframe[ idx ] : float.Epsilon ) );
 				ret += dif * dif;
 
                 lastframe[ idx ] = spectrum[ idx ];

@@ -43,7 +43,7 @@ namespace MusiC.Extensions.Features
 			}
 
 			float aux2;
-			float centr = (float) (wss / ss), bw = 0.0f;
+			float centr = (float) (wss / (ss + float.Epsilon)), bw = 0.0f;
 
 			for( uint idx = 0; idx < wndSize / 2; idx++ )
 			{
@@ -51,7 +51,8 @@ namespace MusiC.Extensions.Features
 				bw += aux2 * aux2;
 			}
 
-			bw = (float) Math.Sqrt( (float) (bw / ss) );
+			bw = (float) Math.Sqrt( (float) (bw / (ss + float.Epsilon)) );
+
 			
 			return bw;
 		}
