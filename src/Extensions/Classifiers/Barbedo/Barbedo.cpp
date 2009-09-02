@@ -31,7 +31,7 @@ using namespace MusiC::Native;
 const int MusiC::Native::Barbedo::MAX_CANDIDATES = 20;
 const int MusiC::Native::Barbedo::CLUSTER_SIZE = 92;
 const int MusiC::Native::Barbedo::CLUSTER_COUNT = 32;
-const float MusiC::Native::Barbedo::RADIUS = 0.6f;
+const float MusiC::Native::Barbedo::RADIUS = 0.7f;
 const int MusiC::Native::Barbedo::FRAME_COUNT =
 MusiC::Native::Barbedo::CLUSTER_SIZE *
 MusiC::Native::Barbedo::CLUSTER_COUNT;
