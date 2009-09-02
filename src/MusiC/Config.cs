@@ -21,6 +21,7 @@
 using System;
 using System.IO;
 using System.Collections.Generic;
+using MusiC.Exceptions;
 
 namespace MusiC
 {
@@ -28,11 +29,23 @@ namespace MusiC
 	/// <summary>
 	/// 
 	/// </summary>
-	public class Config
+	public class Config : MusiCObject
 	{
 		private LinkedList<IAlgorithm> _algList = new LinkedList<IAlgorithm>();
 		private LinkedList<Label> _trainList = new LinkedList<Label>();
+
 		private Label _classify = new Label();
+
+		private Dictionary<Option, string> _opt = new Dictionary<Option, string>();
+
+		//::::::::::::::::::::::::::::::::::::::://
+
+		public enum Option
+		{
+			ALLOW_SAVE,
+			FORCE_EXTRACT,
+			FORCE_TRAINING
+		}
 
 		//::::::::::::::::::::::::::::::::::::::://
 
@@ -53,6 +66,7 @@ namespace MusiC
 		{
 			get { return _trainList; }
 		}
+
 		//::::::::::::::::::::::::::::::::::::::://
 
 		//// <value>
@@ -68,12 +82,23 @@ namespace MusiC
 		/// <summary>
 		/// 
 		/// </summary>
-		/// <param name="algorithm">
-		/// A <see cref="IAlgorithm"/>
-		/// </param>
-		public void AddAlgorithm( IAlgorithm algorithm )
+		/// <param name="algorithm"></param>
+		/// <returns></returns>
+		public bool AddAlgorithm( IAlgorithm algorithm )
 		{
-			_algList.AddLast( algorithm );
+			bool ret = true;
+
+			try
+			{
+				_algList.AddLast( algorithm );
+			}
+			catch( Exception e )
+			{
+				Error( e );
+				ret = false;
+			}
+
+			return ret;
 		}
 
 		//::::::::::::::::::::::::::::::::::::::://
@@ -81,13 +106,16 @@ namespace MusiC
 		/// <summary>
 		/// 
 		/// </summary>
-		/// <param name="label">
-		/// A <see cref="ILabel"/>
-		/// </param>
-		public void AddTrainLabel( Label label )
+		/// <param name="label"></param>
+		/// <returns></returns>
+		public bool AddTrainLabel( Label label )
 		{
-			if( label.Validate() )
+			bool ret;
+
+			if( ret = label.Validate() )
 				_trainList.AddLast( label );
+
+			return ret;
 		}
 
 		//::::::::::::::::::::::::::::::::::::::://
@@ -118,6 +146,116 @@ namespace MusiC
 
 		//::::::::::::::::::::::::::::::::::::::://
 
+		/// <summary>
+		/// Makes an option available.
+		/// </summary>
+		/// <param name="id"> A name to identify the option </param>
+		/// <param name="value"> Option value </param>
+		/// <returns> Success flag </returns>
+		public bool AddOption( Option id, string value )
+		{
+			if( value == null )
+				return false;
+
+			bool ret = true;
+
+			try
+			{
+				_opt.Add( id, value.ToUpper() );
+			}
+			catch( Exception e )
+			{
+				Error( e );
+				ret = false;
+			}
+
+			return ret;
+		}
+
+		//::::::::::::::::::::::::::::::::::::::://
+
+		public bool AddOption( string id, string value )
+		{
+			if( id == null || value == null )
+				return false;
+
+			bool ret = true;
+
+			try
+			{
+				Option opt = ( Option ) Enum.Parse( typeof( Option ), id.ToUpper() );
+				ret = AddOption( opt, value.ToUpper() );
+			}
+			catch
+			{
+				MCException ex = new MCException("Unrecognized option name: " + id );
+			}
+
+			return ret;
+		}
+
+		//::::::::::::::::::::::::::::::::::::::://
+
+		/// <summary>
+		/// Try to get an option as a string. All options, if available, succeed to this call.
+		/// </summary>
+		/// <param name="id"></param>
+		/// <param name="value"></param>
+		/// <returns></returns>
+		public bool GetOption( Option id, out string value )
+		{
+			return _opt.TryGetValue( id, out value );
+		}
+
+		//::::::::::::::::::::::::::::::::::::::://
+
+		/// <summary>
+		/// Try to get an option as a boolean. Depends on successful convertion.
+		/// </summary>
+		/// <param name="id"> The option name </param>
+		/// <param name="value"> [OUT] The boolean returned </param>
+		/// <returns> Success flag </returns>
+		public bool GetBoolOption( Option id, out bool value )
+		{
+			string val;
+
+			if( !GetOption( id, out val ) )
+			{
+				value = false;
+				return false;
+			}
+
+			return Boolean.TryParse( val, out value );
+		}
+
+		//::::::::::::::::::::::::::::::::::::::://
+
+		/// <summary>
+		/// Try to get an option as an integer. Depends on successful convertion.
+		/// </summary>
+		/// <param name="id"> The option name </param>
+		/// <param name="value"> [OUT] The integer returned </param>
+		/// <returns> Success flag </returns>
+		public bool GetIntOption( Option id, out int value )
+		{
+			string val;
+
+			if( !GetOption( id, out val ) )
+			{
+				value = 0;
+				return false;
+			}
+
+			return Int32.TryParse( val, out value );
+		}
+
+		//::::::::::::::::::::::::::::::::::::::://
+
+		/// <summary>
+		/// 
+		/// </summary>
+		/// <param name="n"></param>
+		/// <returns></returns>
 		public Label GetLabel( int n )
 		{
 			int count = -1;
