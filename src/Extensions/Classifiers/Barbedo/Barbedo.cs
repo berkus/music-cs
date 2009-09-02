@@ -26,6 +26,8 @@ using System.Collections.Generic;
 using MusiC;
 using MusiC.Data.Unmanaged;
 
+using System.Security.Permissions;
+
 namespace MusiC.Extensions.Classifiers
 {
 	/// <summary>
@@ -163,10 +165,11 @@ namespace MusiC.Extensions.Classifiers
 
 		//::::::::::::::::::::::::::::::::::::::://
 
+		[assembly: FileIOPermission(SecurityAction.RequestMinimum)]
 		override unsafe
 		public void SaveTraining()
 		{
-			FileStream f = new FileStream( "barbedo_train_data", FileMode.CreateNew );
+			FileStream f = new FileStream( "barbedo_train_data", FileMode.Create );
 			BinaryWriter writer = new BinaryWriter( f );
 
 			// Genre Count
