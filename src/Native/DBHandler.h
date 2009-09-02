@@ -55,28 +55,31 @@ namespace MusiC
 
         public:
 
-            void AddData(const char * sectionLabel, const char * dataLabel, float * data, int dataSectionSz);
-            void CloseDB();
+            bool AddData(const char * sectionLabel, const char * dataLabel, float * data, int dataSectionSz);
             bool HasData(const char * sectionLabel, const char * dtLabel);
-			void OpenDB(const char * dbName);
 			int ReadData(float * dt);
+
+			void OpenDB(const char * dbName);
+			void CloseDB();
 
 			//::::::::::::::::::::::::::::::::::::::://
 
         private:
 
+			bool IsDBOpen() { return db.is_open(); }
+			bool IsEndOfFile() { bool ret = (db.peek() == EOF); db.clear(); return (ret); }
+
             char * GetSection();
 			char * GetDataLabel();
-			bool IsDBOpen() { return db.is_open(); }
-			bool IsEndOfFile() { return (db.peek() == EOF); }
-			void JumpDataSection();
-			bool LoadNext();
+
 			void PrintHeader();
-			void ReadHeader();
+			bool ReadHeader();
 			void Reset();
-			void Set();
-			void WriteHeader(const char * sectionLabel, const char * dataLabel, int dataSectionSz);
-			void WriteData(float * data, int dataSectionSz);
+
+			void Destroy();
+
+			bool WriteHeader(const char * sectionLabel, const char * dataLabel, int dataSectionSz);
+			bool WriteData(float * data, int dataSectionSz);
 		};
 	}
 }
