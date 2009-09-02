@@ -17,7 +17,7 @@
 // LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 // THE SOFTWARE.
- 
+
 using System;
 using System.IO;
 using System.Reflection;
@@ -25,7 +25,7 @@ using System.Reflection;
 using MusiC.Exceptions;
 using MusiC.Extensions;
 
-[assembly: CLSCompliant(true)]
+[assembly: CLSCompliant( true )]
 
 namespace MusiC
 {
@@ -40,18 +40,18 @@ namespace MusiC
 	{
 		#region Attributes
 		private UnhandledExceptionEventHandler _UnhandledExceptionHandler;
-		
+
 		private String _configFile = "config.xml";
-		private String _extensionsDir = ".";
-		
+		private String _extensionsDir = Path.GetDirectoryName( Assembly.GetEntryAssembly().Location );
+
 		private ExtensionCache _cache = new ExtensionCache();
 		#endregion
 
 		//::::::::::::::::::::::::::::::::::::::://
-		
+
 		#region Properties
 		/// <summary>
-		/// The directory where we are looking for extensions.
+		/// The directory where we are looking at for extensions.
 		/// 
 		/// If the assigned path doesn't exists it keeps unchanged.
 		/// </summary>
@@ -61,17 +61,13 @@ namespace MusiC
 
 			set
 			{
-				if(Directory.Exists(value))
-				{
-                    _extensionsDir = value;
-                    //_extensionsDir = Path.GetDirectoryName(Assembly.GetEntryAssembly().Location);
-				}
-				
+				if( Directory.Exists( value ) )
+					_extensionsDir = value;
 			}
 		}
 
 		//::::::::::::::::::::::::::::::::::::::://
-		
+
 		/// <summary>
 		/// Library config file.
 		/// 
@@ -79,79 +75,85 @@ namespace MusiC
 		/// </summary>
 		public String ConfigFile
 		{
-			get {return _configFile;}
-			set 
-            {
-				if(File.Exists(value))
-				{
-                    _configFile = value;
-					//_configFile = Path.Combine(ExtensionsDir, "config.xml");
-				}	
+			get { return _configFile; }
+			set
+			{
+				if( File.Exists( value ) )
+					_configFile = value;
 			}
 		}
 		#endregion
 
 		//::::::::::::::::::::::::::::::::::::::://
-		
+
 		#region Library Startup/Finishing Functions
 		/// <summary>
 		/// Basic library startup code.
 		/// </summary>
 		public void Start()
 		{
-			_UnhandledExceptionHandler = new UnhandledExceptionEventHandler(MusiCObject.UnhandledException);
+			_UnhandledExceptionHandler = new UnhandledExceptionEventHandler( MusiCObject.UnhandledException );
 			AppDomain.CurrentDomain.UnhandledException += _UnhandledExceptionHandler;
-			
+
 			try
 			{
-				BeginReportSection("Starting Extension Loading");
-				
-				_cache.Load(ExtensionsDir);
+				BeginReportSection( "Starting Extension Loading" );
+
+				_cache.LoadDir( ExtensionsDir );
 				_cache.Say();
-				
-				EndReportSection(true);
+
+				EndReportSection( true );
 			}
-			catch(MCException mce)
+			catch( MCException mce )
 			{
 				mce.Report();
 			}
-			catch(Exception e)
+			catch( Exception e )
 			{
-				Error(e);
+				Error( e );
 			}
 		}
-		
+
 		//::::::::::::::::::::::::::::::::::::::://
-		
+
 		/// <summary>
-		/// 
+		/// Library finalization routine.
 		/// </summary>
 		public void Stop()
 		{
 			AppDomain.CurrentDomain.UnhandledException -= _UnhandledExceptionHandler;
 		}
-		
+
 		#endregion
-		
+
 		//::::::::::::::::::::::::::::::::::::::://
-		
+
 		#region Extensions Handling
-		
+
 		/// <summary>
-		/// 
+		/// Loads all extensions found in the indicated directory.
 		/// </summary>
-		/// <param name="path">
-		/// A <see cref="System.String"/>
-		/// </param>
-		public void LoadFrom(String path)
+		/// <param name="path"></param>
+		public void LoadExtensionDir( String path )
 		{
-			_cache.Load(path);
+			_cache.LoadDir( path );
 		}
-		
+
 		//::::::::::::::::::::::::::::::::::::::://
-		
+
 		/// <summary>
-		/// 
+		/// Load an extension
+		/// </summary>
+		/// <param name="path"></param>
+		public void LoadExtension( String path )
+		{
+			_cache.LoadDir( path );
+		}
+
+		//::::::::::::::::::::::::::::::::::::::://
+
+		/// <summary>
+		/// Checks if an extension was loaded.
 		/// </summary>
 		/// <param name="classname">
 		/// A <see cref="System.String"/>
@@ -159,49 +161,49 @@ namespace MusiC
 		/// <returns>
 		/// A <see cref="System.Boolean"/>
 		/// </returns>
-		public bool IsExtensionLoaded(String classname)
+		public bool IsExtensionLoaded( String classname )
 		{
-			return !(ExtensionCache.GetInfo(classname) == null);
+			return !( ExtensionCache.GetInfo( classname ) == null );
 		}
-		
+
 		#endregion
-		
+
 		//::::::::::::::::::::::::::::::::::::::://
-		
+
 		#region Algorithm Handling
 		#endregion
-		
+
 		//::::::::::::::::::::::::::::::::::::::://
-		
+
 		#region Algorithm Execution
 
-        /// <summary>
-        /// 
-        /// </summary>
-        public void Run()
-        {
-            try
-            {
-                Configurator cfg = _cache.GetConfigurator(ConfigFile);
-                Config conf = cfg.LoadConfig(ConfigFile);
+		/// <summary>
+		/// Starts running algorithms.
+		/// </summary>
+		public void Run()
+		{
+			try
+			{
+				Configurator cfg = _cache.GetConfigurator( ConfigFile );
+				Config conf = cfg.LoadConfig( ConfigFile );
 
-                Message(_configFile + " ... [LOADED]");
+				Message( _configFile + " ... [LOADED]" );
 
-                foreach (Algorithm a in conf.AlgorithmList)
-                {
-                    a.Execute(conf);
-                }
-            }
-            catch (MCException mce)
-            {
-                mce.Report();
-            }
-            catch (Exception e)
-            {
-                Error(e);
-            }
-        }
-		
+				foreach( Algorithm a in conf.AlgorithmList )
+				{
+					a.Execute( conf );
+				}
+			}
+			catch( MCException mce )
+			{
+				mce.Report();
+			}
+			catch( Exception e )
+			{
+				Error( e );
+			}
+		}
+
 		#endregion
 	}
 }
