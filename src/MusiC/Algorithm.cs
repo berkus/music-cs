@@ -541,7 +541,13 @@ namespace MusiC
 		{
 			if( _classifier != null )
 			{
-				if( _classifier.NeedTraining( conf ) )
+				bool force_extract = false;
+				bool ok = conf.GetBoolOption(Config.Option.FORCE_EXTRACT, out force_extract);
+				
+				bool force_training = false;
+				ok = conf.GetBoolOption( Config.Option.FORCE_TRAINING, out force_training );
+
+				if( _classifier.NeedTraining( conf ) || force_extract || force_training )
 				{
 					Message( "Extracting . . ." );
 					Data.Unmanaged.DataCollection* dtCol = Extract( conf );

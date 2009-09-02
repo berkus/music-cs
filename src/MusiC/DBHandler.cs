@@ -19,6 +19,7 @@
 // THE SOFTWARE.
 
 using System;
+using System.IO;
 using System.Runtime.InteropServices;
 
 namespace MusiC
@@ -28,26 +29,40 @@ namespace MusiC
 	/// </summary>
 	public class DBHandler : MusiCObject
 	{
+		private string _file;
+		private bool _init = false;
+
+		//::::::::::::::::::::::::::::::::::::::://
+
+		private void Initialize()
+		{
+			uInitialize( _file );
+			_init = true;
+		}
+
+		//::::::::::::::::::::::::::::::::::::::://
+
 		/// <summary>
 		/// 
 		/// </summary>
 		/// <param name="file">
 		/// A <see cref="System.String"/>
 		/// </param>
-		public DBHandler(string file)
+		public DBHandler( string file )
 		{
-			uInitialize(GetDBName(file));
+			GetDBName( file );
 		}
-		
+
 		//::::::::::::::::::::::::::::::::::::::://
-		
-		public void Terminate ()
+
+		public void Terminate()
 		{
-			uTerminate();
+			if( _init )
+				uTerminate();
 		}
-		
+
 		//::::::::::::::::::::::::::::::::::::::://
-		
+
 		/// <summary>
 		/// 
 		/// </summary>
@@ -57,13 +72,13 @@ namespace MusiC
 		/// <returns>
 		/// A <see cref="System.String"/>
 		/// </returns>
-		public string GetDBName(string file)
+		public string GetDBName( string file )
 		{
-			return file + ".db";
+			return _file = file + ".db";
 		}
-		
+
 		//::::::::::::::::::::::::::::::::::::::://
-		
+
 		/// <summary>
 		/// 
 		/// </summary>
@@ -79,17 +94,28 @@ namespace MusiC
 		/// <returns>
 		/// A <see cref="System.Int32"/>
 		/// </returns>
-		[CLSCompliant(false)]
+		[CLSCompliant( false )]
 		unsafe
-		public int GetFeature(string wndName, string featName, float * data)
+		public int GetFeature( string wndName, string featName, float* data )
 		{
-			return uGetFeature(wndName, featName, data);
+			if( File.Exists( _file ) )
+			{
+				if( !_init )
+					Initialize();
+
+				return uGetFeature( wndName, featName, data );
+			}
+			else
+			{
+				data = null;
+				return 0;
+			}
 		}
-		
+
 		//::::::::::::::::::::::::::::::::::::::://
-		
+
 		/// <summary>
-		/// 
+		/// Add or replace the pair window-feature saved data.
 		/// </summary>
 		/// <param name="wndName">
 		/// A <see cref="System.String"/>
@@ -103,36 +129,39 @@ namespace MusiC
 		/// <param name="size">
 		/// A <see cref="System.Int32"/>
 		/// </param>
-		[CLSCompliant(false)]
+		[CLSCompliant( false )]
 		unsafe
-		public void AddFeature(string wndName, string featName, float * data, int size)
+		public void AddFeature( string wndName, string featName, float* data, int size )
 		{
-			uAddFeature(wndName, featName, data, size);
+			if( !_init )
+				Initialize();
+
+			uAddFeature( wndName, featName, data, size );
 		}
-		
+
 		//::::::::::::::::::::::::::::::::::::::://
-		
+
 		/// <summary>
 		/// 
 		/// </summary>
 		/// <param name="dbName">
 		/// A <see cref="System.String"/>
 		/// </param>
-		[DllImport("MusiC.Native.Core.dll", EntryPoint="Initialize", CharSet=CharSet.Ansi)]
+		[DllImport( "MusiC.Native.Core.dll", EntryPoint = "Initialize", CharSet = CharSet.Ansi )]
 		extern static unsafe
-		private void uInitialize(string dbName);
-		
+		private void uInitialize( string dbName );
+
 		//::::::::::::::::::::::::::::::::::::::://
-		
+
 		/// <summary>
 		/// 
 		/// </summary>
-		[DllImport("MusiC.Native.Core.dll", EntryPoint="Terminate")]
+		[DllImport( "MusiC.Native.Core.dll", EntryPoint = "Terminate" )]
 		extern static unsafe
 		private void uTerminate();
-		
+
 		//::::::::::::::::::::::::::::::::::::::://
-		
+
 		/// <summary>
 		/// 
 		/// </summary>
@@ -148,12 +177,12 @@ namespace MusiC
 		/// <returns>
 		/// A <see cref="System.Int32"/>
 		/// </returns>
-		[DllImport("MusiC.Native.Core.dll", EntryPoint="GetFeature", CharSet=CharSet.Ansi)]
+		[DllImport( "MusiC.Native.Core.dll", EntryPoint = "GetFeature", CharSet = CharSet.Ansi )]
 		extern static unsafe
-		private int uGetFeature(string wndName, string featName, float * data);
-		
+		private int uGetFeature( string wndName, string featName, float* data );
+
 		//::::::::::::::::::::::::::::::::::::::://
-		
+
 		/// <summary>
 		/// 
 		/// </summary>
@@ -169,9 +198,9 @@ namespace MusiC
 		/// <param name="size">
 		/// A <see cref="System.Int32"/>
 		/// </param>
-		[DllImport("MusiC.Native.Core.dll", EntryPoint="AddFeature", CharSet=CharSet.Ansi)]
+		[DllImport( "MusiC.Native.Core.dll", EntryPoint = "AddFeature", CharSet = CharSet.Ansi )]
 		extern static unsafe
-		private void uAddFeature(string wndName, string featName, float * data, int size);
+		private void uAddFeature( string wndName, string featName, float* data, int size );
 
 	}
 }
