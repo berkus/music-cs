@@ -247,13 +247,13 @@ namespace MusiC
 		public class Window : BaseWindow
 		{
 			/// External. Handler buffer if audio data.
-			private float* _rawStream = null;
+			private float* _rawAudioStream = null;
 
 			/// Buffer window data.
 			private float* _wndData = null;
 
 			/// Windowed Data. This is the _rawStream after processing.
-			private float* _dataStream = null;
+			private float* _wndAudioStream = null;
 
 			private Frame _frame = new Frame();
 
@@ -279,7 +279,7 @@ namespace MusiC
 				: base( size, overlap )
 			{
 				_wndData = NativeMethods.Pointer.fgetmem( size );
-				_dataStream = NativeMethods.Pointer.fgetmem( size );
+				_wndAudioStream = NativeMethods.Pointer.fgetmem( size );
 
 				for( int i = 0; i < WindowSize; i++ )
 					_wndData[ i ] = Factory( i );
@@ -292,8 +292,8 @@ namespace MusiC
 				if( _wndData != null )
 					NativeMethods.Pointer.free( _wndData );
 
-				if( _dataStream != null )
-					NativeMethods.Pointer.free( _dataStream );
+				if( _wndAudioStream != null )
+					NativeMethods.Pointer.free( _wndAudioStream );
 			}
 
 			//::::::::::::::::::::::::::::::::::::::://
@@ -319,10 +319,10 @@ namespace MusiC
 			/// A float-pointer to hold the result.
 			/// </param>
 			virtual
-			protected void Calculate( float* wndData, float* fileData, float* result )
+			protected void Calculate( float* window, float* rawAudio, float* wndAudio )
 			{
 				for( int i = 0; i < WindowSize; i++ )
-					*( result++ ) = *( fileData++ ) * *( wndData++ );
+					*( wndAudio++ ) = *( rawAudio++ ) * *( window++ );
 			}
 
 			//::::::::::::::::::::::::::::::::::::::://
@@ -335,20 +335,19 @@ namespace MusiC
 			/// <returns>A <see cref="MusiC.Unmanaged.Frame"/> with audio-data already windowed.</returns>
 			public Frame GetWindow( uint windowPos, uint displacement )
 			{
-				_rawStream = FileHandler.Read( ( windowPos * ( WindowSize - WindowOverlap ) ) + displacement, WindowSize );
+				_rawAudioStream = FileHandler.Read( ( windowPos * ( WindowSize - WindowOverlap ) ) + displacement, WindowSize );
 
-				_frame.AttachBuffer( _rawStream, WindowSize );
+				_frame.AttachBuffer( _wndAudioStream, WindowSize );
 
-				if( _rawStream == null )
+				if( _rawAudioStream == null )
 					return _frame;
 
-				float* ptrRawStream = _rawStream;
-				float* ptrDataStream = _dataStream;
+				float* ptrRawAudioStream = _rawAudioStream;
+				float* ptrWndAudioStream = _wndAudioStream;
 				float* ptrWnd = _wndData;
 
-				Calculate( ptrWnd, ptrRawStream, ptrDataStream );
+				Calculate( ptrWnd, ptrRawAudioStream, ptrWndAudioStream );
 
-				//return _dataStream;
 				return _frame;
 			}
 

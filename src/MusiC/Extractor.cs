@@ -100,17 +100,22 @@ namespace MusiC
 			public Data.Unmanaged.FileData* Extract( Window wnd, IEnumerable<Feature> featList, Config cfg )
 			{
 				int fIdx;
-				//float * windowBuffer;
 				Frame dataFrame;
+				int featCount = 0;
 
 				BaseHandler bdb = wnd.HandlerInterface as BaseHandler;
 				DBHandler db = bdb.GetDBHandler();
-				int featCount = 0;
 
 				// Options
+				bool ok, save, force_extract;
+
+				ok = cfg.GetBoolOption( Config.Option.ALLOW_SAVE, out save );
+				if( !ok ) save = true;
+
+				ok = cfg.GetBoolOption( Config.Option.FORCE_EXTRACT, out force_extract );
+				if( !ok ) force_extract = false;
+
 				uint frameCount = 2944;
-				bool force_extract = false;
-				bool save = true;
 
 				uint samples = ( uint ) ( frameCount * ( wnd.WindowSize - wnd.WindowOverlap ) + wnd.WindowOverlap );
 				// Centering Samples
@@ -187,16 +192,20 @@ namespace MusiC
 					}
 				}
 
-				// storing unextracted data.
-				foreach( FeatureHelper fh in parsedList )
+				if( save )
 				{
-					if( !fh.extracted && save )
-						db.AddFeature( wnd.GetID(), fh.feat.GetID(), fh.data, wnd.WindowCount );
+					// storing unextracted data.
+					foreach( FeatureHelper fh in parsedList )
+					{
+						if( !fh.extracted || force_extract )
+							db.AddFeature( wnd.GetID(), fh.feat.GetID(), fh.data, wnd.WindowCount );
 
-					NativeMethods.Pointer.free( fh.data );
+						NativeMethods.Pointer.free( fh.data );
+					}
+
+					db.Terminate();
 				}
 
-				db.Terminate();
 				return dataStg;
 			}
 		}
