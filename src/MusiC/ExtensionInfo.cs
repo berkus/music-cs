@@ -99,7 +99,9 @@ namespace MusiC
 			get { return _managed; }
 		}
 		#endregion
-		
+
+		//::::::::::::::::::::::::::::::::::::::://
+
 		#region Contructor
 		public ExtensionInfo(Type t)
 		{

@@ -17,7 +17,7 @@
 // LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 // THE SOFTWARE.
- 
+
 using System;
 using System.Reflection;
 
@@ -26,17 +26,16 @@ namespace MusiC
 	/// <summary>
 	/// 
 	/// </summary>
-	public 
+	public
 	class Instantiable : ParamList
 	{
-		private string _name;
 		private string _classname;
 		private string _strValue;
-		
+
 		private Type _class;
 		private object _value;
-		
-		private bool  _isInitiated = false;
+
+		private bool _isInitiated = false;
 
 		//::::::::::::::::::::::::::::::::::::::://
 
@@ -50,25 +49,14 @@ namespace MusiC
 		}
 
 		//::::::::::::::::::::::::::::::::::::::://
-		
-		//// <value>
-		/// 
-		/// </value>
-		public string Name
-		{
-			get { return _name; }
-			set {_name = value; }
-		}
 
-		//::::::::::::::::::::::::::::::::::::::://
-		
 		//// <value>
 		/// 
 		/// </value>
 		public string Class
 		{
 			get { return _classname; }
-			set { _class = Type.GetType(value, false, false); _classname = value; }
+			set { _class = Type.GetType( value, false, false ); _classname = value; }
 		}
 
 		//::::::::::::::::::::::::::::::::::::::://
@@ -79,7 +67,7 @@ namespace MusiC
 		public string StrValue
 		{
 			get { return _strValue; }
-			set { _strValue=value; }
+			set { _strValue = value; }
 		}
 
 		//::::::::::::::::::::::::::::::::::::::://
@@ -93,7 +81,7 @@ namespace MusiC
 		}
 
 		//::::::::::::::::::::::::::::::::::::::://
-		
+
 		/// <summary>
 		/// 
 		/// </summary>
@@ -103,15 +91,14 @@ namespace MusiC
 		/// <param name="paramClass">
 		/// A <see cref="System.String"/>
 		/// </param>
-		public Instantiable(String paramName, String paramClass)
+		public Instantiable( string paramClass )
 		{
-			_name=paramName;
-			_classname=paramClass;
-			_class = Type.GetType(paramClass, false, false);
+			_classname = paramClass;
+			_class = Type.GetType( paramClass, false, false );
 		}
 
 		//::::::::::::::::::::::::::::::::::::::://
-		
+
 		/// <summary>
 		/// Creates a new instance of a class
 		/// 
@@ -126,35 +113,35 @@ namespace MusiC
 		override
 		public void Instantiate()
 		{
-			if( _value != null || _isInitiated)
+			if( _value != null || _isInitiated )
 				return;
-			
+
 			///@todo throw exception
-			if(_class == null || _classname == null)
+			if( _class == null || _classname == null )
 				return;
-			
+
 			base.Instantiate();
-			
-			if(_strValue != null)
+
+			if( _strValue != null )
 			{
-				MethodInfo parse = _class.GetMethod("Parse", new Type[]{typeof(String)});
-				
-				if(parse == null)
+				MethodInfo parse = _class.GetMethod( "Parse", new Type[] { typeof( String ) } );
+
+				if( parse == null )
 				{
-					Warning(_classname+".Parse wasn't found. This must be a static method. Using declared constructor.");
+					Warning( _classname + ".Parse wasn't found. This must be a static method. Using declared constructor." );
 				}
 				else
 				{
-					_value = parse.Invoke(null, new Object[] { StrValue } );
+					_value = parse.Invoke( null, new Object[] { StrValue } );
 					return;
 				}
 			}
-			
+
 			// Find the constructor matching the types contained by the list. Order IS relevant.
-			ConstructorInfo defaultCtor = _class.GetConstructor(GetTypes());
-			
+			ConstructorInfo defaultCtor = _class.GetConstructor( GetTypes() );
+
 			// Invoke the constructor.
-			defaultCtor.Invoke(GetParamsValue());
+			defaultCtor.Invoke( GetParamsValue() );
 		}
 	}
 }

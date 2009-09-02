@@ -31,81 +31,48 @@ namespace MusiC
 		private bool _isParamInitiated = false;
 
 		private LinkedList<Instantiable> _paramList = new LinkedList<Instantiable>();
-		
+
 		//::::::::::::::::::::::::::::::::::::::://
-		
+
 		/// <summary>
 		/// 
 		/// </summary>
-		/// <param name="paramName">
-		/// A <see cref="System.String"/>
-		/// </param>
-		/// <param name="paramClass">
-		/// A <see cref="System.String"/>
-		/// </param>
-		public virtual void AddParam(string paramName, string paramClass)
+		/// <param name="paramClass"></param>
+		public virtual void AddParam( string paramClass )
 		{
-			AddParam(paramName, paramClass, null);
+			AddParam( paramClass, null );
 		}
-		
+
 		//::::::::::::::::::::::::::::::::::::::://
-		
+
 		/// <summary>
 		/// 
 		/// </summary>
-		/// <param name="paramName">
-		/// A <see cref="System.String"/>
-		/// </param>
-		/// <param name="paramClass">
-		/// A <see cref="System.String"/>
-		/// </param>
-		/// <param name="strValue">
-		/// A <see cref="System.String"/>
-		/// </param>
-		public virtual void AddParam(string paramName, string paramClass, string strValue)
+		/// <param name="paramClass"></param>
+		/// <param name="strValue"></param>
+		public virtual void AddParam( string paramClass, string strValue )
 		{
-			Instantiable i = new Instantiable(paramName, paramClass);
+			Instantiable i = new Instantiable( paramClass );
 			i.StrValue = strValue;
-			_paramList.AddLast(i);
+			_paramList.AddLast( i );
 		}
-		
+
 		//::::::::::::::::::::::::::::::::::::::://
-		
+
 		/// <summary>
 		/// 
 		/// </summary>
 		public virtual void Instantiate()
 		{
-			if (_paramList.Count != 0 && !_isParamInitiated) {
-				foreach (Instantiable i in _paramList)
+			if( _paramList.Count != 0 && !_isParamInitiated )
+			{
+				foreach( Instantiable i in _paramList )
 					i.Instantiate();
 			}
 		}
 
 		//::::::::::::::::::::::::::::::::::::::://
-		
-		/// <summary>
-		/// 
-		/// </summary>
-		/// <param name="name">
-		/// A <see cref="System.String"/>
-		/// </param>
-		/// <returns>
-		/// A <see cref="Instantiable"/>
-		/// </returns>
-		public Instantiable GetParamByName(string name)
-		{
-			foreach (Instantiable i in _paramList) {
-				if (i.Name == name) return i; 
-			}
 
-			return null;
-
-			///@todo error handling
-		}
-		
-		//::::::::::::::::::::::::::::::::::::::://
-		
 		/// <summary>
 		/// 
 		/// </summary>
@@ -115,19 +82,20 @@ namespace MusiC
 		public virtual Type[] GetTypes()
 		{
 			int paramCount = _paramList.Count;
-			Type[] paramClassTypes = new Type[paramCount];
+			Type[] paramClassTypes = new Type[ paramCount ];
 
 			int i = 0;
-			foreach (Instantiable param in _paramList) {
-				paramClassTypes[i] = param.TypeObj;
+			foreach( Instantiable param in _paramList )
+			{
+				paramClassTypes[ i ] = param.TypeObj;
 				i++;
 			}
 
 			return paramClassTypes;
 		}
-		
+
 		//::::::::::::::::::::::::::::::::::::::://
-		
+
 		/// <summary>
 		/// 
 		/// </summary>
@@ -136,32 +104,34 @@ namespace MusiC
 		/// </returns>
 		public virtual object[] GetParamsValue()
 		{
-			if (_paramList.Count != 0 && !_isParamInitiated) {
-				foreach (Instantiable i in _paramList)
+			if( _paramList.Count != 0 && !_isParamInitiated )
+			{
+				foreach( Instantiable i in _paramList )
 					i.Instantiate();
 			}
 
 			Int32 paramCount = _paramList.Count;
-			object[] paramValue = new object[paramCount];
+			object[] paramValue = new object[ paramCount ];
 
 			Int32 j = 0;
-			foreach (Instantiable param in _paramList) {
-				paramValue[j] = param.Value;
+			foreach( Instantiable param in _paramList )
+			{
+				paramValue[ j ] = param.Value;
 				j++;
 			}
 
 			return paramValue;
 		}
 
-        //::::::::::::::::::::::::::::::::::::::://
+		//::::::::::::::::::::::::::::::::::::::://
 
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <returns></returns>
-        public IEnumerable<Instantiable> GetParamList()
-        {
-            return _paramList;
-        }
+		/// <summary>
+		/// 
+		/// </summary>
+		/// <returns></returns>
+		public IEnumerable<Instantiable> GetParamList()
+		{
+			return _paramList;
+		}
 	}
 }
