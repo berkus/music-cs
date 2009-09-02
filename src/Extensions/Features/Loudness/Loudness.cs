@@ -28,39 +28,39 @@ namespace MusiC.Extensions.Features
 		// this will be replaced later.
 		float d = 0.043066f;
 		uint sz = 0;
-		float * _w;
-		
+		float* _w;
+
 		override unsafe
 		public float Extract( Unmanaged.Frame frame )
 		{
-            int wndSize = frame.Size;
+			int wndSize = frame.Size;
 			if( sz != wndSize )
-			{	
+			{
 				// Local buffer managed by the managed base class.
 				// As long as the size doesn't change it may be used to store values 
 				// between calls.
 
 				if( sz < wndSize )
 				{
-					sz = (uint) wndSize;
+					sz = ( uint ) wndSize;
 
-                    NativeMethods.Pointer.free( _w );
+					NativeMethods.Pointer.free( _w );
 					_w = NativeMethods.Pointer.fgetmem( wndSize / 2 );
 				}
-				
+
 				for( int idx = 0; idx < wndSize / 2; idx++ )
 				{
-					float f = (idx + 1) * d;
-					_w[ idx ] = (float) Math.Pow(10, (-0.6 * 3.64 * Math.Pow( f, -0.8 ) - 6.5 * Math.Pow( Math.E, -0.6 * (f-3.3) * (f-3.3) ) + 0.001 * Math.Pow( f, 3.6 ) ) / 20);
+					float f = ( idx + 1 ) * d;
+					_w[ idx ] = ( float ) Math.Pow( 10, ( -0.6 * 3.64 * Math.Pow( f, -0.8 ) - 6.5 * Math.Pow( Math.E, -0.6 * ( f - 3.3 ) * ( f - 3.3 ) ) + 0.001 * Math.Pow( f, 3.6 ) ) / 20 );
 				}
 			}
-			
+
 			float ld = 0.0f;
 
-            float * spectrum = frame.RequestFFTMagnitude();
+			float* spectrum = frame.RequestFFTMagnitude();
 			for( int idx = 0; idx < wndSize / 2; idx++ )
 			{
-                ld += spectrum[ idx ] * spectrum[ idx ] * _w[ idx ];
+				ld += spectrum[ idx ] * spectrum[ idx ] * _w[ idx ];
 			}
 
 			return ld;

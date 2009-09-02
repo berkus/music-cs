@@ -31,10 +31,10 @@ using System.Reflection;
 using System.Runtime.InteropServices;
 using System.Security.Permissions;
 
-[assembly: CLSCompliant(true)]
-[assembly: ComVisible(false)]
-[assembly: AssemblyTitle("MusiC - Feature - SpecRollOff")]
-[assembly: AssemblyVersionAttribute("0.0.*")]
+[assembly: CLSCompliant( true )]
+[assembly: ComVisible( false )]
+[assembly: AssemblyTitle( "MusiC - Feature - SpecRollOff" )]
+[assembly: AssemblyVersionAttribute( "0.0.*" )]
 
 #region Security
 //[assembly: PermissionSetAttribute(SecurityAction.RequestMinimum, Name="Nothing")]
@@ -51,14 +51,14 @@ using System.Security.Permissions;
 //[assembly: SiteIdentityPermission(SecurityAction.RequestRefuse)]
 //[assembly: UIPermission(SecurityAction.RequestRefuse)]
 //[assembly: ZoneIdentityPermission(SecurityAction.RequestRefuse)]
-#endregion 
+#endregion
 
 namespace MusiC.Extensions.Features
 {
-	[CLSCompliant(false)]
+	[CLSCompliant( false )]
 	unsafe
 	public class SpecRollOffU : Unmanaged.Feature
-	{	
+	{
 		/// <summary>
 		/// 
 		/// </summary>
@@ -77,31 +77,31 @@ namespace MusiC.Extensions.Features
 			double sum = 0, cum = 0;
 			int sro = 0;
 
-            int wndSize = frame.Size;
-            float * spectrum = frame.RequestFFTMagnitude();
-			
-			for (int i = 0; i < wndSize / 2; i++)
+			int wndSize = frame.Size;
+			float* spectrum = frame.RequestFFTMagnitude();
+
+			for( int i = 0; i < wndSize / 2; i++ )
 				sum += spectrum[ i ] * spectrum[ i ];
-			
+
 			cum = sum;
-			
-			for (sro = (wndSize / 2) - 1; sro > 0; sro--)
+
+			for( sro = ( wndSize / 2 ) - 1; sro > 0; sro-- )
 			{
-                if (cum < (0.95 * sum))
-                    break;
+				if( cum < ( 0.95 * sum ) )
+					break;
 
 				cum -= spectrum[ sro ] * spectrum[ sro ];
 			}
-			
+
 			return sro;
 		}
 	}
-	
+
 	//---------------------------------------//
-	
+
 	public class SpecRollOffM : Managed.Feature
-	{	
-		override public Single[] Extract(Managed.Window window)
+	{
+		override public Single[] Extract( Managed.Window window )
 		{
 			return null;
 		}
