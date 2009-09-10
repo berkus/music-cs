@@ -18,32 +18,39 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 // THE SOFTWARE.
 
-#ifndef __factory__
-#define __factory__
+#include "MemoryManager.h"
 
-#include "../music_output.h"
-#include "../music_input.h"
-#include "../music_exec.h"
+using namespace std;
 
-#include "../impl/music_output_impl.h"
-#include "../impl/music_input_impl.h"
-#include "../impl/music_exec_impl.h"
-
-namespace music
+void MusiC::Native::MemoryManager::Dealloc()
 {
-	namespace impl
-	{
-		class factory
-		{
-			factory();
-			
-		public:
-			
-			inline static music_output * get_output_system() { return new music_output_impl(); }
-			inline static music_input * get_input_system() { return new music_input_impl(); }
-			inline static music_exec * get_exec_system() { return new music_exec_impl(); }
-		};
-	}
+    list<size_t>::iterator it;
+
+    for(it = l.begin(); it != l.end(); it++)
+    {
+            free((void *) *it);
+    }
 }
 
-#endif // __factory__
+void MusiC::Native::MemoryManager::Dealloc(void * p)
+{
+    if(!p)
+        return;
+
+    for(std::list<size_t>::iterator it = l.begin(); it != l.end(); it++)
+    {
+        if( (*it) == reinterpret_cast<size_t>(p) )
+        {
+            free(p);
+            l.erase(it);
+            break;
+        }
+    }
+}
+
+MusiC::Native::MemoryManager::~MemoryManager()
+{
+    Dealloc();
+}
+
+// END OF FILE

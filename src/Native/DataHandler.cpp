@@ -18,49 +18,81 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 // THE SOFTWARE.
 
-#include "music_object.h"
+#include "DataHandler.h"
 
-log4cxx::Logger * music::base::music_object::logger = NULL;
+using namespace MusiC::Native;
 
-music::base::music_object::music_object()
+DataHandler::DataHandler() : _data( NULL ), _curClass( NULL )
+{}
+
+void DataHandler::Attach( DataCollection * dtCol )
 {
-	if( !logger )
-	{
-		log4cxx::xml::DOMConfigurator::configure( L"MusiC.log.xml" );
-		logger = log4cxx::Logger::getRootLogger();
-	}
+    _data = dtCol;
+    _curClass = NULL;
 }
 
-music::base::music_object::~music_object()
+ClassData * DataHandler::GetClass( unsigned int idx )
 {
-	//dtor
+    if( idx > _data->nClasses - 1 )
+        return NULL;
+
+    ClassData * c = _data->pFirstClass;
+
+    while( idx )
+    {
+        c = c->pNextClass;
+        idx--;
+    }
+
+    return c;
 }
 
-void music::base::music_object::info( std::wstring msg ) const
+ClassData * DataHandler::GetNextClass()
 {
-	logger->info( msg );
+    if( !_curClass )
+    {
+		return _curClass = _data->pFirstClass;
+    }
+
+    return _curClass = _curClass->pNextClass;
 }
 
-void music::base::music_object::debug( std::wstring msg ) const
+FileData * DataHandler::GetNextLocalFile()
 {
-	logger->debug( msg );
+    return NULL;
 }
 
-void music::base::music_object::error( std::wstring msg ) const
+FrameData * DataHandler::GetNextLocalFrame()
 {
-	logger->error( msg );
+    return NULL;
 }
 
-void music::base::music_object::fatal( std::wstring msg ) const
+FileData * DataHandler::GetNextGlobalFile()
 {
-	logger->fatal( msg );
+    if (!_curFile)
+    {
+		if( !_curClass )
+			GetNextClass();
+		
+		return _curFile = _curClass->pFirstFile;
+    }
+    
+    _curFile = _curFile->pNextFile;
+    
+    if( !_curFile )
+    {
+		GetNextClass();
+				
+		if( !_curClass )
+			return NULL;
+		
+		_curFile = _curClass->pFirstFile;
+    }
+    
+    return _curFile;
 }
 
-void music::base::music_object::warning( std::wstring msg ) const
+FrameData * DataHandler::GetNextGlobalFrame()
 {
-	logger->warn( msg );
-}
-
-void music::base::music_object::say()
-{
+    return NULL;
 }

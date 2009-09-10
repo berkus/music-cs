@@ -18,60 +18,64 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 // THE SOFTWARE.
 
-#ifndef __music_extension__
-#define __music_extension__
+#if !defined(_MUSIC_NATIVE_EXTRACTEDDATA_H_)
+#define _MUSIC_NATIVE_EXTRACTEDDATA_H_
 
-#include "music_object.h"
+#include "Platform.h"
 
-namespace music
+namespace MusiC
 {
-	namespace base
+	namespace Native
 	{
-		class music_extension : public music_object
+		struct FrameData
 		{
-		public:
-			
-			enum type
-			{
-				NOT_SET,
-				
-				CONFIGURATOR, // Extension
-				
-				CLASSIFIER, // Execution
-				FEATURE,
-				WINDOW,
-				
-				IN_CHANNEL_ADAPTER, // Input
-				IN_MEDIA_HANDLER,
-				
-				OUT_MEDIA_HANDLER, // Output
-				OUT_CHANNEL_ADAPTER,
-				
-				REPORTER // Report
-			};
-			
-			music_extension();
-			virtual ~music_extension();
-			
-			virtual type get_type() = 0;
-			
-			virtual void dummy() {};
+			float * pData;
+
+			FrameData * pNextFrame;
 		};
-		
-		struct music_ctor_metadata
+
+		struct ClassData;
+
+		struct FileData
 		{
-			wchar_t ** type;
+			UInt64 nFrames;
+
+			FileData * pNextFile;
+			FileData * pPrevFile;
+
+			FrameData * pFirstFrame;
+			FrameData * pLastFrame;
+
+			FrameData * pFiltered;
+
+			ClassData * pClass;
 		};
-		
-		struct music_class_metadata
+
+		struct DataCollection;
+
+		struct ClassData
 		{
-			music_extension::type kind;
-			wchar_t * classname;
-			music_extension * (*ctor)();
-			void (*dtor)(music_extension *);
-			music_ctor_metadata * ctorInfo;
+			UInt64 nFiles;
+			UInt64 nFrames;
+
+			ClassData * pNextClass;
+
+			FileData * pFirstFile;
+			FileData * pLastFile;
+
+			DataCollection * pCollection;
+		};
+
+		struct DataCollection
+		{
+			unsigned int nClasses;
+			unsigned int nFeatures;
+
+			ClassData * pFirstClass;
+			ClassData * pLastClass;
 		};
 	}
 }
 
-#endif // __extension__
+#endif
+

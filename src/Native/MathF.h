@@ -18,13 +18,47 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 // THE SOFTWARE.
 
-#include "music_extension.h"
+#if !defined(_MUSIC_NATIVE_MATH_H_)
+#define _MUSIC_NATIVE_MATH_H_
 
-music::base::music_extension::music_extension()
+#include <limits>
+
+#ifdef INFINITY
+#undef INFINITY 
+#endif
+
+#define INFINITY numeric_limits<float>::infinity();
+
+#include "MemoryManager.h"
+
+namespace MusiC
 {
+	namespace Native
+	{
+		class Math
+		{
+			private:
+
+				MusiC::Native::MemoryManager mgr;
+
+				float * _sintbl;
+				float * _cplx;
+				int _maxfftsize;
+
+				int checkm (int m);
+
+			public:
+
+                Math() : _sintbl(NULL), _cplx(NULL), _maxfftsize(0)
+                {}
+
+				int fft (float *x, float *y, const int m);
+				int fftr (float* x, int m);
+				int fftr_mag (float * x, int m);
+
+				~Math();
+		};
+	}
 }
 
-music::base::music_extension::~music_extension()
-{
-}
-
+#endif // _MUSIC_NATIVE_MATH_H_

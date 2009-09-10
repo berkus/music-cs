@@ -1,4 +1,4 @@
-// Copyright (c) 2008-2009 Marcos Jos√© Sant'Anna Magalh√£es
+// Copyright (c) 2008-2009 Marcos JosÈ Sant'Anna Magalh„es
 // 
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -18,28 +18,34 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 // THE SOFTWARE.
 
+#include "LogHandler.h"
 
-#include "music_exception.h"
-
-#include <sstream>
-//#include <iostream>
-
-music::base::music_exception::music_exception( const char * msg, const char * func, const char * file, int line )
+std::string MusiC::Native::LogHandler::Tabulate()
 {
-	std::ostringstream oss;
+	if( t != s.length() )
+	{
+		s.clear();
 
-	oss << "FILE: " << file << std::endl;
-	oss << "FUNCTION: " << func << " - LINE: " << line << std::endl;
-	oss << "WHAT: " << msg << std::endl;
+		for(int i = 0; i < t; i++)
+			s.append("\t");
+	}
 
-	_msg = QString::fromStdString( oss.str() );
+	return s;
 }
 
-music::base::music_exception::~music_exception() throw()
+void MusiC::Native::LogHandler::BeginSection(std::string name)
 {
+	(*this) << name << std::endl;
+	(*this) << "{" << std::endl;
+
+	t++;
+	Tabulate();
 }
 
-const char * music::base::music_exception::what() const throw()
+void MusiC::Native::LogHandler::EndSection()
 {
-	return _msg.toStdString().c_str();
+	t--;
+	Tabulate();
+
+	(*this) << "}" << std::endl;
 }

@@ -18,23 +18,16 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 // THE SOFTWARE.
 
-#ifndef __report__
-#define __report__
+#if !defined(_MUSIC_NATIVE_H_)
+#define _MUSIC_NATIVE_H_
 
-#include "music_object.h"
+#include "Platform.h"
 
-namespace music
-{
-	namespace base
-	{
-		class Report : public music_object
-		{
-			
-		public:
-			
-			virtual ~Report();
-		};
-	}
-}
+#include "LogHandler.h"
+#include "DBHandler.h"
+#include "DataHandler.h"
+#include "ExtractedData.h"
+#include "MathF.h"
 
-#endif // __report__
+#endif // _MUSIC_NATIVE_H_
+
