@@ -17,7 +17,7 @@
 // LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 // THE SOFTWARE.
- 
+
 using System;
 using System.Reflection;
 
@@ -42,9 +42,9 @@ namespace MusiC
 		/// </summary>
 		Error
 	}
-	
+
 	//---------------------------------------//
-	
+
 	/// <summary>
 	/// Identifies to which Pipeline an extension should go.
 	/// </summary>
@@ -56,9 +56,9 @@ namespace MusiC
 		NotSet,
 		Error
 	}
-	
+
 	//---------------------------------------//
-	
+
 	/// <summary>
 	/// Holds information about available extensions.
 	/// </summary>
@@ -68,51 +68,49 @@ namespace MusiC
 		/// <summary>
 		/// The type of the represented class.
 		/// </summary>
-		private Type _class=null;
-		
+		private Type _class = null;
+
 		/// <summary>
 		/// The kind of the represented extension.
 		/// </summary>
 		private ExtensionKind _kind = ExtensionKind.NotSet;
-		
+
 		/// <summary>
 		/// 
 		/// </summary>
 		private MemoryModel _managed = MemoryModel.NotSet;
 		#endregion
-		
+
 		//::::::::::::::::::::::::::::::::::::::://
-		
+
 		#region Properties
 		public Type Class
 		{
 			get { return _class; }
 		}
-		
+
 		public ExtensionKind Kind
 		{
 			get { return _kind; }
 		}
-		
+
 		public MemoryModel Model
 		{
 			get { return _managed; }
 		}
 		#endregion
 
-		//::::::::::::::::::::::::::::::::::::::://
-
 		#region Contructor
-		public ExtensionInfo(Type t)
+		public ExtensionInfo( Type t )
 		{
 			_class = t;
-			_kind = Identify(_class);
-			_managed = IdentifyManagement(_class);
+			_kind = Identify( _class );
+			_managed = IdentifyManagement( _class );
 		}
 		#endregion
-		
+
 		//::::::::::::::::::::::::::::::::::::::://
-		
+
 		#region Identification Routines
 		/// <summary>
 		/// Identify the category of an extension.
@@ -120,30 +118,30 @@ namespace MusiC
 		/// <returns>
 		/// The kind of the extension.
 		/// </returns>
-		static 
-		public ExtensionKind Identify(Type t)
+		static
+		public ExtensionKind Identify( Type t )
 		{
 			// This one should be the most frequent call.
-			if(typeof(BaseFeature).IsAssignableFrom(t))
+			if( typeof( BaseFeature ).IsAssignableFrom( t ) )
 				return ExtensionKind.Feature;
-			
-			if(typeof(IHandler).IsAssignableFrom(t))
+
+			if( typeof( IHandler ).IsAssignableFrom( t ) )
 				return ExtensionKind.FileHandler;
-			
-			if(typeof(Configurator).IsAssignableFrom(t))
+
+			if( typeof( Configurator ).IsAssignableFrom( t ) )
 				return ExtensionKind.Configuration;
-			
-			if(typeof(IClassifier).IsAssignableFrom(t))
+
+			if( typeof( IClassifier ).IsAssignableFrom( t ) )
 				return ExtensionKind.Classifier;
-			
-			if(typeof(IWindow).IsAssignableFrom(t))
+
+			if( typeof( IWindow ).IsAssignableFrom( t ) )
 				return ExtensionKind.Window;
-			
+
 			return ExtensionKind.Error;
 		}
-		
+
 		//::::::::::::::::::::::::::::::::::::::://
-		
+
 		/// <summary>
 		/// 
 		/// </summary>
@@ -154,34 +152,44 @@ namespace MusiC
 		/// A <see cref="ExtensionManagement"/>
 		/// </returns>
 		static
-		public MemoryModel IdentifyManagement(Type t)
+		public MemoryModel IdentifyManagement( Type t )
 		{
 			// Managed
 			if(
-				typeof(Managed.Feature).IsAssignableFrom(t) ||
-				typeof(Managed.Classifier).IsAssignableFrom(t) ||
-				typeof(Managed.Handler).IsAssignableFrom(t) ||
-				typeof(Managed.Window).IsAssignableFrom(t) ||
-				typeof(Configurator).IsAssignableFrom(t)
+				typeof( Managed.Feature ).IsAssignableFrom( t ) ||
+				typeof( Managed.Classifier ).IsAssignableFrom( t ) ||
+				typeof( Managed.Handler ).IsAssignableFrom( t ) ||
+				typeof( Managed.Window ).IsAssignableFrom( t ) ||
+				typeof( Configurator ).IsAssignableFrom( t )
 			)
 				return MemoryModel.Managed;
-			
+
 			// Unmanaged
 			if(
-				typeof(Unmanaged.Feature).IsAssignableFrom(t) ||
-				typeof(Unmanaged.Classifier).IsAssignableFrom(t) ||
-				typeof(Unmanaged.Handler).IsAssignableFrom(t) ||
-				typeof(Unmanaged.Window).IsAssignableFrom(t)
+				typeof( Unmanaged.Feature ).IsAssignableFrom( t ) ||
+				typeof( Unmanaged.Classifier ).IsAssignableFrom( t ) ||
+				typeof( Unmanaged.Handler ).IsAssignableFrom( t ) ||
+				typeof( Unmanaged.Window ).IsAssignableFrom( t )
 			)
 				return MemoryModel.Unmanaged;
-					
+
 			return MemoryModel.Error;
 		}
-		
+
+		public bool CanHandle( string file )
+		{
+			if( _kind != ExtensionKind.Configuration || _managed != MemoryModel.Managed )
+				return false; //TODO: Issue Exception
+
+			MethodInfo m = _class.GetMethod( "CanHandle" );
+
+			return ( bool ) m.Invoke( null, new object[] { file } );
+		}
+
 		#endregion
-		
+
 		//::::::::::::::::::::::::::::::::::::::://
-		
+
 		#region Instantiate
 		/// <summary>
 		/// Creates an instance of the represented extension.
@@ -189,14 +197,14 @@ namespace MusiC
 		/// <param name="pList"></param>
 		/// <returns></returns>
 		/// @todo Use Invoker
-		public Extension Instantiate(ParamList pList)
+		public Extension Instantiate( ParamList pList )
 		{
 			Type[] paramTypes;
 			Object[] paramValues;
-			
-			if(pList == null)
+
+			if( pList == null )
 			{
-				paramTypes = new Type[0]{};
+				paramTypes = new Type[ 0 ] { };
 				paramValues = null;
 			}
 			else
@@ -204,19 +212,19 @@ namespace MusiC
 				paramTypes = pList.GetTypes();
 				paramValues = pList.GetParamsValue();
 			}
-			
-			ConstructorInfo ctor = _class.GetConstructor(paramTypes);
-			
+
+			ConstructorInfo ctor = _class.GetConstructor( paramTypes );
+
 			Extension e = null;
-			
-			if(ctor != null)
+
+			if( ctor != null )
 			{
-				e = ctor.Invoke(paramValues) as Extension;
+				e = ctor.Invoke( paramValues ) as Extension;
 			}
-			
+
 			return e;
 		}
-		
+
 		#endregion
 	}
 }

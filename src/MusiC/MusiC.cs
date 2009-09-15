@@ -124,22 +124,34 @@ namespace MusiC
 			AppDomain.CurrentDomain.UnhandledException -= _UnhandledExceptionHandler;
 		}
 
+		public Config Configure( string config_file )
+		{
+			Config conf = null;
+
+			try
+			{
+				Configurator cfg = _cache.GetConfigurator( config_file );
+				conf = cfg.LoadConfig( config_file );
+
+				Message( _configFile + " ... [LOADED]" );
+			}
+			catch( MCException mce )
+			{
+				mce.Report();
+			}
+			catch( Exception e )
+			{
+				Error( e );
+			}
+
+			return conf;
+		}
+
 		#endregion
 
 		//::::::::::::::::::::::::::::::::::::::://
 
 		#region Extensions Handling
-
-		/// <summary>
-		/// Loads all extensions found in the indicated directory.
-		/// </summary>
-		/// <param name="path"></param>
-		public void LoadExtensionDir( String path )
-		{
-			_cache.LoadDir( path );
-		}
-
-		//::::::::::::::::::::::::::::::::::::::://
 
 		/// <summary>
 		/// Load an extension
@@ -184,8 +196,8 @@ namespace MusiC
 		{
 			try
 			{
-				Configurator cfg = _cache.GetConfigurator( ConfigFile );
-				Config conf = cfg.LoadConfig( ConfigFile );
+				Configurator cfg = _cache.GetConfigurator( _configFile );
+				Config conf = cfg.LoadConfig( _configFile );
 
 				Message( _configFile + " ... [LOADED]" );
 
@@ -286,4 +298,3 @@ namespace MusiC
 ///		}
 ///	}
 /// @endverbatim
-///
