@@ -23,6 +23,7 @@ using System.Collections.Generic;
 using System.IO;
 
 using MusiC.Extensions;
+using MusiC.Exceptions;
 
 namespace MusiC
 {
@@ -400,42 +401,6 @@ namespace MusiC
 		/// <summary>
 		/// 
 		/// </summary>
-		/// <param name="file">
-		/// A <see cref="System.String"/>
-		/// </param>
-		/// <returns>
-		/// A <see cref="Data.Unmanaged.FileData"/>
-		/// </returns>
-		unsafe
-		private Data.Unmanaged.FileData* Extract( string file )
-		{
-			BeginReportSection( file );
-
-			Unmanaged.Handler h = ExtensionCache.GetUnmanagedHandler( file );
-			if( h == null )
-			{
-				Warning( file + ": No handler supports this file" );
-				return null;
-			}
-
-			h.Attach( file );
-			_window.Attach( h );
-
-			Data.Unmanaged.FileData* currentFile = Data.Unmanaged.DataHandler.BuildFileData();
-			Unmanaged.Extractor.Extract( _window, _featureList, currentFile );
-
-			h.Detach();
-
-			EndReportSection( true );
-
-			return currentFile;
-		}
-
-		//::::::::::::::::::::::::::::::::::::::://
-
-		/// <summary>
-		/// 
-		/// </summary>
 		/// <param name="tLabel">
 		/// A <see cref="IEnumerable"/>
 		/// </param>
@@ -443,11 +408,11 @@ namespace MusiC
 		/// A <see cref="Data.Unmanaged.DataCollection"/>
 		/// </returns>
 		unsafe
-		private Data.Unmanaged.DataCollection* Extract( IEnumerable<Label> tLabel )
+		private Data.Unmanaged.DataCollection* Extract( Config cfg )
 		{
 			Data.Unmanaged.DataCollection* dtCol = Data.Unmanaged.DataHandler.BuildCollection( ( uint ) _featureList.Count );
 
-			foreach( Label label in tLabel )
+			foreach( Label label in cfg.LabelList )
 			{
 				Data.Unmanaged.ClassData* currentClass = Data.Unmanaged.DataHandler.BuildClassData( dtCol );
 				BeginReportSection( "Processing Label: " + label.Name );
@@ -455,14 +420,55 @@ namespace MusiC
 				//foreach (string file in Directory.GetFiles(label.InputDir, "*.wav"))
 				foreach( string file in label )
 				{
-					Data.Unmanaged.FileData* currentFile = Extract( file );
-					Data.Unmanaged.DataHandler.AddFileData( currentFile, currentClass );
+					Data.Unmanaged.FileData* currentFile = Extract( file, cfg );
+
+					if( currentFile != null )
+						Data.Unmanaged.DataHandler.AddFileData( currentFile, currentClass );
 				}
 
 				EndReportSection( true );
 			}
 
 			return dtCol;
+		}
+
+		unsafe private Data.Unmanaged.FileData* Extract( string file, Config cfg )
+		{
+			BeginReportSection( file );
+			//Console.WriteLine( file );
+
+			Unmanaged.Handler h = ExtensionCache.GetUnmanagedHandler( file );
+			if( h == null )
+			{
+				Warning( file + ": No handler supports this file" );
+				EndReportSection( true );
+				return null;
+			}
+
+			try
+			{
+				h.Attach( file );
+				_window.Attach( h );
+			}
+			catch( MCException e )
+			{
+				Error( "File was NOT extracted." );
+				Error( e );
+
+				_window.Detach();
+				h.Detach();
+
+				EndReportSection( true );
+				return null;
+			}
+
+			Data.Unmanaged.FileData* currentFile = Unmanaged.Extractor.Extract( _window, _featureList, cfg );
+
+			_window.Detach();
+			h.Detach();
+
+			EndReportSection( true );
+			return currentFile;
 		}
 
 		//::::::::::::::::::::::::::::::::::::::://
@@ -533,22 +539,24 @@ namespace MusiC
 		unsafe
 		public void Execute( Config conf )
 		{
-			IEnumerable<Label> tLabel = conf.LabelList;
-
 			if( _classifier != null )
 			{
-				if( _classifier.NeedTraining( tLabel ) )
-				{
-					Message( "Beginning Training" );
+				bool force_extract = false;
+				bool ok = conf.GetBoolOption(Config.Option.FORCE_EXTRACT, out force_extract);
+				
+				bool force_training = false;
+				ok = conf.GetBoolOption( Config.Option.FORCE_TRAINING, out force_training );
 
+				if( _classifier.NeedTraining( conf ) || force_extract || force_training )
+				{
 					Message( "Extracting . . ." );
-					Data.Unmanaged.DataCollection* dtCol = Extract( tLabel );
+					Data.Unmanaged.DataCollection* dtCol = Extract( conf );
 
 					// Report what we have after extractor
 					Summarize( dtCol );
 
 					Message( "Filtering . . ." );
-					Data.Unmanaged.DataCollection* filteredData = _classifier.ExtractionFilter( dtCol );
+					Data.Unmanaged.DataCollection* filteredData = _classifier.TrainingFilter( dtCol );
 
 					Message( "Training . . ." );
 
@@ -557,6 +565,8 @@ namespace MusiC
 					else
 						_classifier.Train( filteredData );
 
+					_classifier.SaveTraining();
+
 					Message( "Freeing Extracted Data" );
 					Data.Unmanaged.DataHandler.DestroyCollection( dtCol );
 
@@ -564,14 +574,24 @@ namespace MusiC
 					//if (filteredData != null)
 					//    Data.Unmanaged.DataHandler.DestroyCollection(filteredData);
 				}
+				else
+				{
+					_classifier.LoadTraining();
+				}
 
 				Message( "Begining Classification . . ." );
+				FileStream output = new FileStream( "results.txt", FileMode.Create );
+				StreamWriter w = new StreamWriter( output );
 
 				foreach( string file in conf.Classify )
 				{
 					Message( "Classifying: " + file );
 
-					Data.Unmanaged.FileData* f = Extract( file );
+					Data.Unmanaged.FileData* f = Extract( file, conf );
+
+					if( f == null )
+						continue;
+
 					Data.Unmanaged.FileData* filteredFile = _classifier.ClassificationFilter( f, ( uint ) this._featureList.Count );
 
 					if( filteredFile == null )
@@ -582,13 +602,16 @@ namespace MusiC
 					// Destroy classified file
 					//Data.Unmanaged.DataHandler.
 
-					Message( "RESULT: " + conf.GetLabel( result ).Name );
+					w.WriteLine( file + ", " + conf.GetLabel( result ).Name );
+					w.Flush();
 				}
+
+				w.Close();
 			}
 			else
 			{
 				Message( "Extracting . . ." );
-				Data.Unmanaged.DataCollection* dtCol = Extract( tLabel );
+				Data.Unmanaged.DataCollection* dtCol = Extract( conf );
 				Message( "Freeing Extracted Data" );
 				Data.Unmanaged.DataHandler.DestroyCollection( dtCol );
 			}

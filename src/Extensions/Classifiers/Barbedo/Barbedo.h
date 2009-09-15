@@ -50,6 +50,7 @@ namespace MusiC
 			static const int CLUSTER_SIZE; // frames to make a second
 			static const int CLUSTER_COUNT; // how many seconds
 			static const int FRAME_COUNT;
+			static const float RADIUS; // range of std. dev. to approve a vector
 
 			LogHandler log;
 

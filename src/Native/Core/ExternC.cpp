@@ -48,9 +48,9 @@ extern "C"
 
 	//::::::::::::::::::::::::::::::::::::::://
 
-	MUSIC_EXPORT void AddFeature(const char * sectionLabel, const char * dataLabel, float * data, int dataSz)
+	MUSIC_EXPORT bool AddFeature(const char * sectionLabel, const char * dataLabel, float * data, int dataSz)
 	{
-		hnd.AddData(sectionLabel, dataLabel, data, dataSz * sizeof(float));
+		return hnd.AddData(sectionLabel, dataLabel, data, dataSz * sizeof(float));
 	}
 
 	//::::::::::::::::::::::::::::::::::::::://
@@ -70,6 +70,20 @@ extern "C"
 	MUSIC_EXPORT void Terminate()
 	{
 		hnd.CloseDB();
+	}
+
+	//::::::::::::::::::::::::::::::::::::::://
+
+	MUSIC_EXPORT void * alloc( int bytes )
+	{
+		return malloc( bytes );
+	}
+
+	//::::::::::::::::::::::::::::::::::::::://
+
+	MUSIC_EXPORT void dealloc( void * ptr )
+	{
+		if( ptr ) free( ptr );
 	}
 }
 

@@ -27,236 +27,312 @@
 #include <iostream>
 #include <sstream>
 
+#include <vector>
+
 #include <ExtractedData.h>
 
 #include "gsl.h"
 
- namespace MusiC
- {
-    namespace Native
-    {
-        class CombinationData
-        {
-            public:
+namespace MusiC
+{
+	namespace Native
+	{
+		class CombinationData
+		{
+		public:
 
-            gsl_combination * raw;
-            ClassData * data;
-            unsigned int * idx;
-            FrameData ** frames;
+			gsl_combination * raw;
+			ClassData * data;
+			unsigned int * idx;
+			FrameData ** frames;
 
-            CombinationData(ClassData * a)
-            {
-                unsigned int base = 3;
+			//::::::::::::::::::::::::::::::::::::::://
 
-                raw = gsl_combination_calloc( (size_t) a->nFrames, base );
-                data = a;
-                frames = new FrameData * [base];
-                idx = new unsigned int[base];
+			CombinationData(ClassData * a)
+			{
+				unsigned int base = 3;
 
-                reset();
-            }
+				raw = gsl_combination_calloc( (size_t) a->nFrames, base );
+				data = a;
+				frames = new FrameData * [base];
+				idx = new unsigned int[base];
 
-            ~CombinationData()
-            {
-                gsl_combination_free(raw);
+				reset();
+			}
 
-                delete[] frames;
-                delete[] idx;
-            }
+			//::::::::::::::::::::::::::::::::::::::://
 
-            void reset()
-            {
-                unsigned int base = 3;
+			~CombinationData()
+			{
+				gsl_combination_free(raw);
 
-                FrameData * ta = data->pFirstFile->pFirstFrame;
-                for( unsigned int i = 0; i < base; i++ )
-                {
-                    frames[ i ] = ta; ta = ta->pNextFrame;
-                    idx[ i ] = i;
-                }
-            }
+				delete[] frames;
+				delete[] idx;
+			}
+			
+			//::::::::::::::::::::::::::::::::::::::://
 
-            void update()
-            {
-                unsigned int base = 3;
+			void reset()
+			{
+				unsigned int base = 3;
 
-                for( unsigned int i = 0; i < base; i++)
-                {
-                    if( raw->data[ i ] == idx[ i ] )
-                        continue;
+				FrameData * ta = data->pFirstFile->pFirstFrame;
+				for( unsigned int i = 0; i < base; i++ )
+				{
+					frames[ i ] = ta; ta = ta->pNextFrame;
+					idx[ i ] = i;
+				}
+			}
+			
+			//::::::::::::::::::::::::::::::::::::::://
 
-                    // tipical operation. move next.
-                    if( raw->data[ i ] == idx[ i ] + 1 )
-                    {
-                        frames[ i ] = frames[ i ]->pNextFrame;
-                        idx[ i ]++;
-                        continue;
-                    }
+			void update()
+			{
+				unsigned int base = 3;
 
-                    // tipical operation. move next to neighbour.
-                    if( i > 0 )
-                    {
-                        if( raw->data[ i ] == raw->data[ i - 1 ] + 1 )
-                        {
-                            frames[ i ] = frames[ i - 1]->pNextFrame;
-                            idx[ i ] = idx[ i - 1 ] + 1;
-                            continue;
-                        }
-                    }
+				for( unsigned int i = 0; i < base; i++)
+				{
+					if( raw->data[ i ] == idx[ i ] )
+						continue;
 
-                    std::cout << "reached worse case" << std::endl;
+					// tipical operation. move next.
+					if( raw->data[ i ] == idx[ i ] + 1 )
+					{
+						frames[ i ] = frames[ i ]->pNextFrame;
+						idx[ i ]++;
+						continue;
+					}
 
-                    std::ostringstream a1;
-                    std::ostringstream a2;
+					// tipical operation. move next to neighbour.
+					if( i > 0 )
+					{
+						if( raw->data[ i ] == raw->data[ i - 1 ] + 1 )
+						{
+							frames[ i ] = frames[ i - 1]->pNextFrame;
+							idx[ i ] = idx[ i - 1 ] + 1;
+							continue;
+						}
+					}
 
-                    a1 << "[ ";
-                    a2 << "[ ";
+					std::cout << "reached worse case" << std::endl;
 
-                    for ( unsigned int elemIdx = 0; elemIdx < 3; elemIdx++ )
-                    {
-                        a1 << gsl_combination_get( raw, elemIdx ) << " ";
-                        a2 << idx[ elemIdx ] << " ";
-                    }
+					std::ostringstream a1;
+					std::ostringstream a2;
 
-                    a1 << "]";
-                    a2 << "]";
+					a1 << "[ ";
+					a2 << "[ ";
 
-                    std::cout << a1.str() << " " << a2.str() << std::endl;
+					for ( unsigned int elemIdx = 0; elemIdx < 3; elemIdx++ )
+					{
+						a1 << gsl_combination_get( raw, elemIdx ) << " ";
+						a2 << idx[ elemIdx ] << " ";
+					}
 
-                    //worst case ... move counting
-                    int offset = raw->data[ i ] - idx[ i ];
-                    while ( offset != 0 )
-                    {
-                        offset--;
-                        frames[ i ] = frames[ i ]->pNextFrame;
-                        idx[ i ]++;
-                    }
-                }
-            }
-        };
+					a1 << "]";
+					a2 << "]";
 
-        
-        class VectorCombinationData
-        {
-        public:
+					std::cout << a1.str() << " " << a2.str() << std::endl;
 
-            CombinationData * a;
-            CombinationData * b;
+					//worst case ... move counting
+					int offset = raw->data[ i ] - idx[ i ];
+					while ( offset != 0 )
+					{
+						offset--;
+						frames[ i ] = frames[ i ]->pNextFrame;
+						idx[ i ]++;
+					}
+				}
+			}
+		};
+		
+		//---------------------------------------//
 
-            VectorCombinationData(ClassData * class_a, ClassData * class_b)
-            {
-                a = new CombinationData(class_a);
-                b = new CombinationData(class_b);
-            }
+		class VectorCombinationData
+		{
+		public:
 
-            ~VectorCombinationData()
-            {
-                delete a;
-                delete b;
-            }
-        };
+			CombinationData * a;
+			CombinationData * b;
+			
+			//::::::::::::::::::::::::::::::::::::::://
 
-        class GenreCombinationData
-        {
+			VectorCombinationData(ClassData * class_a, ClassData * class_b)
+			{
+				a = new CombinationData(class_a);
+				b = new CombinationData(class_b);
+			}
+			
+			//::::::::::::::::::::::::::::::::::::::://
+
+			~VectorCombinationData()
+			{
+				delete a;
+				delete b;
+			}
+		};
+		
+		//---------------------------------------//
+
+		class GenreCombinationData
+		{
 			FrameData * _frames_a;
 			FrameData * _frames_b;
 
-        public:
+			unsigned int _size;
 
-            int genre_a;
-            FrameData ** frames_a;
+		public:
 
-            int genre_b;
-            FrameData ** frames_b;
+			int genre_a;
+			FrameData ** frames_a;
 
-            GenreCombinationData()
-            {
-                _frames_a = new FrameData [3];
-                _frames_b = new FrameData [3];
+			int genre_b;
+			FrameData ** frames_b;
+
+			//::::::::::::::::::::::::::::::::::::::://
+
+			GenreCombinationData( unsigned int size )
+			{
+				_frames_a = new FrameData [3];
+				_frames_b = new FrameData [3];
 
 				frames_a = new FrameData * [3];
 				frames_b = new FrameData * [3];
 
+				_size = size;
+
 				for( unsigned int idx = 0; idx < 3; idx++)
 				{
 					frames_a[ idx ] = &_frames_a[ idx ];
-					_frames_a[ idx ].pData = NULL;
+					_frames_a[ idx ].pData = new float[ size ];
 
 					frames_b[ idx ] = &_frames_b[ idx ];
-					_frames_b[ idx ].pData = NULL;
+					_frames_b[ idx ].pData = new float[ size ];
 				}
-            }
+			}
 
-            void setData( unsigned int a, unsigned int b, VectorCombinationData * ref , unsigned int size)
-            {
-                genre_a = a;
-                genre_b = b;
+			//::::::::::::::::::::::::::::::::::::::://
+
+			void SetData( unsigned int a, unsigned int b, VectorCombinationData * ref )
+			{
+				genre_a = a;
+				genre_b = b;
 
 				for( unsigned int idx = 0; idx < 3; idx++)
 				{
-					if( !_frames_a[ idx ].pData ) _frames_a[ idx ].pData = new float [size];
-					if( !_frames_b[ idx ].pData ) _frames_b[ idx ].pData = new float [size];
-
-					for( unsigned szIdx = 0; szIdx < size; szIdx++)
-					{
-						_frames_a[ idx ].pData[ szIdx ] = ref->a->frames[ idx ]->pData[ szIdx ];
-						_frames_b[ idx ].pData[ szIdx ] = ref->b->frames[ idx ]->pData[ szIdx ];
-					}
+					memcpy( _frames_a[ idx ].pData, ref->a->frames[ idx ]->pData, _size * sizeof(float) );
+					memcpy( _frames_b[ idx ].pData, ref->b->frames[ idx ]->pData, _size * sizeof(float) );
 				}
+			}
 
-                //memcpy( frames_a, ref->a->frames, 3 * sizeof(size_t) );
-                //memcpy( frames_b, ref->b->frames, 3 * sizeof(size_t) );
-            }
-        };
+			//::::::::::::::::::::::::::::::::::::::://
 
-        class BarbedoTData
-        {
-        public:
+			void SetVector( unsigned int genre, unsigned int vector, float * data, unsigned int size )
+			{
+				FrameData * genreData = (genre) ? _frames_b : _frames_a;
+				memcpy( genreData[ vector ].pData, data, size * sizeof(float) );
+			}
 
-            GenreCombinationData * data;
-            unsigned int nFeat;
-            unsigned int genreCombinationCount;
-            unsigned int genreCount;
+			//::::::::::::::::::::::::::::::::::::::://
 
-            BarbedoTData(unsigned int genres)
-            {
-                genreCount = genres;
-                double count = gsl_sf_choose(genres, 2);
+			void SetGenrePair( unsigned int a, unsigned int b )
+			{
+				genre_a = a;
+				genre_b = b;
+			}
 
-                if( count < std::numeric_limits<int>::max() )
-                {
-                    genreCombinationCount = (unsigned int) count;
-                    data = new GenreCombinationData[genreCombinationCount];
-                }
-                else
-                {
-                    genreCombinationCount = 0;
-                    data = NULL;
-                }
-            }
+			//::::::::::::::::::::::::::::::::::::::://
 
-            void setPairWinner( UInt64 idx, gsl_combination * genres, VectorCombinationData * ref )
-            {
-                data[ idx ].setData(
-                    gsl_combination_get(genres, 0),
-                    gsl_combination_get(genres, 1),
-                    ref,
-					nFeat);
-            }
-        };
+			float * GetData( unsigned int genre, unsigned int vector )
+			{
+				FrameData * genreData = (genre) ? _frames_b : _frames_a;
+				return (genreData + vector)->pData;
+			}
+		};
 
-        class BarbedoCData
-        {
-            unsigned int * votes;
+		//---------------------------------------//
 
-        public:
+		class BarbedoTData
+		{
+			unsigned int _genreCombinationCount;
+			unsigned int _genreCount;
 
-            BarbedoCData(unsigned int genres)
-            {
-                votes = new unsigned int[genres]();
-            }
-        };
-    }
- }
+		public:
+
+			GenreCombinationData ** data;
+			unsigned int nFeat;
+			
+			//::::::::::::::::::::::::::::::::::::::://
+
+			BarbedoTData( unsigned int genreCount, unsigned int nfeat )
+			{
+				_genreCount = genreCount;
+				nFeat = nfeat;
+
+				double count = gsl_sf_choose( genreCount, 2 );
+
+				if( count < std::numeric_limits<int>::max() )
+				{
+					_genreCombinationCount = ( unsigned int ) count;
+					data = new GenreCombinationData * [ _genreCombinationCount ];
+
+					for( unsigned int i = 0; i < _genreCombinationCount; i++ )
+						data[ i ] = new GenreCombinationData( nfeat );
+				}
+				else
+				{
+					_genreCombinationCount = 0;
+					data = NULL;
+				}
+			}
+			
+			//::::::::::::::::::::::::::::::::::::::://
+
+			void SetPair( unsigned int idx, gsl_combination * genres, VectorCombinationData * ref )
+			{
+				data[ idx ]->SetData(
+					gsl_combination_get(genres, 0),
+					gsl_combination_get(genres, 1),
+					ref);
+			}
+			
+			//::::::::::::::::::::::::::::::::::::::://
+
+			float * GetPair( unsigned int idx, unsigned int genre, unsigned int vector )
+			{
+				return data[ idx ]->GetData( genre, vector );
+			}
+			
+			//::::::::::::::::::::::::::::::::::::::://
+
+			unsigned int GetGenreCount()
+			{
+				return _genreCount;
+			}
+
+			//::::::::::::::::::::::::::::::::::::::://
+
+			unsigned int GetGenreCombinationCount()
+			{
+				return _genreCombinationCount;
+			}
+		};
+
+		//---------------------------------------//
+
+		class BarbedoCData
+		{
+			unsigned int * votes;
+			
+			//::::::::::::::::::::::::::::::::::::::://
+
+		public:
+
+			BarbedoCData( unsigned int genreCount )
+			{
+				votes = new unsigned int[ genreCount ]();
+			}
+		};
+	}
+}
 
 #endif

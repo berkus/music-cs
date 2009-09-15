@@ -31,6 +31,7 @@ using namespace MusiC::Native;
 const int MusiC::Native::Barbedo::MAX_CANDIDATES = 20;
 const int MusiC::Native::Barbedo::CLUSTER_SIZE = 92;
 const int MusiC::Native::Barbedo::CLUSTER_COUNT = 32;
+const float MusiC::Native::Barbedo::RADIUS = 0.7f;
 const int MusiC::Native::Barbedo::FRAME_COUNT =
 MusiC::Native::Barbedo::CLUSTER_SIZE *
 MusiC::Native::Barbedo::CLUSTER_COUNT;
@@ -78,6 +79,7 @@ DataCollection * Barbedo::FilterCandidates( DataCollection * dtCol )
 	LOG_IN();
 
 	log << "Target Frame Count: " << MAX_CANDIDATES << endl << endl;
+	log << "Std. Dev. Radius for Approval: " << RADIUS << endl << endl;
 
 	// feat idx and feat count
 	register int idx = 0;
@@ -116,7 +118,7 @@ DataCollection * Barbedo::FilterCandidates( DataCollection * dtCol )
 		}
 
 		FrameData * frameDt = cl->pFirstFile->pFirstFrame;
-		UInt64 nframes_before = cl->nFrames;
+		int nframes_before = ( int ) cl->nFrames;
 
 		// Calculating mean, var of all frames.
 		// var = E( x^2 ) - E( x )^2
@@ -140,19 +142,19 @@ DataCollection * Barbedo::FilterCandidates( DataCollection * dtCol )
 			var[ idx ] = abs( var[ idx ] - mean[ idx ] * mean[ idx ] );
 
 			// 1% of the standard deviation
-			if( var[ idx ] < 0.0001f * mean[ idx ] )
-				var[ idx ] = 0.0001f * mean[ idx ];
+			if( var[ idx ] < 0.0001f * mean[ idx ] * mean[ idx ] )
+				var[ idx ] = 0.0001f * mean[ idx ] * mean[ idx ];
 
-			high_bound[ idx ] = mean[ idx ] + 0.75f * sqrt( var[ idx ] );
-			low_bound[ idx ] = mean[ idx ] - 0.75f * sqrt( var[ idx ] );
+			high_bound[ idx ] = mean[ idx ] + RADIUS * sqrt( var[ idx ] );
+			low_bound[ idx ] = mean[ idx ] - RADIUS * sqrt( var[ idx ] );
 
-			log << "feature: " << idx << " mean: " << mean[ idx ] << " var: " << var[ idx ] << " std_dev.: +-" << sqrt( var[ idx ] );
-			log << " hi: " << high_bound[ idx ] << "   lo:" << low_bound[ idx ] << endl;
+			float std_dev = sqrt( var[ idx ] );
+			log << "" << idx << ": " << mean[ idx ] << " | " << var[ idx ] << " | " << std_dev << " (" << 100*std_dev / mean[ idx ];
+			log << "%) | " << high_bound[ idx ] << " | " << low_bound[ idx ] << endl;
 		}
 
 		// Go back to first frame
 		frameDt = cl->pFirstFile->pFirstFrame;
-		FrameData * lastkept = NULL;
 
 		bool keep;
 
@@ -200,7 +202,7 @@ DataCollection * Barbedo::FilterCandidates( DataCollection * dtCol )
 
 		log.put('\n');
 		log << "- Frame Count -" << endl;
-		log << "Initial: " << nframes_before << " Aproved: " << candidates_counter;
+		log << "Initial: " << nframes_before << " Aproved: " << candidates_counter << " (" << 100*candidates_counter/nframes_before << "%) ";
 		log << " Selected: " << ncl->nFrames << endl << endl;
 
 
@@ -289,7 +291,7 @@ FileData * Barbedo::Filter( FileData * fileDt, unsigned int nFeat )
 	LOG_IN();
 
 	// loop counters
-	unsigned int frame_counter = 0;
+	//unsigned int frame_counter = 0;
 	unsigned int cluster_sz_counter = 0;
 	unsigned int cluster_counter = 0;
 
@@ -328,10 +330,10 @@ FileData * Barbedo::Filter( FileData * fileDt, unsigned int nFeat )
 
 	float * currentFrame;
 
-	for( frame_counter = 0; frame_counter < firstFrameIdx; frame_counter++ )
+	/*for( frame_counter = 0; frame_counter < firstFrameIdx; frame_counter++ )
 	{
 		frameDt = frameDt->pNextFrame;
-	}
+	}*/
 
 	for( cluster_counter = 0; cluster_counter < CLUSTER_COUNT; cluster_counter++ )
 	{
@@ -346,9 +348,27 @@ FileData * Barbedo::Filter( FileData * fileDt, unsigned int nFeat )
 			max[ idx ] = -INFINITY;
 		}
 
+		unsigned int cluster_size = 0;
 		for( cluster_sz_counter = 0; cluster_sz_counter < CLUSTER_SIZE; cluster_sz_counter++ )
 		{
 			currentFrame = frameDt->pData;
+
+			for( idx = 0; idx < nfeat; idx++ )
+			{
+				// NaN Test
+				if( currentFrame[ idx ] != currentFrame[ idx ] )
+					break;
+
+				// Inf Test
+				if( currentFrame[ idx ] > FLT_MAX || currentFrame[ idx ] < -FLT_MAX )
+					break;
+			}
+
+			// loop breaked
+			if( idx != nfeat )
+				continue;
+
+			cluster_size++;
 
 			for( idx = 0; idx < nfeat; idx++ )
 			{
@@ -361,24 +381,35 @@ FileData * Barbedo::Filter( FileData * fileDt, unsigned int nFeat )
 			frameDt = frameDt->pNextFrame;
 		}
 
+		log << "cluster: " << cluster_counter << " - frames:" << cluster_size << endl;
 		for( idx = 0; idx < nfeat; idx++ )
 		{
 			var[ idx ] = abs( var[ idx ] - mean[ idx ] * mean[ idx ] );
 
-			// 1% of the standard deviation
-			if( var[ idx ] < 0.0001f * mean[ idx ] )
-				var[ idx ] = 0.0001f * mean[ idx ];
+			// standard deviation >= 1% of the mean
+			if( var[ idx ] < 0.0001f * mean[ idx ] * mean[ idx ] )
+				var[ idx ] = 0.0001f * mean[ idx ] * mean[ idx ];
 
 			nfd->pData[ 3 * idx ] = mean[ idx ];
 			nfd->pData[ 3 * idx + 1 ] = var[ idx ];
-			nfd->pData[ 3 * idx + 2 ] = max[ idx ] / mean[ idx ];
+			float ppp = max[ idx ] / mean[ idx ];
 
-			//log << "cluster: " << cluster_counter <<
-			//	" feature: " << idx <<
-			//	" mean: " << mean[ idx ] <<
-			//	" var: " << var[ idx ] <<
-			//	" ppp: " << max[ idx ] / mean[ idx ] << endl;
+			// NaN Test 0/0
+			if( ppp != ppp )
+				ppp = 1.0f;
+
+			// Inf or -Inf   +x/0 -x/0
+			if( ppp > FLT_MAX || ppp < -FLT_MAX )
+				ppp = max[ idx ] / std::numeric_limits<float>::epsilon();
+
+			nfd->pData[ 3 * idx + 2 ] = ppp;
+
+			float std_dev = sqrt( var[ idx ] );
+			log << "" << idx << ": " << mean[ idx ] << " | " << var[ idx ] << " | " << std_dev;
+			log <<" (" << 100 * std_dev/mean[ idx ] << "%) | " << max[ idx ] / mean[ idx ] << endl;
 		}
+
+		log.put('\n');
 
 		nfl->nFrames++;
 
@@ -392,8 +423,6 @@ FileData * Barbedo::Filter( FileData * fileDt, unsigned int nFeat )
 			nfl->pLastFrame->pNextFrame = nfd;
 			nfl->pLastFrame = nfd;
 		}
-
-		//frameDt = frameDt->pNextFrame;
 	}
 
 	delete max;
@@ -417,8 +446,6 @@ DataCollection * Barbedo::Filter( DataCollection * extractedData )
 	hnd.Attach( extractedData );
 
 	log << "============ Barbedo::Filter ============" << endl;
-	//log << "Address (target):" << reinterpret_cast<size_t>( extractedData ) << endl;
-	//log << "Address( pointer ):" << reinterpret_cast<size_t>( &extractedData ) << endl;
 	log << "Received " << hnd.GetNumClasses( ) << " Classes" << endl;
 	log << "Received " << hnd.GetNumFeatures( ) << " Features" << endl;
 	log << "========== Algorithm Constants ==========" << endl;
@@ -520,14 +547,13 @@ void * Barbedo::Train( DataCollection * extractedData )
 	//log << "Received " << data.GetNumClasses( ) << " Classes" << endl;
 	//log << "Received " << data.GetNumFeatures( ) << " Features" << endl;
 
-	UInt64 genreCombinationIndex = 0;
+	BarbedoTData * tdata = new BarbedoTData( data.GetNumClasses(), data.GetNumFeatures() );
+	
+	unsigned int genreCombinationIndex = 0;
 	log << "========================" << endl;
-	double genreCombinationCount = gsl_sf_choose( data.GetNumClasses(), 2 );
+	unsigned int genreCombinationCount = tdata->GetGenreCombinationCount();
 	log << "Algorithm Rounds: " << genreCombinationCount << endl;
 	log << "========================" << endl << endl;
-
-	BarbedoTData * tdata = new BarbedoTData( data.GetNumClasses() );
-	tdata->nFeat = data.GetNumFeatures();
 
 	DataCollection * filteredData = FilterCandidates( extractedData );
 
@@ -557,6 +583,12 @@ void * Barbedo::Train( DataCollection * extractedData )
 
 		log << "Frame Count: " << fClassA->nFrames << "/" << classA->nFrames << endl;
 		log << "Frame Count: " << fClassB->nFrames << "/" << classB->nFrames << endl << endl;
+
+		//float genre_weight =  ((float) classA->nFrames / (float) classB->nFrames);
+		float genre_weight = 1;
+
+		unsigned int nclusters_a = classA->nFrames;
+		unsigned int nclusters_b = genre_weight * classB->nFrames;
 
 		// ----------- Frames Combintation -----------//
 		long score_a, score_b, score_max, winner;
@@ -603,12 +635,14 @@ void * Barbedo::Train( DataCollection * extractedData )
 				refVec = refVec->pNextFrame;
 			} // Frame Comparison
 
+			unsigned int wscore_b = (genre_weight * score_b);
+
 			// Scoring System
-			if( score_a + score_b > score_max )
+			if( score_a + wscore_b > score_max )
 			{
-				score_max = score_a + score_b;
+				score_max = score_a + wscore_b;
 				winner = potentialsCombinationIndex;
-				tdata->setPairWinner(genreCombinationIndex, selectedGenres, refVecsIndex);
+				tdata->SetPair( genreCombinationIndex, selectedGenres, refVecsIndex );
 
 				ostringstream aElem;
 				ostringstream bElem;
@@ -626,12 +660,12 @@ void * Barbedo::Train( DataCollection * extractedData )
 				bElem << "]";
 
 				log << "New Winner: " << winner << " / " <<
-					( UInt64 ) ( gsl_sf_choose( fClassA->nFrames, 3 ) *
+					( unsigned int ) ( gsl_sf_choose( fClassA->nFrames, 3 ) *
 					gsl_sf_choose( fClassB->nFrames, 3 ) ) <<
-					" - score: A(" << score_a << "/" << classA->nFrames << " - " << 100 * score_a / classA->nFrames <<
-					"%) B(" << score_b << "/" << classB->nFrames << " - " << 100 * score_b / classB->nFrames <<
-					"%) - Total: " << score_max << "/" << (classA->nFrames + classB->nFrames) << " " <<
-					100 * score_max / (classA->nFrames + classB->nFrames) << "% - Vectors: " << aElem.str( ) << " & " << bElem.str( ) << endl;
+					" - score: A(" << score_a << "/" << nclusters_a << " - " << 100 * score_a / nclusters_a <<
+					"%) B(" << wscore_b << "/" << nclusters_b << " - " << 100 * wscore_b / nclusters_b <<
+					"%) - Total: " << score_max << "/" << (nclusters_a + nclusters_b) << " " <<
+					100 * score_max / (nclusters_a + nclusters_b) << "% - Vectors: " << aElem.str( ) << " & " << bElem.str( ) << endl;
 			}
 
 			if( !(potentialsCombinationIndex % 100000) )

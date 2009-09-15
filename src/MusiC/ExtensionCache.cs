@@ -34,7 +34,7 @@ namespace MusiC.Extensions
 	{
 		// Attributes
 		private Configurator _objConfig;
-		
+
 		#region Static Attributes
 
 		static readonly
@@ -44,118 +44,138 @@ namespace MusiC.Extensions
 		private XElement _root;
 
 		static readonly
-		private LinkedList<ExtensionInfo> _infoList = new LinkedList<ExtensionInfo>(); 
+		private LinkedList<ExtensionInfo> _infoList = new LinkedList<ExtensionInfo>();
 
 		static readonly
 		private LinkedList<IHandler> _hndPool = new LinkedList<IHandler>();
-		
+
 		#endregion
-		
+
 		//::::::::::::::::::::::::::::::::::::::://
-		
+
 		static
 		ExtensionCache()
 		{
 			_doc = new XDocument(
-				new XDeclaration("1.0", "utf-16", "true"),
-    			_root = new XElement("MusiC.Extensions.Cache"));
+				new XDeclaration( "1.0", "utf-16", "true" ),
+				_root = new XElement( "MusiC.Extensions.Cache" ) );
 		}
-		
+
 		//::::::::::::::::::::::::::::::::::::::://
-		
+
 		#region Extension Handling
-		
+
 		/// <summary>
 		/// 
 		/// </summary>
 		/// <param name="extensionsDir">
 		/// A <see cref="String"/>
 		/// </param>
-		public void Load(String extensionsDir)
-		{			
-			foreach(String ext in Directory.GetFiles(extensionsDir, "*.dll"))
+		public void LoadDir( String extensionsDir )
+		{
+			foreach( String ext in Directory.GetFiles( extensionsDir, "*.dll" ) )
 			{
 				// FIX: When MusiC.dll is loaded the Type.IsSubClassOf() fails.
-                // FIX: No need to load log4net classes.
-				if (
-                    Path.GetFileName(ext) == "MusiC.dll" ||
-                    Path.GetFileName(ext) == "log4net.dll"
-                    )
+				// FIX: No need to load log4net classes.
+				if(
+					Path.GetFileName( ext ) == "MusiC.dll" ||
+					Path.GetFileName( ext ) == "log4net.dll"
+					)
 
 					continue;
-					
-				try {
-					Assembly l = Assembly.LoadFrom(ext);
-					BeginReportSection(ext+" ... [LOADED]");
-					
-					foreach(Type t in l.GetExportedTypes())
-					{
-						Add(t);
-					}
-					
-					EndReportSection(true);
-				}
-				catch {
-					// Probably trying to load an unmanaged assembly.
-					Warning(ext+" ... [FAILED - UNMANAGED]");
-				}
+
+				LoadExtension( ext );
 			}
 		}
-		
+
 		//::::::::::::::::::::::::::::::::::::::://
 
-		private XElement BuildEntry(ExtensionInfo info)
+		/// <summary>
+		/// Load an extension file from the indicated path. May throw exceptions.
+		/// </summary>
+		/// <param name="ext"></param>
+		public void LoadExtension( String ext )
 		{
-			XElement entry = new XElement("MusiC.Extension");
-			entry.Add( new XAttribute("Index", _infoList.Count() ));
-			entry.Add( new XElement("Class", info.Class.FullName) );
-			entry.Add( new XElement("Kind", info.Kind.ToString()) );
-			entry.Add( new XElement("Model", info.Model.ToString()) );
+			if( !File.Exists( ext ) )
+				Error( "Extensions file " + ext + " doesn't exists." );
+
+			try
+			{
+				Assembly l = Assembly.LoadFrom( ext );
+				BeginReportSection( ext + " ... [LOADED]" );
+
+				foreach( Type t in l.GetExportedTypes() )
+				{
+					Add( t );
+				}
+
+				EndReportSection( true );
+			}
+			catch( BadImageFormatException )
+			{
+				// Probably trying to load an unmanaged assembly.
+				Warning( ext + " ... [FAILED - UNMANAGED]" );
+			}
+			catch( Exception ex )
+			{
+				Error( ex );
+			}
+		}
+
+		//::::::::::::::::::::::::::::::::::::::://
+
+		private XElement BuildEntry( ExtensionInfo info )
+		{
+			XElement entry = new XElement( "MusiC.Extension" );
+			entry.Add( new XAttribute( "Index", _infoList.Count() ) );
+			entry.Add( new XElement( "Class", info.Class.FullName ) );
+			entry.Add( new XElement( "Kind", info.Kind.ToString() ) );
+			entry.Add( new XElement( "Model", info.Model.ToString() ) );
 
 			if( info.Kind == ExtensionKind.FileHandler )
-				entry.Add( new XElement("Handler_Index", _hndPool.Count()) );
+				entry.Add( new XElement( "Handler_Index", _hndPool.Count() ) );
 
 			return entry;
 		}
-		
+
 		//::::::::::::::::::::::::::::::::::::::://
-		
-		public void Add(Type extensionType)
+
+		public void Add( Type extensionType )
 		{
-			
-			if(ExtensionInfo.Identify(extensionType) == ExtensionKind.Error)
+
+			if( ExtensionInfo.Identify( extensionType ) == ExtensionKind.Error )
 			{
-				Message(extensionType.ToString() + " ... [REJECTED]");
+				Message( extensionType.ToString() + " ... [REJECTED]" );
 				return;
 			}
-			
-			ExtensionInfo info = new ExtensionInfo(extensionType);
-			
-            // Check for duplicated entries.
-            IEnumerable<ExtensionInfo> result =
-            from ExtensionInfo _info in _infoList where _info.Class.FullName == extensionType.FullName select _info;
 
-            if (result.Count() != 0)
-            {
-                Message(extensionType.ToString() + " ... [REJECTED - DUPLICATED]");
-                return;
-            }
+			ExtensionInfo info = new ExtensionInfo( extensionType );
 
-			_root.Add(BuildEntry(info));
-			_infoList.AddLast(info);
+			// Check for duplicated entries.
+			IEnumerable<ExtensionInfo> result =
+			from ExtensionInfo _info in _infoList where _info.Class.FullName == extensionType.FullName select _info;
+
+			if( result.Count() != 0 )
+			{
+				Message( extensionType.ToString() + " ... [REJECTED - DUPLICATED]" );
+				return;
+			}
+
+			_root.Add( BuildEntry( info ) );
+			_infoList.AddLast( info );
 
 			if( info.Kind == ExtensionKind.FileHandler )
-				_hndPool.AddLast(info.Instantiate(null) as IHandler);
-			
-			Message(extensionType.ToString() + " ... [ADDED]");
+				_hndPool.AddLast( info.Instantiate( null ) as IHandler );
+
+			Message( extensionType.ToString() + " ... [ADDED]" );
 		}
-		
+
 		#endregion
-		
+
 		//::::::::::::::::::::::::::::::::::::::://
-		
+
 		#region FileHandlers Handling
-		
+
 		/// <summary>
 		/// 
 		/// </summary>
@@ -166,21 +186,21 @@ namespace MusiC.Extensions
 		/// A <see cref="Managed.Handler"/>
 		/// </returns>
 		static
-		public Managed.Handler GetManagedHandler(String file)
+		public Managed.Handler GetManagedHandler( String file )
 		{
-//			foreach(IHandler h in _handlerList)
-//			{
-//				if(h.CanHandle(file) && ExtensionManagement.Managed == ExtensionInfo.IdentifyManagement(h.GetType()))
-//				{
-//					return h as Managed.Handler;
-//				}
-//			}
-			
+			//			foreach(IHandler h in _handlerList)
+			//			{
+			//				if(h.CanHandle(file) && ExtensionManagement.Managed == ExtensionInfo.IdentifyManagement(h.GetType()))
+			//				{
+			//					return h as Managed.Handler;
+			//				}
+			//			}
+
 			return null;
 		}
-		
+
 		//::::::::::::::::::::::::::::::::::::::://
-		
+
 		/// <summary>
 		/// 
 		/// </summary>
@@ -190,36 +210,36 @@ namespace MusiC.Extensions
 		/// <returns>
 		/// A <see cref="Unmanaged.Handler"/>
 		/// </returns>
-        [CLSCompliant(false)]
+		[CLSCompliant( false )]
 		static
-		public Unmanaged.Handler GetUnmanagedHandler(String file)
+		public Unmanaged.Handler GetUnmanagedHandler( String file )
 		{
 			IHandler hnd = null;
 			// Get possible extensions
 			IEnumerable<IHandler> result =
-				from element in _root.Elements("MusiC.Extension")
-					where element.Descendants("Kind").ElementAt(0).Value == "FileHandler"
-					where (
-					       element.Descendants("Model").ElementAt(0).Value == "Unmanaged" ||
-					       element.Descendants("Model").ElementAt(0).Value == "Both"
-					       )
-					where (hnd = _hndPool.ElementAt(int.Parse( element.Elements("Handler_Index").ElementAt(0).Value ))).CanHandle(file)
-					select hnd;
-			
+				from element in _root.Elements( "MusiC.Extension" )
+				where element.Descendants( "Kind" ).ElementAt( 0 ).Value == "FileHandler"
+				where (
+					   element.Descendants( "Model" ).ElementAt( 0 ).Value == "Unmanaged" ||
+					   element.Descendants( "Model" ).ElementAt( 0 ).Value == "Both"
+					   )
+				where ( hnd = _hndPool.ElementAt( int.Parse( element.Elements( "Handler_Index" ).ElementAt( 0 ).Value ) ) ).CanHandle( file )
+				select hnd;
+
 			//Message("GetUnmanagedHandler - Handlers Found: " + result.Count());
-			
-			if (result.Count() > 0)
-				return result.ElementAt(0) as Unmanaged.Handler;
+
+			if( result.Count() > 0 )
+				return result.ElementAt( 0 ) as Unmanaged.Handler;
 			else
 				return null;
 		}
-		
+
 		#endregion
-		
+
 		//::::::::::::::::::::::::::::::::::::::://
-		
+
 		#region Configurator Handling
-		
+
 		/// <summary>
 		/// 
 		/// </summary>
@@ -230,28 +250,28 @@ namespace MusiC.Extensions
 		/// A <see cref="Configurator"/>
 		/// </returns>
 		/// <exception cref="MusiC.Exceptions.MissingExtensionException"></exception>
-		public Configurator GetConfigurator(string file)
+		public Configurator GetConfigurator( string file )
 		{
-			if(_objConfig!=null)
+			if( _objConfig != null )
 				return _objConfig;
 
 			IEnumerable<ExtensionInfo> result =
 				from ExtensionInfo info in _infoList where info.Kind == ExtensionKind.Configuration select info;
-			
+
 			if( result.Count() == 0 )
-				throw new Exceptions.MissingExtensionException("MusiC doesn't know how to load a configuration extension. Seems none was provided or aproved.");
-			
-			_objConfig = Invoker.LoadConfig(result.ElementAt(0).Class);
-			
+				throw new Exceptions.MissingExtensionException( "MusiC doesn't know how to load a configuration extension. Seems none was provided or aproved." );
+
+			_objConfig = Invoker.LoadConfig( result.ElementAt( 0 ).Class );
+
 			return _objConfig;
 		}
-		
+
 		#endregion
-		
+
 		//::::::::::::::::::::::::::::::::::::::://
-		
+
 		#region Info Handling
-		
+
 		/// <summary>
 		/// 
 		/// </summary>
@@ -261,20 +281,20 @@ namespace MusiC.Extensions
 		/// <returns>
 		/// A <see cref="ExtensionInfo"/>
 		/// </returns>
-		static public ExtensionInfo GetInfo(String className)
+		static public ExtensionInfo GetInfo( String className )
 		{
-            IEnumerable<ExtensionInfo> result =
-            from ExtensionInfo _info in _infoList where _info.Class.FullName == className select _info;
+			IEnumerable<ExtensionInfo> result =
+			from ExtensionInfo _info in _infoList where _info.Class.FullName == className select _info;
 
-			return result.ElementAt(0);
+			return result.ElementAt( 0 );
 		}
-		
+
 		#endregion
-		
+
 		//::::::::::::::::::::::::::::::::::::::://
-		
+
 		#region Checkers
-		
+
 		/// <summary>
 		/// 
 		/// </summary>
@@ -285,12 +305,12 @@ namespace MusiC.Extensions
 		{
 			IEnumerable<ExtensionInfo> result =
 				from ExtensionInfo info in _infoList where info.Kind == ExtensionKind.Configuration select info;
-			
-			return (result.Count() > 0);
+
+			return ( result.Count() > 0 );
 		}
-		
+
 		//::::::::::::::::::::::::::::::::::::::://
-		
+
 		/// <summary>
 		/// 
 		/// </summary>
@@ -301,10 +321,10 @@ namespace MusiC.Extensions
 		{
 			IEnumerable<ExtensionInfo> result =
 				from ExtensionInfo info in _infoList where info.Kind == ExtensionKind.FileHandler select info;
-			
-			return (result.Count() > 0);
+
+			return ( result.Count() > 0 );
 		}
-		
+
 		#endregion
 
 		//::::::::::::::::::::::::::::::::::::::://
@@ -314,7 +334,7 @@ namespace MusiC.Extensions
 		/// </summary>
 		public void Say()
 		{
-			Message(_doc.ToString());
+			Message( _doc.ToString() );
 		}
 	}
 }

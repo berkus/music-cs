@@ -25,53 +25,53 @@ namespace MusiC.Extensions.Features
 	unsafe
 	public class SpectralFlux : Unmanaged.Feature
 	{
-        int _size = 0;
-		float * lastframe;
+		int _size = 0;
+		float* lastframe;
 		bool first = true;
 
 		~SpectralFlux()
 		{
 			NativeMethods.Pointer.free( lastframe );
 		}
-		
+
 		override unsafe
 		public float Extract( Unmanaged.Frame frame )
 		{
-            int wndSize = frame.Size;
+			int wndSize = frame.Size;
 
 			if( lastframe == null || wndSize > _size )
 			{
-                if( lastframe != null )
-                    NativeMethods.Pointer.free(lastframe);
+				if( lastframe != null )
+					NativeMethods.Pointer.free( lastframe );
 
 				lastframe = NativeMethods.Pointer.fgetmem( wndSize );
-                _size = wndSize;
+				_size = wndSize;
 			}
 
-            float * spectrum;
+			float* spectrum;
 			if( first )
 			{
 				first = false;
-                spectrum = frame.RequestFFTMagnitude();
+				spectrum = frame.RequestFFTMagnitude();
 
-                // Copy data from fft buffer before next frame overwrites.
-                for (int idx = 0; idx < wndSize / 2; idx++)
-                    lastframe[idx] = spectrum[idx];
+				// Copy data from fft buffer before next frame overwrites.
+				for( int idx = 0; idx < wndSize / 2; idx++ )
+					lastframe[ idx ] = spectrum[ idx ];
 
 				return 0.0f;
 			}
-			
+
 			float ret = 0.0f, dif = 0.0f;
-            spectrum = frame.RequestFFTMagnitude();
-			
+			spectrum = frame.RequestFFTMagnitude();
+
 			for( int idx = 0; idx < wndSize / 2; idx++ )
 			{
-				dif = (float) ( Math.Log10( (double) spectrum[ idx ] ) - Math.Log10( ( double ) lastframe[ idx ] ) );
+				dif = ( float ) ( Math.Log10( spectrum[ idx ] != 0.0f ? spectrum[ idx ] : float.Epsilon ) - Math.Log10( lastframe[ idx ] != 0.0f ? lastframe[ idx ] : float.Epsilon ) );
 				ret += dif * dif;
 
-                lastframe[ idx ] = spectrum[ idx ];
+				lastframe[ idx ] = spectrum[ idx ];
 			}
-			
+
 			return ret;
 		}
 

@@ -35,6 +35,13 @@ namespace MusiC
 	public class Configurator : Extension
 	{
 		private Config _currentConf;
+		
+		//::::::::::::::::::::::::::::::::::::::://
+
+		public Config CurrentConfig
+		{
+			get { return _currentConf; }
+		}
 
 		//::::::::::::::::::::::::::::::::::::::://
 
@@ -51,12 +58,11 @@ namespace MusiC
 		/// <summary>
 		/// 
 		/// </summary>
-		/// <param name="algorithm">
-		/// A <see cref="IAlgorithm"/>
-		/// </param>
-		protected void AddAlgorithm( IAlgorithm algorithm )
+		/// <param name="algorithm"></param>
+		/// <returns></returns>
+		protected bool AddAlgorithm( IAlgorithm algorithm )
 		{
-			_currentConf.AddAlgorithm( algorithm );
+			return _currentConf.AddAlgorithm( algorithm );
 		}
 
 		//::::::::::::::::::::::::::::::::::::::://
@@ -64,12 +70,11 @@ namespace MusiC
 		/// <summary>
 		/// 
 		/// </summary>
-		/// <param name="label">
-		/// A <see cref="ILabel"/>
-		/// </param>
-		protected void AddTrainLabel( ILabel label )
+		/// <param name="label"></param>
+		/// <returns></returns>
+		protected bool AddTrainLabel( ILabel label )
 		{
-			_currentConf.AddTrainLabel( label as Label );
+			return _currentConf.AddTrainLabel( label as Label );
 		}
 
 		//::::::::::::::::::::::::::::::::::::::://
@@ -77,18 +82,20 @@ namespace MusiC
 		/// <summary>
 		/// 
 		/// </summary>
-		/// <param name="dir">
-		/// A <see cref="String"/>
-		/// </param>
-		/// <returns>
-		/// A <see cref="System.Boolean"/>
-		/// </returns>
-		protected void AddClassificationDir( string dir, bool recursive, string filter )
+		/// <param name="dir"></param>
+		/// <param name="recursive"></param>
+		/// <param name="filter"></param>
+		/// <returns></returns>
+		protected bool AddClassificationDir( string dir, bool recursive, string filter )
 		{
-			if( !_currentConf.AddClassificationDir( dir, recursive, filter ) )
+			bool ret;
+
+			if( !(ret = _currentConf.AddClassificationDir( dir, recursive, filter )) )
 			{
 				Warning( "A non-existent directory (" + dir + ") wasn't added to the processing queue." );
 			}
+
+			return ret;
 		}
 
 		//::::::::::::::::::::::::::::::::::::::://
@@ -96,18 +103,18 @@ namespace MusiC
 		/// <summary>
 		/// 
 		/// </summary>
-		/// <param name="dir">
-		/// A <see cref="String"/>
-		/// </param>
-		/// <returns>
-		/// A <see cref="System.Boolean"/>
-		/// </returns>
-		protected void AddClassificationFile( string file )
+		/// <param name="file"></param>
+		/// <returns></returns>
+		protected bool AddClassificationFile( string file )
 		{
-			if( !_currentConf.AddClassificationFile( file ) )
+			bool ret;
+
+			if( !(ret = _currentConf.AddClassificationFile( file )) )
 			{
 				Warning( "A non-existent file (" + file + ") wasn't added to the processing queue." );
 			}
+
+			return ret;
 		}
 
 		//::::::::::::::::::::::::::::::::::::::://

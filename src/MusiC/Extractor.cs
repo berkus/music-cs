@@ -97,15 +97,33 @@ namespace MusiC
 			/// A <see cref="Data.Unmanaged.FileData"/>
 			/// </param>
 			static unsafe
-			public void Extract( Window wnd, IEnumerable<Feature> featList, Data.Unmanaged.FileData* dataStg )
+			public Data.Unmanaged.FileData* Extract( Window wnd, IEnumerable<Feature> featList, Config cfg )
 			{
 				int fIdx;
-				//float * windowBuffer;
 				Frame dataFrame;
+				int featCount = 0;
 
 				BaseHandler bdb = wnd.HandlerInterface as BaseHandler;
 				DBHandler db = bdb.GetDBHandler();
-				int featCount = 0;
+
+				// Options
+				bool ok, save, force_extract;
+
+				ok = cfg.GetBoolOption( Config.Option.ALLOW_SAVE, out save );
+				if( !ok ) save = true;
+
+				ok = cfg.GetBoolOption( Config.Option.FORCE_EXTRACT, out force_extract );
+				if( !ok ) force_extract = false;
+
+				uint frameCount = 2944;
+
+				uint samples = ( uint ) ( frameCount * ( wnd.WindowSize - wnd.WindowOverlap ) + wnd.WindowOverlap );
+				// Centering Samples
+				uint first_sample = ( uint ) Math.Floor( ( float ) ( wnd.HandlerInterface.GetStreamSize() - ( samples ) ) / 2 );
+				//uint last_sample = first_sample + frameCount - 1;
+
+				if( frameCount > wnd.WindowCount )
+					return null;
 
 				LinkedList<FeatureHelper> parsedList = new LinkedList<FeatureHelper>();
 
@@ -137,7 +155,12 @@ namespace MusiC
 					parsedList.AddLast( fh );
 				}
 
-				for( int i = 0; i < wnd.WindowCount; i++ )
+				//reporter.AddMessage( "Number of Frames: " + wnd.WindowCount );
+
+				Data.Unmanaged.FileData* dataStg = Data.Unmanaged.DataHandler.BuildFileData();
+				
+				float value;
+				for( uint i = 0; i < frameCount; i++ )
 				{
 					Data.Unmanaged.FrameData* frame =
 						Data.Unmanaged.DataHandler.BuildFrameData( featCount );
@@ -147,44 +170,43 @@ namespace MusiC
 					fIdx = 0;
 					foreach( FeatureHelper fh in parsedList )
 					{
-						if( fh.extracted )
+						if( !fh.extracted || force_extract )
 						{
-							// If the data has been extracted already get the value correspondent
-							// to the current window.
-							*( frame->pData + fIdx ) = *( fh.data + i );
-						}
-						else
-						{
-							dataFrame = wnd.GetWindow( i );
+							dataFrame = wnd.GetWindow( i, first_sample );
 
 							if( !dataFrame.IsValid() )
-								continue;
+								break;
 
 							// if it hasn't been extracted yet then extract it and prepare to store it.
+							value = fh.feat.Extract( dataFrame );
+							
+							if( float.IsInfinity( value ) || float.IsNaN( value ) )
+								break;
 
-							// This code breaks mono compiler. It generates invalid IL instructions.
-							//*(fh.data + i) = *(frame->pData + fIdx) = fh.feat.Extract(windowBuffer, wnd.WindowSize);
-
-							// FIX: Mono Bad IL Instructions Generated
-							float val = fh.feat.Extract( dataFrame );
-							*( frame->pData + fIdx ) = val;
-							*( fh.data + i ) = val;
+							*( fh.data + i ) = value;
 						}
+
+						*( frame->pData + fIdx ) = *( fh.data + i );
 
 						fIdx++;
 					}
 				}
 
-				// storing unextracted data.
-				foreach( FeatureHelper fh in parsedList )
+				if( save )
 				{
-					if( !fh.extracted )
-						db.AddFeature( wnd.GetID(), fh.feat.GetID(), fh.data, wnd.WindowCount );
+					// storing unextracted data.
+					foreach( FeatureHelper fh in parsedList )
+					{
+						if( !fh.extracted || force_extract )
+							db.AddFeature( wnd.GetID(), fh.feat.GetID(), fh.data, wnd.WindowCount );
 
-					NativeMethods.Pointer.free( fh.data );
+						NativeMethods.Pointer.free( fh.data );
+					}
+
+					db.Terminate();
 				}
 
-				db.Terminate();
+				return dataStg;
 			}
 		}
 	}

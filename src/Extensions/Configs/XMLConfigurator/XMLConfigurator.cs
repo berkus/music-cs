@@ -87,6 +87,9 @@ namespace MusiC.Extensions.Configs
 					case "MusiC-Algorithm":
 						HandleNode_Algorithm( node );
 						break;
+					case "MusiC-Option":
+						HandleNode_Options( node );
+						break;
 				}
 			}
 		}
@@ -142,7 +145,7 @@ namespace MusiC.Extensions.Configs
 		//::::::::::::::::::::::::::::::::::::::://
 
 		/// <summary>
-		/// Get attributes from a xml node. 
+		/// Safely retrieve attributes from a xml node. Attributes are considered non-optional.
 		/// </summary>
 		/// <param name="n">The System.XmlNode here the attribute might be</param>
 		/// <param name="attName">The System.Attribute name</param>
@@ -182,9 +185,10 @@ namespace MusiC.Extensions.Configs
 					{
 						switch( node_path.Name )
 						{
-							case "Dir":
+							case "TrainDir":
 								path = XmlSafeAttribute( node_path, "path", true );
-								if( path == null ) { path = System.IO.Path.Combine( baseDir, l.Name ); }
+								if( path == null ) { path = System.IO.Path.Combine( baseDir, l.Name ); } // path undeclared
+								else { if( !Path.IsPathRooted( path ) ) { path = System.IO.Path.Combine( baseDir, path ); } }
 
 								string recursive_text = XmlSafeAttribute( node_path, "recursive", true );
 								string filter = XmlSafeAttribute( node_path, "filter", true );
@@ -199,7 +203,7 @@ namespace MusiC.Extensions.Configs
 								l.AddInputDir( path, recursive, filter );
 								break;
 
-							case "File":
+							case "TrainFile":
 								path = XmlSafeAttribute( node_path, "path" );
 								l.AddInputFile( path );
 								break;
@@ -231,7 +235,7 @@ namespace MusiC.Extensions.Configs
 
 				switch( node.Name )
 				{
-					case "Dir":
+					case "ClassDir":
 						path = XmlSafeAttribute( node, "path" );
 						string recursive_text = XmlSafeAttribute( node, "recursive", true );
 						string filter = XmlSafeAttribute( node, "filter", true );
@@ -246,7 +250,7 @@ namespace MusiC.Extensions.Configs
 						AddClassificationDir( path, recursive, filter );
 						break;
 
-					case "File":
+					case "ClassFile":
 						path = XmlSafeAttribute( node, "path" );
 						AddClassificationFile( path );
 						break;
@@ -272,7 +276,7 @@ namespace MusiC.Extensions.Configs
 
 			foreach( XmlNode child in node_algorithm.ChildNodes )
 			{
-				if( child.Name == "MusiC-Extension" )
+				if( child.Name == "Extension" )
 				{
 					className = XmlSafeAttribute( child, "class" );
 				}
@@ -280,7 +284,7 @@ namespace MusiC.Extensions.Configs
 				{
 					if( !_tagCache.TryGetValue( child.Name, out className ) )
 					{
-						Warning( "Cant find tag " + child.Name );
+						Error( "Cant find tag " + child.Name );
 						break;
 					}
 				}
@@ -293,7 +297,6 @@ namespace MusiC.Extensions.Configs
 						continue;
 
 					paramList.AddParam(
-									   XmlSafeAttribute( param, "name" ),
 									   XmlSafeAttribute( param, "class" ),
 									   XmlSafeAttribute( param, "value", true ) );
 				}
@@ -312,6 +315,28 @@ namespace MusiC.Extensions.Configs
 			}
 
 			AddAlgorithm( algorithm );
+		}
+
+		//::::::::::::::::::::::::::::::::::::::://
+
+		/// <summary>
+		/// 
+		/// </summary>
+		/// <param name="node_options"></param>
+		public void HandleNode_Options( XmlNode node_options )
+		{
+			string id = XmlSafeAttribute( node_options, "name" );
+			
+			if( id == null )
+			{
+				Warning("The option id (case INSENSITIVE) must be specified ... Skipping.");
+				return;
+			}
+
+			bool ok = false;
+			ok = CurrentConfig.AddOption( id, XmlSafeAttribute( node_options, "value" ) ); 
+
+			if( !ok ) Error("The Option " + id + " wasnt recognized." );
 		}
 
 		#endregion
